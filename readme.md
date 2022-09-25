@@ -6,6 +6,19 @@ and/or need of having contract's code in-order to generate java wrappers for con
 
 # Sample code
 
+Getting USDT balance on BSC Testnet using kWeb3:
+
+```java
+interface Erc20 extends Contract {
+    @View
+    Uint256 balanceOf(Address account);
+}
+
+var client = Web3Client.createClient(new Web3Wallet(privateKey), Chains.BSC_TESTNET);
+var usdt = client.getContract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
+var balance = usdt.balanceOf(client.getAddress());  // Uint256
+```
+
 Getting USDT balance on BSC Testnet using Web3j:
 
 ```java
@@ -25,19 +38,6 @@ var transaction = Transaction.createEthCallTransaction(
 var result = web3j.ethCall(transaction,DefaultBlockParameter.valueOf("latest")).send().getResult();
 var values = FunctionReturnDecoder.decode(function.getOutputParameters());
 var balance = values.get(0); // Uint256
-```
-
-Getting USDT balance on BSC Testnet using kWeb3:
-
-```java
-interface Erc20 extends Contract {
-    @View
-    Uint256 balanceOf(Address account);
-}
-
-var client = Web3Client.createClient(new Web3Wallet(privateKey), Chains.BSC_TESTNET);
-var usdt = client.getContract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
-var balance = usdt.balanceOf(client.getAddress());  // Uint256
 ```
 
 # Convertible Types
@@ -146,13 +146,13 @@ Type representation and convertability.
 
 | Solidity Type     | Java Types                                            |
 |-------------------|-------------------------------------------------------|
-| Address (Uint160) | String, BigInteger, BigDecimal                        |
+| Address (uint160) | String, BigInteger, BigDecimal                        |
 | uint              | String, BigInteger, BigDecimal                        |
 | bytes             | byte[]                                                |
 | dynamic array     | `Type[]` or `List<Type>` of any java or solidity type |
 | <b>bool*</b>      | boolean                                               |
 | <b>string*</b>    | String                                                |
-| <b>struct**</b>       | java.lang.Class                                     |
+| <b>struct**</b>   | java.lang.Class                                     |
 | int               | <i>to be implemented</i>                              |
 | fixed             | <i>to be implemented</i>                              |
 | array\[size]      | <i>to be implemented</i>                              |
