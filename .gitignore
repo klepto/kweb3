@@ -1,0 +1,7 @@
+.gradle/
+.idea/
+out/
+build/
+test/
+pk
+key
