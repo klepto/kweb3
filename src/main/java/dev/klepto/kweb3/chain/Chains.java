@@ -24,4 +24,12 @@ public class Chains {
             "https://data-seed-prebsc-1-s1.binance.org:8545"
     );
 
+    public static final Chain CRONOS = new Chain(
+            25,
+            "Cronos",
+            "CRO",
+            "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23",
+            "https://evm.cronos.org"
+    );
+
 }
