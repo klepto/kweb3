@@ -1,10 +1,7 @@
 package dev.klepto.kweb3.contract.codec;
 
 import com.google.common.reflect.TypeToken;
-import dev.klepto.kweb3.type.convert.BigDecimalValue;
-import dev.klepto.kweb3.type.convert.BigIntegerValue;
-import dev.klepto.kweb3.type.convert.ByteArrayValue;
-import dev.klepto.kweb3.type.convert.StringValue;
+import dev.klepto.kweb3.type.convert.*;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -87,7 +84,13 @@ public class ContractDecoder {
             return decodeReturnValues(arrayToList(((Object[]) value)), type);
         }
 
-        if (BigDecimal.class == rawType && value instanceof BigDecimalValue) {
+        if ((int.class == rawType || Integer.class == rawType) && value instanceof IntValue) {
+            return ((IntValue) value).getIntValue();
+        } else if ((long.class == rawType || Long.class == rawType) && value instanceof LongValue) {
+            return ((LongValue) value).getLongValue();
+        } else if ((double.class == rawType || Double.class == rawType) && value instanceof DoubleValue) {
+            return ((DoubleValue) value).getDoubleValue();
+        } else if (BigDecimal.class == rawType && value instanceof BigDecimalValue) {
             return ((BigDecimalValue) value).getBigDecimalValue();
         } else if (BigInteger.class == rawType && value instanceof BigIntegerValue) {
             return ((BigIntegerValue) value).getBigIntegerValue();

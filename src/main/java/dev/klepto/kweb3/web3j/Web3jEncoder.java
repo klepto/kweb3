@@ -54,6 +54,8 @@ public class Web3jEncoder {
             val parameterizedName = type.isArray() ? typeName + "[]" : typeName;
             return TypeReference.makeTypeReference(parameterizedName, indexed, false);
         } catch (Exception e) {
+            e.printStackTrace();
+
             throw new Web3Error("Couldn't encode type {} to web3j.", type);
         }
     }

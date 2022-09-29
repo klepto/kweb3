@@ -25,12 +25,20 @@ public class Uint256 extends Uint implements Math<Uint256> {
         this(value.toBigInteger());
     }
 
+    public Uint256(int value) {
+        this(BigInteger.valueOf(value));
+    }
+
     public static Uint256 uint256(BigInteger value) {
         return new Uint256(value);
     }
 
     public static Uint256 uint256(long value) {
         return uint256(BigInteger.valueOf(value));
+    }
+
+    public static Uint256 uint256(byte[] value) {
+        return uint256(Numbers.toBigInteger(value));
     }
 
     public static Uint256 ether(double value) {

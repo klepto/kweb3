@@ -9,6 +9,7 @@ import dev.klepto.kweb3.contract.event.Event;
 import dev.klepto.kweb3.contract.event.Indexed;
 import dev.klepto.kweb3.type.SolidityType;
 import dev.klepto.kweb3.type.Struct;
+import dev.klepto.kweb3.util.Reflection;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -67,9 +68,7 @@ public class ContractEncoder {
         }
 
         // Attempt calling constructor of solidity type with given value.
-        val constructor = solidityType.getDeclaredConstructor(value.getClass());
-        constructor.setAccessible(true);
-        return constructor.newInstance(value);
+        return Reflection.create(solidityType, value);
     }
 
     @SneakyThrows

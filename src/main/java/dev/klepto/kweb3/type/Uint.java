@@ -2,6 +2,7 @@ package dev.klepto.kweb3.type;
 
 import dev.klepto.kweb3.type.convert.BigDecimalValue;
 import dev.klepto.kweb3.type.convert.BigIntegerValue;
+import dev.klepto.kweb3.type.convert.NumberValue;
 import dev.klepto.kweb3.type.convert.StringValue;
 import dev.klepto.kweb3.util.Numbers;
 import lombok.Getter;
@@ -15,18 +16,13 @@ import java.math.BigInteger;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Getter
-public abstract class Uint extends SolidityType implements BigDecimalValue, BigIntegerValue, StringValue {
+public abstract class Uint extends SolidityType implements NumberValue, StringValue {
 
     private final BigInteger value;
 
     public Uint(String encodedName, BigInteger value) {
         super(encodedName);
         this.value = value;
-    }
-
-    @Override
-    public BigInteger getBigIntegerValue() {
-        return getValue();
     }
 
     @Override

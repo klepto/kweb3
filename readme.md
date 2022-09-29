@@ -146,13 +146,13 @@ Type representation and convertability.
 
 | Solidity Type     | Java Types                                            |
 |-------------------|-------------------------------------------------------|
-| Address (uint160) | String, BigInteger, BigDecimal                        |
-| uint              | String, BigInteger, BigDecimal                        |
+| Address (uint160) | String, BigInteger                       |
+| uint              | int, long, double, String, BigInteger, BigDecimal     |
 | bytes             | byte[]                                                |
 | dynamic array     | `Type[]` or `List<Type>` of any java or solidity type |
 | <b>bool*</b>      | boolean                                               |
 | <b>string*</b>    | String                                                |
-| <b>struct**</b>   | java.lang.Class                                     |
+| <b>struct**</b>   | java.lang.Class                                       |
 | int               | <i>to be implemented</i>                              |
 | fixed             | <i>to be implemented</i>                              |
 | array\[size]      | <i>to be implemented</i>                              |

@@ -1,5 +1,9 @@
 package dev.klepto.kweb3.util;
 
+import dev.klepto.kweb3.type.Bytes;
+import dev.klepto.kweb3.type.Uint256;
+import lombok.val;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -36,6 +40,19 @@ public class Numbers {
 
     public static BigDecimal toEther(BigDecimal value, int scale) {
         return value.divide(WEI_IN_ETHER, scale, RoundingMode.FLOOR);
+    }
+
+    public static BigInteger toBigInteger(byte[] value) {
+        return new BigInteger(value);
+    }
+
+    public static BigInteger toBigInteger(Bytes value) {
+        return toBigInteger(value.getByteArrayValue());
+    }
+
+    public static BigInteger toBigInteger(String value) {
+        val hex = value.replace("0x", "");
+        return new BigInteger(hex, 16);
     }
 
 }
