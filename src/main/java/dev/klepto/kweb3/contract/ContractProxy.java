@@ -8,6 +8,7 @@ import dev.klepto.kweb3.contract.codec.ContractCodec;
 import dev.klepto.kweb3.contract.codec.ContractDecoder;
 import dev.klepto.kweb3.contract.codec.ContractEncoder;
 import dev.klepto.kweb3.type.*;
+import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +34,17 @@ public class ContractProxy implements InvocationHandler {
     private final Address address;
 
     @Override
+    @SneakyThrows
     public Object invoke(Object proxy, Method method, Object[] args) {
+        if (method.isDefault()) {
+            return InvocationHandler.invokeDefault(proxy, method, args);
+        }
+
         switch (method.getName()) {
             case "getAddress":
                 return address;
+            case "getClient":
+                return client;
             default:
                 return contractCall(method, args);
         }
