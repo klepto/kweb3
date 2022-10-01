@@ -6,12 +6,10 @@ import dev.klepto.kweb3.gas.LegacyGasFee;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.Transaction;
-import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -19,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.type.sized.Uint256.uint256;
+import static dev.klepto.kweb3.util.Logging.debug;
 
 /**
  * Default gas price provider. Selects gas price based on gas prices used in the latest block. Selected price is always
@@ -26,7 +25,6 @@ import static dev.klepto.kweb3.type.sized.Uint256.uint256;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@Slf4j
 @RequiredArgsConstructor
 public class Web3jGasProvider implements GasFeeProvider {
 
@@ -110,9 +108,9 @@ public class Web3jGasProvider implements GasFeeProvider {
                 medianMaxPriorityFee
         );
 
-        log.debug("Latest gas price: {}", gasPrice);
-        log.debug("Latest max fee: {}", maxFee);
-        log.debug("Latest priority fee: {}", maxPriorityFee);
+        debug("Latest gas price: {}", gasPrice);
+        debug("Latest max fee: {}", maxFee);
+        debug("Latest priority fee: {}", maxPriorityFee);
         return new GasFeeStats(
                 gasPrice,
                 maxFee,

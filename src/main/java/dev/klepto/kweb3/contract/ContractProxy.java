@@ -11,7 +11,6 @@ import dev.klepto.kweb3.type.*;
 import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.lang.reflect.*;
@@ -26,7 +25,6 @@ import static dev.klepto.kweb3.Web3Error.require;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@Slf4j
 @RequiredArgsConstructor
 public class ContractProxy implements InvocationHandler {
 
