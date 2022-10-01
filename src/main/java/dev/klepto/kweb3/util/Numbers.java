@@ -1,8 +1,7 @@
 package dev.klepto.kweb3.util;
 
+import com.google.common.io.BaseEncoding;
 import dev.klepto.kweb3.type.Bytes;
-import dev.klepto.kweb3.type.Uint256;
-import lombok.val;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -51,8 +50,19 @@ public class Numbers {
     }
 
     public static BigInteger toBigInteger(String value) {
-        val hex = value.replace("0x", "");
-        return new BigInteger(hex, 16);
+        return new BigInteger(stripHexPrefix(value), 16);
+    }
+
+    public static byte[] toByteArray(BigInteger value) {
+        return toByteArray(value.toString(16));
+    }
+
+    public static byte[] toByteArray(String value) {
+        return BaseEncoding.base16().decode(stripHexPrefix(value.toUpperCase()));
+    }
+
+    private static String stripHexPrefix(String value) {
+        return value.replace("0X", "");
     }
 
 }
