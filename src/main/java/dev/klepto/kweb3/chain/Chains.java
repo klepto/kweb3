@@ -29,7 +29,7 @@ public class Chains {
             "Cronos",
             "CRO",
             "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23",
-            "https://evm.cronos.org"
+            "https://node.croswap.com/rpc"
     );
 
 }
