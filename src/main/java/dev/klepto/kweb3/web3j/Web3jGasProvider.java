@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static dev.klepto.kweb3.type.Uint256.uint256;
+import static dev.klepto.kweb3.type.sized.Uint256.uint256;
 
 /**
  * Default gas price provider. Selects gas price based on gas prices used in the latest block. Selected price is always
@@ -42,8 +42,7 @@ public class Web3jGasProvider implements GasFeeProvider {
 
         val baseFeePerGas = block.getBaseFeePerGas() == null
                 ? BigInteger.ZERO
-                : Numeric.decodeQuantity(block.getBaseFeePerGas())
-                .multiply(BigInteger.TEN.pow(9));
+                : block.getBaseFeePerGas().multiply(BigInteger.TEN.pow(9));
 
         val transactions = block.getTransactions().stream()
                 .map(Transaction.class::cast)
@@ -61,7 +60,6 @@ public class Web3jGasProvider implements GasFeeProvider {
         var maxFeesPerGas = transactions.stream()
                 .map(Transaction::getMaxFeePerGas)
                 .filter(Objects::nonNull)
-                .map(Numeric::decodeQuantity)
                 .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
                 .sorted(BigInteger::compareTo)
                 .collect(Collectors.toList());
@@ -72,7 +70,6 @@ public class Web3jGasProvider implements GasFeeProvider {
         var maxPriorityFeesPerGas = transactions.stream()
                 .map(Transaction::getMaxPriorityFeePerGas)
                 .filter(Objects::nonNull)
-                .map(Numeric::decodeQuantity)
                 .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
                 .sorted(BigInteger::compareTo)
                 .collect(Collectors.toList());
