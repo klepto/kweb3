@@ -146,7 +146,7 @@ Type representation and convertability.
 
 | Solidity Type     | Java Types                                            |
 |-------------------|-------------------------------------------------------|
-| Address (uint160) | String, BigInteger                       |
+| Address (uint160) | String, BigInteger                                    |
 | uint              | int, long, double, String, BigInteger, BigDecimal     |
 | bytes             | byte[]                                                |
 | dynamic array     | `Type[]` or `List<Type>` of any java or solidity type |
