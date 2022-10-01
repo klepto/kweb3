@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.util;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.internal.Primitives;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -50,6 +51,16 @@ public class Reflection {
 
         constructor.setAccessible(true);
         return (Constructor<T>) constructor;
+    }
+
+    public interface Creatable<T> {
+
+        @SneakyThrows
+        default T create(Object... args) {
+            val type = new TypeToken<T>(getClass()) {}.getRawType();
+            return (T) Reflection.create(type, args);
+        }
+
     }
 
 

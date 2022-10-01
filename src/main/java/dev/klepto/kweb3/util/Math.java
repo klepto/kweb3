@@ -12,7 +12,7 @@ import java.math.RoundingMode;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Math<T extends BigDecimalValue> extends TypeInitializer<T>, BigDecimalValue {
+public interface Math<T extends BigDecimalValue> extends Reflection.Creatable<T>, BigDecimalValue {
 
     default T add(BigDecimalValue value) {
         val newValue = getBigDecimalValue().add(value.getBigDecimalValue());
