@@ -1,6 +1,9 @@
 package dev.klepto.kweb3.type;
 
+import com.google.common.base.Strings;
+import dev.klepto.kweb3.type.sized.Uint160;
 import dev.klepto.kweb3.util.Keccak;
+import dev.klepto.kweb3.util.Numbers;
 import lombok.val;
 
 import java.math.BigInteger;
@@ -22,6 +25,10 @@ public class Address extends Uint160 {
 
     public Address(String value) {
         this(getBigInteger(value));
+    }
+
+    public Address(byte[] value) {
+        this(Numbers.toBigInteger(value));
     }
 
     @Override
@@ -57,7 +64,7 @@ public class Address extends Uint160 {
         address = address.toLowerCase().replace("0x", "");
         val hash = Keccak.hash(address);
 
-        val result = new StringBuilder("0x");
+        val result = new StringBuilder();
         for (var i = 0; i < address.length(); i++) {
             val character = address.charAt(i) + "";
             val checksum = hash.charAt(i) + "";
@@ -65,7 +72,8 @@ public class Address extends Uint160 {
             result.append(uppercase ? character.toUpperCase() : character);
         }
 
-        return result.toString();
+        address = result.toString();
+        return "0x" + Strings.padStart(address, 40, '0');
     }
 
     @Override
