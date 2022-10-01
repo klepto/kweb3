@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 
 /**
- * Numberic utility methods.
+ * Numeric utility methods.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
