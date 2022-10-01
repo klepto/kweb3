@@ -3,7 +3,7 @@ package dev.klepto.kweb3.contract.codec;
 import com.google.common.reflect.TypeToken;
 import dev.klepto.kweb3.contract.Type;
 import dev.klepto.kweb3.type.SolidityType;
-import dev.klepto.kweb3.type.Uint256;
+import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.SneakyThrows;
 import lombok.val;
 

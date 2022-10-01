@@ -2,6 +2,7 @@ package dev.klepto.kweb3.web3j;
 
 import dev.klepto.kweb3.Web3Error;
 import dev.klepto.kweb3.type.*;
+import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.val;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.DynamicArray;

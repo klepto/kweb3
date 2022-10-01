@@ -21,7 +21,7 @@ public class Web3jDecoder {
                     .map(this::decodeValue)
                     .toArray();
         } else if (value instanceof Uint256) {
-            return new dev.klepto.kweb3.type.Uint256(((Uint256) value).getValue());
+            return new dev.klepto.kweb3.type.sized.Uint256(((Uint256) value).getValue());
         } else if (value instanceof String) {
             return new dev.klepto.kweb3.type.Address((String) value);
         } else if (value instanceof Address) {

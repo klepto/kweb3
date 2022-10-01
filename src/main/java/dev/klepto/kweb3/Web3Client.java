@@ -6,7 +6,7 @@ import dev.klepto.kweb3.contract.Contract;
 import dev.klepto.kweb3.contract.ContractProxy;
 import dev.klepto.kweb3.gas.GasFeeProvider;
 import dev.klepto.kweb3.type.Address;
-import dev.klepto.kweb3.type.Uint256;
+import dev.klepto.kweb3.type.sized.Uint256;
 import dev.klepto.kweb3.web3j.Web3jClient;
 
 import java.lang.reflect.Proxy;

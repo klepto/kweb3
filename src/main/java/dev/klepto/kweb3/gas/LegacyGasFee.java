@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.gas;
 
-import dev.klepto.kweb3.type.Uint256;
+import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.Value;
 
 /**

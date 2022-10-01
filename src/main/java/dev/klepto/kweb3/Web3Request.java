@@ -2,7 +2,7 @@ package dev.klepto.kweb3;
 
 import dev.klepto.kweb3.contract.Function;
 import dev.klepto.kweb3.type.Address;
-import dev.klepto.kweb3.type.Uint256;
+import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.Value;
 
 import java.util.List;

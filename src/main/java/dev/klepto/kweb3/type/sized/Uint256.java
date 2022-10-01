@@ -1,5 +1,6 @@
-package dev.klepto.kweb3.type;
+package dev.klepto.kweb3.type.sized;
 
+import dev.klepto.kweb3.type.Uint;
 import dev.klepto.kweb3.util.Math;
 import dev.klepto.kweb3.util.Numbers;
 
