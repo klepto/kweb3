@@ -1,11 +1,9 @@
 package dev.klepto.kweb3.web3j;
 
 import dev.klepto.kweb3.Web3Error;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.DynamicArray;
-import org.web3j.abi.datatypes.DynamicBytes;
-import org.web3j.abi.datatypes.Utf8String;
-import org.web3j.abi.datatypes.generated.Uint256;
+import dev.klepto.kweb3.util.Reflection;
+import lombok.val;
+import org.web3j.abi.datatypes.*;
 
 /**
  * Decodes Web3j types into solidity types.
@@ -20,8 +18,9 @@ public class Web3jDecoder {
                     .stream()
                     .map(this::decodeValue)
                     .toArray();
-        } else if (value instanceof Uint256) {
-            return new dev.klepto.kweb3.type.sized.Uint256(((Uint256) value).getValue());
+        } else if (value instanceof Uint) {
+            val className = "dev.klepto.kweb3.type.sized." + value.getClass().getSimpleName();
+            return Reflection.create(className, ((Uint) value).getValue());
         } else if (value instanceof String) {
             return new dev.klepto.kweb3.type.Address((String) value);
         } else if (value instanceof Address) {
