@@ -30,6 +30,8 @@ public interface Web3Client {
         );
     }
 
+    Uint256 balanceOf(Address address);
+
     Web3Response send(Web3Request request);
 
     String abiEncode(Web3Request request);

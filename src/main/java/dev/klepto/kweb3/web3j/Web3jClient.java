@@ -58,7 +58,7 @@ public class Web3jClient implements Web3Client {
         val session = createSession();
         val function = encodeFunction(request);
         val data = FunctionEncoder.encode(function);
-        val to = request.getAddress().getStringValue();
+        val to = request.getAddress().toString();
         val defaultBlockParameter = DefaultBlockParameter.valueOf("latest");
 
         if (logMode == LogMode.ABI) {
@@ -75,7 +75,7 @@ public class Web3jClient implements Web3Client {
                     .stream().map(decoder::decodeValue).collect(Collectors.toList());
             return new Web3Response(null, request, null, result, Collections.emptyList());
         } else {
-            val gasLimit = estimateGas(request, session, data).getBigIntegerValue();
+            val gasLimit = estimateGas(request, session, data).toBigInteger();
             val gasProvider = gasFeeProvider != null ? gasFeeProvider : new Web3jGasProvider(session.getWeb3j());
             val gasFee = gasProvider.getGasFee();
             val legacyGasFee = gasProvider.getLegacyGasFee();
@@ -183,6 +183,16 @@ public class Web3jClient implements Web3Client {
     }
 
     @Override
+    @SneakyThrows
+    public Uint256 balanceOf(Address address) {
+        val session = createSession();
+        val balance = session.getWeb3j()
+                .ethGetBalance(address.toString(), DefaultBlockParameter.valueOf("latest"))
+                .send();
+        return new Uint256(balance.getBalance());
+    }
+
+    @Override
     public String abiEncode(Web3Request request) {
         return FunctionEncoder.encode(encodeFunction(request));
     }
@@ -208,10 +218,10 @@ public class Web3jClient implements Web3Client {
     @SneakyThrows
     private Uint256 estimateGas(Web3Request request, Web3jSession session, String data) {
         val nonce = session.getWeb3j().ethGetTransactionCount(
-                getAddress().getStringValue(), DefaultBlockParameterName.PENDING
+                getAddress().toString(), DefaultBlockParameterName.PENDING
         ).send().getTransactionCount();
         val from = getAddress().toString();
-        val to = request.getAddress().getStringValue();
+        val to = request.getAddress().toString();
         val transaction = request.getFunction().isView()
                 ? Transaction.createEthCallTransaction(from, to, data)
                 : Transaction.createFunctionCallTransaction(from, nonce, BigInteger.ZERO, BigInteger.ZERO, to, data);
