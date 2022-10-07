@@ -34,7 +34,7 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
     }
 
     default T div(Object value) {
-        val newValue = toBigDecimal().divide(toBigDecimal(value), RoundingMode.FLOOR);
+        val newValue = toBigDecimal().divide(toBigDecimal(value), Tokens.DEFAULT_DECIMALS, RoundingMode.FLOOR);
         return create(newValue);
     }
 
@@ -281,6 +281,11 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
 
         public BigDecimalNumeric(Object value) {
             this.value = Numeric.toBigDecimal(value);
+        }
+
+        @Override
+        public String toString() {
+            return getValue().toPlainString();
         }
     }
 
