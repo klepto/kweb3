@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.type;
 
-import dev.klepto.kweb3.util.function.Numeric;
+import dev.klepto.kweb3.util.number.Numeric;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

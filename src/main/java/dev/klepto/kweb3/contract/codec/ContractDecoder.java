@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.contract.codec;
 
 import com.google.common.reflect.TypeToken;
-import dev.klepto.kweb3.util.function.Numeric;
+import dev.klepto.kweb3.util.number.Numeric;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.Web3Error.error;
 import static dev.klepto.kweb3.Web3Error.require;
-import static dev.klepto.kweb3.util.Collections.arrayCast;
-import static dev.klepto.kweb3.util.Collections.arrayToList;
+import static dev.klepto.kweb3.util.Collections.cast;
+import static dev.klepto.kweb3.util.Collections.list;
 
 /**
  * Utilities for decoding web3 contract responses.
@@ -39,7 +39,7 @@ public class ContractDecoder {
             val decodedValues = values.stream()
                     .map(value -> decodeReturnValue(value, componentType))
                     .collect(Collectors.toList());
-            return type.isArray() ? arrayCast(decodedValues.toArray(), componentType.getRawType()) : decodedValues;
+            return type.isArray() ? cast(decodedValues.toArray(), componentType.getRawType()) : decodedValues;
         }
 
         // Decode structs.
@@ -79,7 +79,7 @@ public class ContractDecoder {
         }
 
         if (value.getClass().isArray()) {
-            return decodeReturnValues(arrayToList(((Object[]) value)), type);
+            return decodeReturnValues(list(((Object[]) value)), type);
         }
 
         if (value instanceof Numeric<?,?>) {

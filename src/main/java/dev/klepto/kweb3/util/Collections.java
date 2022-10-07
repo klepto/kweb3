@@ -5,7 +5,6 @@ import lombok.val;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Collection utility methods.
@@ -18,17 +17,17 @@ public class Collections {
         return elements;
     }
 
-    public static <T> List<T> arrayToList(T[] elements) {
-        return Arrays.stream(elements).collect(Collectors.toList());
+    public static <T> List<T> list(T... elements) {
+        return Arrays.stream(elements).toList();
     }
 
-    public static <T> T[] arrayCast(Object[] array, Class<T> componentType) {
+    public static <T> T[] cast(Object[] array, Class<T> componentType) {
         val newArray = Array.newInstance(componentType, array.length);
         System.arraycopy(array, 0, newArray, 0, array.length);
         return (T[]) newArray;
     }
 
-    public static <T> T[] arrayRemove(T[] array, int index) {
+    public static <T> T[] remove(T[] array, int index) {
         if (index < 0 || index >= array.length) {
             return array;
         }

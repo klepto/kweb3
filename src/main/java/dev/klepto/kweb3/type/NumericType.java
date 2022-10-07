@@ -1,14 +1,14 @@
 package dev.klepto.kweb3.type;
 
-import dev.klepto.kweb3.util.function.Numeric;
-import dev.klepto.kweb3.util.function.ValueContainer;
+import dev.klepto.kweb3.util.number.Numeric;
+import dev.klepto.kweb3.util.number.Valueable;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public abstract class NumericType<T extends SolidityType<T, V>, V> extends SolidityType<T, V>
-        implements Numeric<T, V>, Comparable<Object>, ValueContainer<V> {
+        implements Numeric<T, V>, Comparable<Object>, Valueable<V> {
 
     @Override
     public int compareTo(@NotNull Object value) {

@@ -1,11 +1,11 @@
-package dev.klepto.kweb3.util.function;
+package dev.klepto.kweb3.util.number;
 
 import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.internal.Primitives;
 import dev.klepto.kweb3.type.Bytes;
 import dev.klepto.kweb3.type.sized.*;
-import dev.klepto.kweb3.util.Tokens;
+import dev.klepto.kweb3.util.reflection.Creatable;
 import lombok.Getter;
 import lombok.val;
 
@@ -16,7 +16,7 @@ import java.math.RoundingMode;
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Numeric<T, V> extends ValueContainer<V>, Creatable<T> {
+public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
 
     default T add(Object value) {
         val newValue = toBigDecimal().add(toBigDecimal(value));

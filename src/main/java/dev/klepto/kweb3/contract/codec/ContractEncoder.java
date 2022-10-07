@@ -9,7 +9,7 @@ import dev.klepto.kweb3.contract.event.Event;
 import dev.klepto.kweb3.contract.event.Indexed;
 import dev.klepto.kweb3.type.SolidityType;
 import dev.klepto.kweb3.type.Struct;
-import dev.klepto.kweb3.util.Reflection;
+import dev.klepto.kweb3.util.reflection.Reflection;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.Web3Error.error;
 import static dev.klepto.kweb3.Web3Error.require;
-import static dev.klepto.kweb3.util.Collections.arrayCast;
+import static dev.klepto.kweb3.util.Collections.cast;
 
 /**
  * Utilities for encoding web3 contract requests.
@@ -60,7 +60,7 @@ public class ContractEncoder {
             val encodedValues = valueStream
                     .map(element -> encodeParameterValue(element, TypeToken.of(componentType), null))
                     .toArray();
-            return arrayCast(encodedValues, componentType);
+            return cast(encodedValues, componentType);
         }
 
         if (solidityType == Struct.class) {

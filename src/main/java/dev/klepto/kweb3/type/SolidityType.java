@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.type;
 
-import dev.klepto.kweb3.util.function.Creatable;
-import dev.klepto.kweb3.util.function.ValueContainer;
+import dev.klepto.kweb3.util.reflection.Creatable;
+import dev.klepto.kweb3.util.number.Valueable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,6 +12,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class SolidityType<T extends SolidityType<T, V>, V> implements ValueContainer<V>, Creatable<T> {
+public abstract class SolidityType<T extends SolidityType<T, V>, V> implements Valueable<V>, Creatable<T> {
 
 }

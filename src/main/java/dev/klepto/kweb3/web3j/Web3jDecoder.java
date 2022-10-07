@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.web3j;
 
 import dev.klepto.kweb3.Web3Error;
-import dev.klepto.kweb3.util.Reflection;
+import dev.klepto.kweb3.util.reflection.Reflection;
 import lombok.val;
 import org.web3j.abi.datatypes.*;
 

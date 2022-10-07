@@ -1,6 +1,5 @@
-package dev.klepto.kweb3.util;
+package dev.klepto.kweb3.util.reflection;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.internal.Primitives;
 import lombok.SneakyThrows;
 import lombok.val;

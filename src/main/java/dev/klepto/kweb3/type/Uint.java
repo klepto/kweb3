@@ -1,11 +1,8 @@
 package dev.klepto.kweb3.type;
 
-import com.google.common.base.Strings;
-import dev.klepto.kweb3.util.Tokens;
-import dev.klepto.kweb3.util.function.Numeric;
+import dev.klepto.kweb3.util.number.Numeric;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.val;;
+;
 import java.math.BigInteger;
 
 /**

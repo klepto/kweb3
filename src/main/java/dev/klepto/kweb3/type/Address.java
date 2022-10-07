@@ -2,12 +2,8 @@ package dev.klepto.kweb3.type;
 
 import com.google.common.base.Strings;
 import dev.klepto.kweb3.type.sized.Uint160;
-import dev.klepto.kweb3.type.sized.Uint32;
 import dev.klepto.kweb3.util.Keccak;
-import dev.klepto.kweb3.util.Tokens;
 import lombok.val;
-
-import java.math.BigInteger;
 
 /**
  * Represents Address solidity type.
