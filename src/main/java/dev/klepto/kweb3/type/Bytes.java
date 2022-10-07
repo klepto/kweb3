@@ -1,7 +1,8 @@
 package dev.klepto.kweb3.type;
 
-import dev.klepto.kweb3.type.convert.ByteArrayValue;
+import dev.klepto.kweb3.util.function.Numeric;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Represents Bytes solidity type.
@@ -9,22 +10,13 @@ import lombok.Getter;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Getter
-public class Bytes extends SolidityType implements ByteArrayValue {
+@RequiredArgsConstructor
+public class Bytes extends NumericType<Bytes, byte[]> {
 
     private final byte[] value;
 
-    public Bytes() {
-        this(new byte[0]);
-    }
-
-    public Bytes(byte[] value) {
-        super("bytes");
-        this.value = value;
-    }
-
-    @Override
-    public byte[] getByteArrayValue() {
-        return getValue();
+    public static Bytes bytes(Object value) {
+        return new Bytes(Numeric.toByteArray(value));
     }
 
 }

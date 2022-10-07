@@ -28,13 +28,13 @@ public class Web3jEncoder {
         } else if (value instanceof String) {
             return new org.web3j.abi.datatypes.Utf8String((String) value);
         } else if (value instanceof Address) {
-            return new org.web3j.abi.datatypes.Address(((Address) value).getBigIntegerValue());
+            return new org.web3j.abi.datatypes.Address(((Address) value).toBigInteger());
         } else if (value instanceof Uint256) {
             return new org.web3j.abi.datatypes.generated.Uint256(((Uint256) value).getValue());
         } else if (value instanceof Bytes) {
             return new org.web3j.abi.datatypes.DynamicBytes(((Bytes) value).getValue());
         } else if (value instanceof Struct) {
-            val values = ((Struct) value).getValues().stream().map(this::encodeValue).collect(Collectors.toList());
+            val values = ((Struct) value).getValue().stream().map(this::encodeValue).collect(Collectors.toList());
             return new org.web3j.abi.datatypes.DynamicStruct(values);
         }
         throw new Web3Error("Couldn't encode value {} of type {} to web3j.", value, value.getClass());
@@ -49,8 +49,7 @@ public class Web3jEncoder {
             } else if (componentType == Boolean.class) {
                 typeName = "bool";
             } else {
-                val solidityType = (SolidityType) componentType.newInstance();
-                typeName = solidityType.getEncodedName();
+                typeName = componentType.getSimpleName().toLowerCase();
             }
             val parameterizedName = type.isArray() ? typeName + "[]" : typeName;
             return TypeReference.makeTypeReference(parameterizedName, indexed, false);
@@ -60,6 +59,5 @@ public class Web3jEncoder {
             throw new Web3Error("Couldn't encode type {} to web3j.", type);
         }
     }
-
 
 }

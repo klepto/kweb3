@@ -1,13 +1,11 @@
 package dev.klepto.kweb3.contract.codec;
 
 import com.google.common.reflect.TypeToken;
-import dev.klepto.kweb3.type.convert.*;
+import dev.klepto.kweb3.util.function.Numeric;
 import lombok.SneakyThrows;
 import lombok.val;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +28,11 @@ public class ContractDecoder {
 
     @SneakyThrows
     public static Object decodeReturnValues(List<Object> values, TypeToken<?> type) {
+        // If single value, decode first element.
+        if (values.size() == 1) {
+            return decodeReturnValue(values.get(0), type);
+        }
+
         // Decode collection elements one by one.
         val componentType = ContractCodec.getComponentType(type);
         if (componentType != null) {
@@ -37,11 +40,6 @@ public class ContractDecoder {
                     .map(value -> decodeReturnValue(value, componentType))
                     .collect(Collectors.toList());
             return type.isArray() ? arrayCast(decodedValues.toArray(), componentType.getRawType()) : decodedValues;
-        }
-
-        // If single value, decode first element.
-        if (values.size() == 1) {
-            return decodeReturnValue(values.get(0), type);
         }
 
         // Decode structs.
@@ -84,20 +82,11 @@ public class ContractDecoder {
             return decodeReturnValues(arrayToList(((Object[]) value)), type);
         }
 
-        if ((int.class == rawType || Integer.class == rawType) && value instanceof IntValue) {
-            return ((IntValue) value).getIntValue();
-        } else if ((long.class == rawType || Long.class == rawType) && value instanceof LongValue) {
-            return ((LongValue) value).getLongValue();
-        } else if ((double.class == rawType || Double.class == rawType) && value instanceof DoubleValue) {
-            return ((DoubleValue) value).getDoubleValue();
-        } else if (BigDecimal.class == rawType && value instanceof BigDecimalValue) {
-            return ((BigDecimalValue) value).getBigDecimalValue();
-        } else if (BigInteger.class == rawType && value instanceof BigIntegerValue) {
-            return ((BigIntegerValue) value).getBigIntegerValue();
-        } else if (String.class == rawType && value instanceof StringValue) {
-            return ((StringValue) value).getStringValue();
-        } else if ((Class) byte[].class == rawType && value instanceof ByteArrayValue) {
-            return ((ByteArrayValue) value).getByteArrayValue();
+        if (value instanceof Numeric<?,?>) {
+            val convertedValue = Numeric.to(rawType, value);
+            if (convertedValue != null) {
+                return convertedValue;
+            }
         }
 
         error("Couldn't decode {} value to {} type.", value, type);

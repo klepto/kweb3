@@ -1,38 +1,22 @@
 package dev.klepto.kweb3.type.sized;
 
 import dev.klepto.kweb3.type.Uint;
-import dev.klepto.kweb3.util.Math;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * Represents Uint8 solidity type.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class Uint8 extends Uint implements Math<Uint8> {
+public class Uint8 extends Uint<Uint8> {
 
-    public Uint8() {
-        this(BigInteger.ZERO);
+    public Uint8(Object value) {
+        super(value);
     }
 
-    public Uint8(BigInteger value) {
-        super("uint8", value);
-    }
-
-    public Uint8(BigDecimal value) {
-        this(value.toBigInteger());
-    }
-
-    public static Uint8 uint8(BigInteger value) {
+    public static Uint8 uint8(Object value) {
         return new Uint8(value);
     }
 
-    public static Uint8 uint8(long value) {
-        return uint8(BigInteger.valueOf(value));
-    }
-
-    public static final Uint8 ZERO = uint8(BigInteger.ZERO);
+    public static final Uint8 ZERO = new Uint8(0);
 
 }

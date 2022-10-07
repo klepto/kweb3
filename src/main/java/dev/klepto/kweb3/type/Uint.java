@@ -1,13 +1,11 @@
 package dev.klepto.kweb3.type;
 
-import dev.klepto.kweb3.type.convert.BigDecimalValue;
-import dev.klepto.kweb3.type.convert.BigIntegerValue;
-import dev.klepto.kweb3.type.convert.NumberValue;
-import dev.klepto.kweb3.type.convert.StringValue;
-import dev.klepto.kweb3.util.Numbers;
+import com.google.common.base.Strings;
+import dev.klepto.kweb3.util.Tokens;
+import dev.klepto.kweb3.util.function.Numeric;
 import lombok.Getter;
-
-import java.math.BigDecimal;
+import lombok.RequiredArgsConstructor;
+import lombok.val;;
 import java.math.BigInteger;
 
 /**
@@ -16,32 +14,17 @@ import java.math.BigInteger;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Getter
-public abstract class Uint extends SolidityType implements NumberValue, StringValue {
+public abstract class Uint<T extends Uint<T>> extends NumericType<T, BigInteger> {
 
     private final BigInteger value;
 
-    public Uint(String encodedName, BigInteger value) {
-        super(encodedName);
-        this.value = value;
-    }
-
-    @Override
-    public BigDecimal getBigDecimalValue() {
-        return new BigDecimal(getValue());
-    }
-
-    @Override
-    public String getStringValue() {
-        return getBigIntegerValue().toString(16);
-    }
-
-    public BigDecimal toEther() {
-        return Numbers.toEther(getValue());
+    public Uint(Object object) {
+        this.value = Numeric.toBigInteger(object);
     }
 
     @Override
     public String toString() {
-        return "Uint(" + toEther() + ")";
+        return toEther();
     }
 
 }

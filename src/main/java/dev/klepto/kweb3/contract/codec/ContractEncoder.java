@@ -73,13 +73,13 @@ public class ContractEncoder {
 
     @SneakyThrows
     public static Object encodeStructValue(Object value) {
-        val values = new ArrayList<SolidityType>();
+        val values = new ArrayList<SolidityType<?, ?>>();
         for (val field : value.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             val fieldValue = field.get(value);
             val fieldType = TypeToken.of(field.getGenericType());
             val fieldAnnotation = field.getAnnotation(Type.class);
-            values.add((SolidityType) encodeParameterValue(fieldValue, fieldType, fieldAnnotation));
+            values.add((SolidityType<?, ?>) encodeParameterValue(fieldValue, fieldType, fieldAnnotation));
         }
         return new Struct(values);
     }

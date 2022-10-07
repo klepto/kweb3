@@ -2,8 +2,9 @@ package dev.klepto.kweb3.type;
 
 import com.google.common.base.Strings;
 import dev.klepto.kweb3.type.sized.Uint160;
+import dev.klepto.kweb3.type.sized.Uint32;
 import dev.klepto.kweb3.util.Keccak;
-import dev.klepto.kweb3.util.Numbers;
+import dev.klepto.kweb3.util.Tokens;
 import lombok.val;
 
 import java.math.BigInteger;
@@ -15,69 +16,33 @@ import java.math.BigInteger;
  */
 public class Address extends Uint160 {
 
-    public Address() {
-        this(BigInteger.ZERO);
-    }
-
-    public Address(BigInteger value) {
+    public Address(Object value) {
         super(value);
     }
 
-    public Address(String value) {
-        this(getBigInteger(value));
-    }
-
-    public Address(byte[] value) {
-        this(Numbers.toBigInteger(value));
+    public static Address address(Object value) {
+        return new Address(value);
     }
 
     @Override
-    public String getEncodedName() {
-        return "address";
-    }
-
-    @Override
-    public String getStringValue() {
-        return getChecksum(getBigIntegerValue().toString(16));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Uint) {
-            return ((Uint) obj).getValue().equals(getBigIntegerValue());
-        }
-        if (obj instanceof String) {
-            return new Address((String) obj).toString().equals(toString());
-        }
-        if (obj instanceof BigInteger) {
-            return new Address((BigInteger) obj).getBigIntegerValue().equals(getBigIntegerValue());
-        }
-        return false;
-    }
-
-    private static BigInteger getBigInteger(String address) {
-        address = address.replace("0x", "");
-        return new BigInteger(address, 16);
-    }
-
-    private static String getChecksum(String address) {
-        address = address.toLowerCase().replace("0x", "");
-        val hash = Keccak.hash(address);
+    public String toHex() {
+        val hex = super.toHex().toLowerCase().replace("0x", "");
+        val hash = Keccak.hash(hex);
 
         val result = new StringBuilder();
-        for (var i = 0; i < address.length(); i++) {
-            val character = address.charAt(i) + "";
+        for (var i = 0; i < hex.length(); i++) {
+            val character = hex.charAt(i) + "";
             val checksum = hash.charAt(i) + "";
             val uppercase = Integer.parseInt(checksum, 16) >= 8;
             result.append(uppercase ? character.toUpperCase() : character);
         }
 
-        address = result.toString();
-        return "0x" + Strings.padStart(address, 40, '0');
+        return "0x" + Strings.padStart(result.toString(), 40, '0');
     }
 
     @Override
     public String toString() {
-        return getStringValue();
+        return toHex();
     }
+
 }

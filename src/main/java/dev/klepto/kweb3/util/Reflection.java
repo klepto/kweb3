@@ -19,6 +19,12 @@ public class Reflection {
     }
 
     @SneakyThrows
+    public static <T> T create(String className, Object... values) {
+        val type = Reflection.class.getClassLoader().loadClass(className);
+        return (T) create(type, values);
+    }
+
+    @SneakyThrows
     public static <T> T create(Class<T> type, Object... values) {
         val constructor = findConstructor(type, values);
         require(constructor != null, "Couldn't resolve {} constructor.", type);
@@ -30,7 +36,7 @@ public class Reflection {
         for (var i = 0; i < typesA.length; i++) {
             val typeA = Primitives.wrap(typesA[i]);
             val typeB = Primitives.wrap(typesB[i]);
-            if (typeA != typeB) {
+            if (!typeA.isAssignableFrom(typeB)) {
                 return false;
             }
         }
@@ -52,16 +58,5 @@ public class Reflection {
         constructor.setAccessible(true);
         return (Constructor<T>) constructor;
     }
-
-    public interface Creatable<T> {
-
-        @SneakyThrows
-        default T create(Object... args) {
-            val type = new TypeToken<T>(getClass()) {}.getRawType();
-            return (T) Reflection.create(type, args);
-        }
-
-    }
-
 
 }
