@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.web3j;
 
+import com.google.common.collect.ImmutableList;
 import dev.klepto.kweb3.Web3Client;
 import dev.klepto.kweb3.Web3Error;
 import dev.klepto.kweb3.Web3Request;
@@ -9,22 +10,18 @@ import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.*;
 import org.web3j.abi.*;
-import org.web3j.abi.datatypes.*;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.tx.Contract;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_FREQUENCY;
@@ -41,13 +38,10 @@ public class Web3jClient implements Web3Client {
     private final long chainId;
     private final String privateKey;
 
-    private final Web3jEncoder encoder = new Web3jEncoder();
-    private final Web3jDecoder decoder = new Web3jDecoder();
+    @Setter private GasFeeProvider gasFeeProvider;
 
-    @Setter
-    private GasFeeProvider gasFeeProvider;
-    private LogMode logMode;
-    private List<Object> logs = new ArrayList<>();
+    private boolean logging;
+    private final List<Web3Request> logs = new ArrayList<>();
 
     private Web3jSession createSession() {
         return new Web3jSession(rpcUrl, chainId, privateKey);
@@ -55,24 +49,20 @@ public class Web3jClient implements Web3Client {
 
     @SneakyThrows
     public Web3Response send(Web3Request request) {
+        if (logging) {
+            logs.add(request);
+            return null;
+        }
+
         val session = createSession();
-        val function = encodeFunction(request);
+        val function = Web3jEncoder.encodeFunction(request);
         val data = FunctionEncoder.encode(function);
         val to = request.getAddress().toString();
         val defaultBlockParameter = DefaultBlockParameter.valueOf("latest");
 
-        if (logMode == LogMode.ABI) {
-            appendLog(data);
-            return null;
-        } else if (logMode == LogMode.GAS) {
-            appendLog(estimateGas(request));
-            return null;
-        }
-
         if (request.getFunction().isView()) {
             val response = session.getTransactionManager().sendCall(to, data, defaultBlockParameter);
-            val result = FunctionReturnDecoder.decode(response, function.getOutputParameters())
-                    .stream().map(decoder::decodeValue).collect(Collectors.toList());
+            val result = Web3jDecoder.decodeResult(response, function.getOutputParameters());
             return new Web3Response(null, request, null, result, Collections.emptyList());
         } else {
             val gasLimit = estimateGas(request, session, data).toBigInteger();
@@ -112,74 +102,18 @@ public class Web3jClient implements Web3Client {
                     session.getWeb3j(), DEFAULT_POLLING_FREQUENCY, DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH
             );
             val receipt = processor.waitForTransactionReceipt(response.getTransactionHash());
-            val events = decodeEvents(request.getEventTypes(), receipt.getLogs());
+            val events = Web3jDecoder.decodeEvents(request.getEventTypes(), receipt.getLogs());
             var error = (Web3Error) null;
             var result = Collections.emptyList();
 
             if (response.getError() != null) {
                 error = new Web3Error("RPC error: {}", response.getError().getMessage());
             } else {
-
-                result = FunctionReturnDecoder.decode(response.getResult(), function.getOutputParameters())
-                        .stream().map(decoder::decodeValue).collect(Collectors.toList());
+                result = Web3jDecoder.decodeResult(response.getResult(), function.getOutputParameters());
             }
 
             return new Web3Response(response.getTransactionHash(), request, error, result, events);
         }
-    }
-
-    public List<Web3Response.Event> decodeEvents(List<Web3Request.Event> eventTypes, List<Log> logs) {
-        val result = new ArrayList<Web3Response.Event>();
-        val encodedEvents = eventTypes.stream().map(this::encodeEvent).collect(Collectors.toList());
-        for (var i = 0; i < encodedEvents.size(); i++) {
-            val eventType = eventTypes.get(i);
-            val encodedEvent = encodedEvents.get(i);
-            for (val log : logs) {
-                val parameters = Contract.staticExtractEventParameters(encodedEvent, log);
-                if (parameters == null) {
-                    continue;
-                }
-                result.add(decodeEvent(eventType, parameters));
-            }
-        }
-        return result;
-    }
-
-    private Web3Response.Event decodeEvent(Web3Request.Event eventType, EventValues parameters) {
-        val indexQueue = new LinkedList<>(parameters.getIndexedValues());
-        val nonIndexQueue = new LinkedList<>(parameters.getNonIndexedValues());
-        val values = new ArrayList<>();
-        for (var i = 0; i < eventType.getValueTypes().size(); i++) {
-            val value = eventType.getIndexedValues()[i] ? indexQueue.poll() : nonIndexQueue.poll();
-            values.add(decoder.decodeValue(value));
-        }
-        return new Web3Response.Event(eventType.getName(), values);
-    }
-
-    private Event encodeEvent(Web3Request.Event event) {
-        val name = event.getName();
-        val parameters = new ArrayList<TypeReference<?>>();
-        for (var i = 0; i < event.getValueTypes().size(); i++) {
-            val parameter = event.getValueTypes().get(i);
-            val indexed = event.getIndexedValues()[i];
-            val reference = encoder.encodeType(parameter, indexed);
-            parameters.add(reference);
-        }
-        return new Event(name, parameters);
-    }
-
-    private Function encodeFunction(Web3Request request) {
-        val parameters = request.getParameters().stream()
-                .map(encoder::encodeValue)
-                .collect(Collectors.toList());
-
-        val functionReturnTypes = request.getFunction().getReturnTypes();
-        val returnTypes = new ArrayList<TypeReference<?>>();
-        functionReturnTypes.forEach(type -> {
-            returnTypes.add(encoder.encodeType(type, false));
-        });
-
-        return new Function(request.getFunction().getName(), parameters, returnTypes);
     }
 
     @Override
@@ -193,13 +127,20 @@ public class Web3jClient implements Web3Client {
     }
 
     @Override
+    public List<Object> abiDecode(String abi, List<Class<?>> types) {
+        val encodedTypes = Web3jEncoder.encodeTypes(types);
+        return Web3jDecoder.decodeResult(abi, encodedTypes);
+    }
+
+    @Override
     public String abiEncode(Web3Request request) {
-        return FunctionEncoder.encode(encodeFunction(request));
+        val function = Web3jEncoder.encodeFunction(request);
+        return FunctionEncoder.encode(function);
     }
 
     @Override
     public List<String> abiEncode(Runnable runnable) {
-        return captureLogs(LogMode.ABI, runnable, String.class);
+        return getLogs(runnable).stream().map(this::abiEncode).toList();
     }
 
     @Override
@@ -212,7 +153,7 @@ public class Web3jClient implements Web3Client {
 
     @Override
     public List<Uint256> estimateGas(Runnable runnable) {
-        return captureLogs(LogMode.GAS, runnable, Uint256.class);
+        return getLogs(runnable).stream().map(this::estimateGas).toList();
     }
 
     @SneakyThrows
@@ -233,20 +174,13 @@ public class Web3jClient implements Web3Client {
         return new Address(Credentials.create(privateKey).getAddress());
     }
 
-    private <T> List<T> captureLogs(LogMode logMode, Runnable runnable, Class<T> type) {
-        this.logMode = logMode;
+    @Override
+    public List<Web3Request> getLogs(Runnable runnable) {
         logs.clear();
+        logging = true;
         runnable.run();
-        this.logMode = null;
-        return logs.stream().map(type::cast).collect(Collectors.toList());
-    }
-
-    private void appendLog(Object object) {
-        logs.add(object);
-    }
-
-    private enum LogMode {
-        ABI, GAS
+        logging = false;
+        return new ArrayList<>(logs);
     }
 
 }
