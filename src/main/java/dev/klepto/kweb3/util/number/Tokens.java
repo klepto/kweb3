@@ -17,8 +17,8 @@ public class Tokens {
     }
 
     public static Uint256 tokens(Object value, Object decimals) {
-        val numericValue = Numeric.of(value);
-        val multiplier = Numeric.of(10).pow(decimals);
+        val numericValue = Numeric.toDecimal(value);
+        val multiplier = Numeric.toDecimal(10).pow(decimals);
         return numericValue.mul(multiplier).toUint256();
     }
 

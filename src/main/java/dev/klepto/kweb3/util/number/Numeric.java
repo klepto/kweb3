@@ -16,7 +16,7 @@ import java.math.RoundingMode;
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
+public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
 
     default T add(Object value) {
         val newValue = toBigDecimal().add(toBigDecimal(value));
@@ -34,13 +34,17 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
     }
 
     default T div(Object value) {
-        val newValue = toBigDecimal().divide(toBigDecimal(value), Tokens.DEFAULT_DECIMALS, RoundingMode.FLOOR);
+        val newValue = toBigDecimal().divide(toBigDecimal(value), RoundingMode.FLOOR);
         return create(newValue);
     }
 
     default T pow(Object value) {
         val newValue = toBigDecimal().pow(toInt(value));
         return create(newValue);
+    }
+
+    default Decimal toDecimal() {
+        return Numeric.toDecimal(getValue());
     }
 
     default float toFloat() {
@@ -194,6 +198,10 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
         return (T) result;
     }
 
+    static Decimal toDecimal(Object value) {
+        return new Decimal(value);
+    }
+
     static float toFloat(Object value) {
         return toBigDecimal(value).floatValue();
     }
@@ -223,11 +231,22 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
     }
 
     static String toHex(Object value) {
+        if (value instanceof byte[] || value instanceof Bytes) {
+            val bytes = value instanceof Bytes ? ((Bytes) value).getValue() : (byte[]) value;
+            return "0x" + BaseEncoding.base16().encode(bytes);
+        }
+
+        if (value instanceof String && ((String) value).startsWith("0x")) {
+            return (String) value;
+        }
+
         return "0x" + toBigInteger(value).toString(16);
     }
 
     static byte[] toByteArray(Object value) {
-        return BaseEncoding.base16().decode(stripHexPrefix(toHex(value)));
+        val hex = value instanceof String ? (String) value : toHex(value);
+        val stripped = stripHexPrefix(hex).toUpperCase();
+        return BaseEncoding.base16().decode(stripped);
     }
 
     static Bytes toBytes(Object value) {
@@ -271,16 +290,29 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
     /*
      * Static utility methods.
      */
-    static BigDecimalNumeric of(Object value) {
-        return new BigDecimalNumeric(toBigDecimal(value));
+    private static String stripHexPrefix(String value) {
+        return value.toLowerCase().replace("0x", "");
     }
 
+    /**
+     * Numeric that supports decimal values, up to {@link Tokens#DEFAULT_DECIMALS} places.
+     */
     @Getter
-    class BigDecimalNumeric implements Numeric<BigDecimalNumeric, BigDecimal> {
+    class Decimal implements Numeric<Decimal, BigDecimal> {
         private final BigDecimal value;
 
-        public BigDecimalNumeric(Object value) {
+        public Decimal(Object value) {
             this.value = Numeric.toBigDecimal(value);
+        }
+
+        @Override
+        public Decimal div(Object value) {
+            val newValue = toBigDecimal().divide(
+                    Numeric.toBigDecimal(value),
+                    Tokens.DEFAULT_DECIMALS,
+                    RoundingMode.FLOOR
+            );
+            return new Decimal(newValue);
         }
 
         @Override
@@ -289,8 +321,6 @@ public interface Numeric<T, V> extends Valueable<V>, Creatable<T> {
         }
     }
 
-    private static String stripHexPrefix(String value) {
-        return value.toLowerCase().replace("0x", "");
-    }
+
 
 }
