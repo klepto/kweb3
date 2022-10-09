@@ -5,6 +5,7 @@ import lombok.val;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Collection utility methods.
@@ -37,6 +38,14 @@ public class Collections {
         System.arraycopy(array, 0, newArray, 0, index);
         System.arraycopy(array, index + 1, newArray, index, array.length - index - 1);
         return (T[]) newArray;
+    }
+
+    public static IntStream until(int limit) {
+        return until(0, limit);
+    }
+
+    public static IntStream until(int start, int limit) {
+        return IntStream.range(start, limit);
     }
 
 }
