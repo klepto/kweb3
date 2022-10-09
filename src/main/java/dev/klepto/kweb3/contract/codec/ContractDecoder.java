@@ -28,11 +28,6 @@ public class ContractDecoder {
 
     @SneakyThrows
     public static Object decodeReturnValues(List<Object> values, TypeToken<?> type) {
-        // If single value, decode first element.
-        if (values.size() == 1) {
-            return decodeReturnValue(values.get(0), type);
-        }
-
         // Decode collection elements one by one.
         val componentType = ContractCodec.getComponentType(type);
         if (componentType != null) {
@@ -40,6 +35,11 @@ public class ContractDecoder {
                     .map(value -> decodeReturnValue(value, componentType))
                     .collect(Collectors.toList());
             return type.isArray() ? cast(decodedValues.toArray(), componentType.getRawType()) : decodedValues;
+        }
+
+        // If single value, decode first element.
+        if (values.size() == 1) {
+            return decodeReturnValue(values.get(0), type);
         }
 
         // Decode structs.
@@ -89,7 +89,7 @@ public class ContractDecoder {
             }
         }
 
-        error("Couldn't decode {} value to {} type.", value, type);
+        error("Couldn't decode {} value to {} type.", value.getClass(), type);
         return null;
     }
 

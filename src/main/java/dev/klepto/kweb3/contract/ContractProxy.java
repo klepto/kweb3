@@ -39,6 +39,10 @@ public class ContractProxy implements InvocationHandler {
         }
 
         switch (method.getName()) {
+            case "toString":
+                return address.toString();
+            case "hashCode":
+                return address.hashCode();
             case "getAddress":
                 return address;
             case "getClient":
@@ -99,7 +103,11 @@ public class ContractProxy implements InvocationHandler {
     private Function parseFunction(Method method) {
         val view = method.isAnnotationPresent(View.class);
         val transaction = method.isAnnotationPresent(Transaction.class);
-        require(view || transaction, "No @View or @Transaction annotation present on contract function.");
+        require(
+                view || transaction,
+                "No @View or @Transaction annotation present on {}#{} contract function.",
+                method.getDeclaringClass().getSimpleName(), method.getName()
+        );
 
         var name = view ? method.getAnnotation(View.class).value() : method.getAnnotation(Transaction.class).value();
         if (name.isBlank()) {
