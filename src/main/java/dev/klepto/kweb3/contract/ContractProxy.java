@@ -30,6 +30,7 @@ public class ContractProxy implements InvocationHandler {
 
     private final Web3Client client;
     private final Address address;
+    private final ContractCache cache = new ContractCache();
 
     @Override
     @SneakyThrows
@@ -55,6 +56,23 @@ public class ContractProxy implements InvocationHandler {
     }
 
     private Object contractCall(Method method, Object[] args) {
+        val request = parseRequest(method, args);
+
+        if (method.isAnnotationPresent(Cache.class)) {
+            val annotation = method.getAnnotation(Cache.class);
+            val duration = annotation.timeUnit().toMillis(annotation.value());
+            val key = client.abiEncode(request);
+            return cache.get(key, () -> {
+                val result = getResponse(method, request);
+                return new ContractCache.CacheItem(result, System.currentTimeMillis(), duration);
+            });
+
+        }
+
+        return getResponse(method, request);
+    }
+
+    private Web3Request parseRequest(Method method, Object[] args) {
         val function = parseFunction(method);
         var value = Uint256.ZERO;
 
@@ -82,7 +100,10 @@ public class ContractProxy implements InvocationHandler {
             }
         }
         val events = ContractEncoder.encodeEvents(method.getDeclaringClass());
-        val request = new Web3Request(address, function, parameters, value, events);
+        return new Web3Request(address, function, parameters, value, events);
+    }
+
+    private Object getResponse(Method method, Web3Request request) {
         val response = client.send(request);
 
         if (method.getReturnType() == Web3Response.class) {
@@ -99,7 +120,6 @@ public class ContractProxy implements InvocationHandler {
 
         val returnType = TypeToken.of(method.getGenericReturnType());
         return ContractDecoder.decodeReturnValues(response.getResult(), returnType);
-
     }
 
     private Function parseFunction(Method method) {

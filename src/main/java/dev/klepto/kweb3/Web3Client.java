@@ -19,11 +19,15 @@ import java.util.List;
  */
 public interface Web3Client {
 
+    default <T extends Contract> T getContract(Class<T> type, String address) {
+        return getContract(type, Numeric.toAddress(address));
+    }
+
     default <T extends Contract> T getContract(Class<T> type, Address address) {
         return (T) Proxy.newProxyInstance(
                 Web3Client.class.getClassLoader(),
                 new Class[]{type},
-                new ContractProxy(this, Numeric.toAddress(address))
+                new ContractProxy(this, address)
         );
     }
 
