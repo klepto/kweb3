@@ -41,4 +41,9 @@ public class Address extends Uint160 {
         return toHex();
     }
 
+    @Override
+    public int hashCode() {
+        return toHex().hashCode();
+    }
+    
 }
