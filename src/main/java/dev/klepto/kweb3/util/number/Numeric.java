@@ -3,6 +3,8 @@ package dev.klepto.kweb3.util.number;
 import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.internal.Primitives;
+import dev.klepto.kweb3.contract.Contract;
+import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.Bytes;
 import dev.klepto.kweb3.type.sized.*;
 import dev.klepto.kweb3.util.reflection.Creatable;
@@ -16,7 +18,7 @@ import java.math.RoundingMode;
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
+public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Object> {
 
     default T add(Object value) {
         val newValue = toBigDecimal().add(toBigDecimal(value));
@@ -41,6 +43,31 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
     default T pow(Object value) {
         val newValue = toBigDecimal().pow(toInt(value));
         return create(newValue);
+    }
+
+    default boolean moreThan(Object value) {
+        return compareTo(value) > 0;
+    }
+
+    default boolean moreThanOrEquals(Object value) {
+        return compareTo(value) >= 0;
+    }
+
+    default boolean lessThan(Object value) {
+        return compareTo(value) < 0;
+    }
+
+    default boolean lessThanOrEquals(Object value) {
+        return compareTo(value) <= 0;
+    }
+
+    default boolean equalTo(Object value) {
+        return compareTo(value) == 0;
+    }
+
+    @Override
+    default int compareTo(Object other) {
+        return toBigDecimal().compareTo(toBigDecimal(other));
     }
 
     default Decimal toDecimal() {
@@ -111,12 +138,12 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
         return toUint256(getValue());
     }
 
-    default String toEther() {
-        return toEtherString(getValue());
+    default Address toAddress() {
+        return toAddress(getValue());
     }
 
-    default String toEther(Object decimals) {
-        return toEtherString(getValue(), decimals);
+    default String toTokens(Object decimals) {
+        return toTokens(getValue(), decimals);
     }
 
     /*
@@ -211,23 +238,23 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
     }
 
     static byte toByte(Object value) {
-        return toBigDecimal(value).byteValueExact();
+        return toBigDecimal(value).byteValue();
     }
 
     static short toShort(Object value) {
-        return toBigDecimal(value).shortValueExact();
+        return toBigDecimal(value).shortValue();
     }
 
     static int toInt(Object value) {
-        return toBigDecimal(value).intValueExact();
+        return toBigDecimal(value).intValue();
     }
 
     static long toLong(Object value) {
-        return toBigDecimal(value).longValueExact();
+        return toBigDecimal(value).longValue();
     }
 
     static BigInteger toBigInteger(Object value) {
-        return toBigDecimal(value).toBigIntegerExact();
+        return toBigDecimal(value).toBigInteger();
     }
 
     static String toHex(Object value) {
@@ -273,11 +300,19 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
         return new Uint256(value);
     }
 
-    static String toEtherString(Object value) {
-        return toEtherString(value, Tokens.DEFAULT_DECIMALS);
+    static Address toAddress(Object value) {
+        if (value instanceof Contract) {
+            return ((Contract) value).getAddress();
+        }
+
+        if (value instanceof Address) {
+            return ((Address) value);
+        }
+
+        return new Address(toHex(value));
     }
 
-    static String toEtherString(Object value, Object decimals) {
+    static String toTokens(Object value, Object decimals) {
         val stringValue = toBigInteger(value).toString();
         val valueDecimals = toInt(decimals);
         val string = Strings.padStart(stringValue, valueDecimals + 1, '0');
@@ -320,7 +355,6 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T> {
             return getValue().toPlainString();
         }
     }
-
 
 
 }
