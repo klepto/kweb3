@@ -7,6 +7,7 @@ import dev.klepto.kweb3.contract.ContractProxy;
 import dev.klepto.kweb3.gas.GasFeeProvider;
 import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
+import dev.klepto.kweb3.util.number.Numeric;
 import dev.klepto.kweb3.web3j.Web3jClient;
 
 import java.lang.reflect.Proxy;
@@ -18,15 +19,11 @@ import java.util.List;
  */
 public interface Web3Client {
 
-    default <T extends Contract> T getContract(Class<T> type, String address) {
-        return getContract(type, new Address(address));
-    }
-
     default <T extends Contract> T getContract(Class<T> type, Address address) {
         return (T) Proxy.newProxyInstance(
                 Web3Client.class.getClassLoader(),
                 new Class[]{type},
-                new ContractProxy(this, address)
+                new ContractProxy(this, Numeric.toAddress(address))
         );
     }
 

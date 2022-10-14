@@ -8,6 +8,7 @@ import dev.klepto.kweb3.Web3Response;
 import dev.klepto.kweb3.gas.GasFeeProvider;
 import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
+import dev.klepto.kweb3.util.number.Numeric;
 import lombok.*;
 import org.web3j.abi.*;
 import org.web3j.crypto.Credentials;
