@@ -39,6 +39,8 @@ public class ContractProxy implements InvocationHandler {
         }
 
         switch (method.getName()) {
+            case "equals":
+                return address.equals(args[0]);
             case "toString":
                 return address.toString();
             case "hashCode":
