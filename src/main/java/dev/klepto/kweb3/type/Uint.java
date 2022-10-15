@@ -21,7 +21,7 @@ public abstract class Uint<T extends Uint<T>> extends NumericType<T, BigInteger>
 
     @Override
     public String toString() {
-        return toTokens(16);
+        return toString(DEFAULT_DECIMALS);
     }
 
 }

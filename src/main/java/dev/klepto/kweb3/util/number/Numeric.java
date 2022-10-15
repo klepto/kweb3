@@ -1,6 +1,5 @@
 package dev.klepto.kweb3.util.number;
 
-import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.internal.Primitives;
 import dev.klepto.kweb3.contract.Contract;
@@ -19,6 +18,8 @@ import java.math.RoundingMode;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Object> {
+
+    int DEFAULT_DECIMALS = 18;
 
     default T add(Object value) {
         val newValue = toBigDecimal().add(toBigDecimal(value));
@@ -71,7 +72,7 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     default Decimal toDecimal() {
-        return Numeric.toDecimal(getValue());
+        return toDecimal(getValue());
     }
 
     default float toFloat() {
@@ -142,8 +143,8 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return toAddress(getValue());
     }
 
-    default String toTokens(Object decimals) {
-        return toTokens(getValue(), decimals);
+    default String toString(int scale) {
+        return new BigDecimal(toBigInteger(), scale).toPlainString();
     }
 
     /*
@@ -226,7 +227,7 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static Decimal toDecimal(Object value) {
-        return new Decimal(value);
+        return new Decimal(toBigDecimal(value).setScale(DEFAULT_DECIMALS));
     }
 
     static float toFloat(Object value) {
@@ -312,16 +313,6 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return new Address(toHex(value));
     }
 
-    static String toTokens(Object value, Object decimals) {
-        val stringValue = toBigInteger(value).toString();
-        val valueDecimals = toInt(decimals);
-        val string = Strings.padStart(stringValue, valueDecimals + 1, '0');
-        val commaIndex = string.length() - valueDecimals;
-        val numberPart = string.substring(0, commaIndex);
-        val decimalPart = string.substring(commaIndex);
-        return numberPart + "." + decimalPart;
-    }
-
     /*
      * Static utility methods.
      */
@@ -329,22 +320,36 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return value.toLowerCase().replace("0x", "");
     }
 
+    static Numeric.Decimal numeric(Object value) {
+        return toDecimal(value);
+    }
+
+    static Uint256 tokens(Object value) {
+        return tokens(value, DEFAULT_DECIMALS);
+    }
+
+    static Uint256 tokens(Object value, Object decimals) {
+        return numeric(value)
+                .mul(numeric(10).pow(decimals))
+                .toUint256();
+    }
+
     /**
-     * Numeric that supports decimal values, up to {@link Tokens#DEFAULT_DECIMALS} places.
+     * Numeric that supports decimal values.
      */
     @Getter
     class Decimal implements Numeric<Decimal, BigDecimal> {
         private final BigDecimal value;
 
-        public Decimal(Object value) {
-            this.value = Numeric.toBigDecimal(value);
+        public Decimal(BigDecimal value) {
+            this.value = value;
         }
 
         @Override
         public Decimal div(Object value) {
-            val newValue = toBigDecimal().divide(
+            val newValue = this.value.divide(
                     Numeric.toBigDecimal(value),
-                    Tokens.DEFAULT_DECIMALS,
+                    this.value.scale(),
                     RoundingMode.FLOOR
             );
             return new Decimal(newValue);
