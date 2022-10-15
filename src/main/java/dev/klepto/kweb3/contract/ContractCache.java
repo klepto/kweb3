@@ -27,7 +27,7 @@ public class ContractCache {
 
     public Object get(String key, Supplier<CacheItem> supplier) {
         removeExpired();
-        return items.computeIfAbsent(key, k -> supplier.get());
+        return items.computeIfAbsent(key, k -> supplier.get()).getValue();
     }
 
     public boolean remove(String key) {

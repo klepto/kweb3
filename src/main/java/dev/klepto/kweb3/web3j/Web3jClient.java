@@ -41,7 +41,7 @@ public class Web3jClient implements Web3Client {
 
     @Setter private GasFeeProvider gasFeeProvider;
 
-    private boolean logging;
+   @Getter private boolean logging;
     private final List<Web3Request> logs = new ArrayList<>();
 
     private Web3jSession createSession() {

@@ -49,6 +49,8 @@ public interface Web3Client {
 
     List<Web3Request> getLogs(Runnable runnable);
 
+    boolean isLogging();
+
     void setGasFeeProvider(GasFeeProvider provider);
 
     static Web3Client createClient(Web3Wallet wallet, Chain chain) {

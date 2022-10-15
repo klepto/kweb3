@@ -58,7 +58,7 @@ public class ContractProxy implements InvocationHandler {
     private Object contractCall(Method method, Object[] args) {
         val request = parseRequest(method, args);
 
-        if (method.isAnnotationPresent(Cache.class)) {
+        if (method.isAnnotationPresent(Cache.class) && !client.isLogging()) {
             val annotation = method.getAnnotation(Cache.class);
             val duration = annotation.timeUnit().toMillis(annotation.value());
             val key = client.abiEncode(request);
