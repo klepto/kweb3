@@ -1,14 +1,9 @@
 package dev.klepto.kweb3.web3j;
 
-import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.Web3Client;
-import dev.klepto.kweb3.Web3Error;
-import dev.klepto.kweb3.Web3Request;
-import dev.klepto.kweb3.Web3Response;
+import dev.klepto.kweb3.*;
 import dev.klepto.kweb3.gas.GasFeeProvider;
 import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
-import dev.klepto.kweb3.util.number.Numeric;
 import lombok.*;
 import org.web3j.abi.*;
 import org.web3j.crypto.Credentials;
@@ -19,10 +14,8 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_FREQUENCY;
@@ -33,28 +26,19 @@ import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_FREQUENCY;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @RequiredArgsConstructor
-public class Web3jClient implements Web3Client {
+public class Web3jClient extends AbstractWeb3Client {
 
     private final String rpcUrl;
     private final long chainId;
     private final String privateKey;
-
     @Setter private GasFeeProvider gasFeeProvider;
-
-   @Getter private boolean logging;
-    private final List<Web3Request> logs = new ArrayList<>();
 
     private Web3jSession createSession() {
         return new Web3jSession(rpcUrl, chainId, privateKey);
     }
 
     @SneakyThrows
-    public Web3Response send(Web3Request request) {
-        if (logging) {
-            logs.add(request);
-            return null;
-        }
-
+    public Web3Response request(Web3Request request) {
         val session = createSession();
         val function = Web3jEncoder.encodeFunction(request);
         val data = FunctionEncoder.encode(function);
@@ -140,21 +124,11 @@ public class Web3jClient implements Web3Client {
     }
 
     @Override
-    public List<String> abiEncode(Runnable runnable) {
-        return getLogs(runnable).stream().map(this::abiEncode).toList();
-    }
-
-    @Override
     @SneakyThrows
     public Uint256 estimateGas(Web3Request request) {
         val session = createSession();
         val data = abiEncode(request);
         return estimateGas(request, session, data);
-    }
-
-    @Override
-    public List<Uint256> estimateGas(Runnable runnable) {
-        return getLogs(runnable).stream().map(this::estimateGas).toList();
     }
 
     @SneakyThrows
@@ -173,15 +147,6 @@ public class Web3jClient implements Web3Client {
 
     public Address getAddress() {
         return new Address(Credentials.create(privateKey).getAddress());
-    }
-
-    @Override
-    public List<Web3Request> getLogs(Runnable runnable) {
-        logs.clear();
-        logging = true;
-        runnable.run();
-        logging = false;
-        return new ArrayList<>(logs);
     }
 
 }
