@@ -3,14 +3,16 @@ package dev.klepto.kweb3.web3j;
 import dev.klepto.kweb3.Web3Error;
 import dev.klepto.kweb3.Web3Request;
 import dev.klepto.kweb3.type.*;
+import dev.klepto.kweb3.type.Address;
+import dev.klepto.kweb3.type.Bytes;
 import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.val;
+import org.web3j.abi.TypeEncoder;
 import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.DynamicArray;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.*;
+import org.web3j.abi.datatypes.Uint;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,27 +47,39 @@ public interface Web3jEncoder {
         throw new Web3Error("Couldn't encode value {} of type {} to web3j.", value, value.getClass());
     }
 
-    static TypeReference<?> encodeType(Class<?> type, boolean indexed) {
+    static TypeReference<?> encodeType(Object type, boolean indexed) {
         try {
-            val componentType = type.isArray() ? type.getComponentType() : type;
-            var typeName = "";
-            if (componentType == String.class) {
-                typeName = "string";
-            } else if (componentType == Boolean.class) {
-                typeName = "bool";
-            } else {
-                typeName = componentType.getSimpleName().toLowerCase();
-            }
-            val parameterizedName = type.isArray() ? typeName + "[]" : typeName;
-            return TypeReference.makeTypeReference(parameterizedName, indexed, false);
+            return TypeReference.makeTypeReference(encodeTypeName(type), indexed, false);
         } catch (Exception e) {
             e.printStackTrace();
-
             throw new Web3Error("Couldn't encode type {} to web3j.", type);
         }
     }
 
-    static List<TypeReference<?>> encodeTypes(List<Class<?>> types) {
+    static String encodeTypeName(Object type) {
+        // Struct array
+        if (type.getClass().isArray()) {
+            val structTypes = (Object[]) type;
+            val typeNames = Arrays.stream(structTypes).map(Web3jEncoder::encodeTypeName)
+                    .collect(Collectors.joining(","));
+            return "(" + typeNames + ")[]";
+        }
+
+        val classType = (Class<?>) type;
+        val componentType = classType.isArray() ? classType.getComponentType() : classType;
+        var typeName = "";
+        if (componentType == String.class) {
+            typeName = "string";
+        } else if (componentType == Boolean.class) {
+            typeName = "bool";
+        } else {
+            typeName = componentType.getSimpleName().toLowerCase();
+        }
+
+        return typeName + (classType.isArray() ? "[]" : "");
+    }
+
+    static List<TypeReference<?>> encodeTypes(List<Object> types) {
         return types.stream().<TypeReference<?>>map(type -> encodeType(type, false)).toList();
     }
 
