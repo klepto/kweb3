@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.type.sized.Uint256.uint256;
+import static dev.klepto.kweb3.util.Functional.tryOrElse;
 import static dev.klepto.kweb3.util.Logging.debug;
 
 /**
@@ -47,7 +48,7 @@ public class Web3jGasProvider implements GasFeeProvider {
                 .collect(Collectors.toList());
 
         var gasPrices = transactions.stream()
-                .map(Transaction::getGasPrice)
+                .map(tryOrElse(Transaction::getGasPrice, BigInteger.ZERO))
                 .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
                 .sorted(BigInteger::compareTo)
                 .collect(Collectors.toList());
@@ -56,7 +57,7 @@ public class Web3jGasProvider implements GasFeeProvider {
         }
 
         var maxFeesPerGas = transactions.stream()
-                .map(Transaction::getMaxFeePerGas)
+                .map(tryOrElse(Transaction::getMaxFeePerGas, BigInteger.ZERO))
                 .filter(Objects::nonNull)
                 .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
                 .sorted(BigInteger::compareTo)
@@ -66,7 +67,7 @@ public class Web3jGasProvider implements GasFeeProvider {
         }
 
         var maxPriorityFeesPerGas = transactions.stream()
-                .map(Transaction::getMaxPriorityFeePerGas)
+                .map(tryOrElse(Transaction::getMaxPriorityFeePerGas, BigInteger.ZERO))
                 .filter(Objects::nonNull)
                 .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
                 .sorted(BigInteger::compareTo)
