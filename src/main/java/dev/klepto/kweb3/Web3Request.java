@@ -16,6 +16,7 @@ import java.util.List;
 public class Web3Request {
 
     Address address;
+    Address callerAddress;
     Function function;
     List<Object> parameters;
     Uint256 value;
