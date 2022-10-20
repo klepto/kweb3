@@ -14,7 +14,7 @@ public class Function {
 
     String name;
     boolean view;
-    List<Class<?>> parameterTypes;
-    List<Class<?>> returnTypes;
+    List<Object> parameterTypes;
+    List<Object> returnTypes;
 
 }

@@ -54,7 +54,7 @@ public interface Web3jDecoder {
 
     static List<Web3Response.Event> decodeEvents(List<Web3Request.Event> eventTypes, List<Log> logs) {
         val result = new ArrayList<Web3Response.Event>();
-        val encodedEvents = eventTypes.stream().map(Web3jEncoder::encodeEvent).collect(Collectors.toList());
+        val encodedEvents = eventTypes.stream().map(Web3jEncoder::encodeEvent).toList();
         for (var i = 0; i < encodedEvents.size(); i++) {
             val eventType = eventTypes.get(i);
             val encodedEvent = encodedEvents.get(i);
