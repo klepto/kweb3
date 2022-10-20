@@ -1,6 +1,8 @@
 package dev.klepto.kweb3.contract;
 
 import dev.klepto.kweb3.Web3Error;
+import dev.klepto.kweb3.Web3Request;
+import dev.klepto.kweb3.type.Address;
 import lombok.Value;
 import lombok.val;
 
@@ -13,7 +15,7 @@ import dev.klepto.kweb3.Web3Response;
 
 /**
  * Extension for {@link Web3Response}, rather than containing just web3 result, contains additional information about
- * contract interface such as {@link ContractResponse#getContractClass()} and {@link ContractResponse#getEventClasses()}.
+ * contract interface class.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
@@ -21,6 +23,8 @@ import dev.klepto.kweb3.Web3Response;
 public class ContractResponse {
 
     Class<?> contractClass;
+
+    Web3Request request;
 
     @Nullable
     String transactionHash;
