@@ -7,6 +7,7 @@ import dev.klepto.kweb3.Web3Response;
 import dev.klepto.kweb3.contract.codec.ContractCodec;
 import dev.klepto.kweb3.contract.codec.ContractDecoder;
 import dev.klepto.kweb3.contract.codec.ContractEncoder;
+import dev.klepto.kweb3.contract.codec.ContractEvents;
 import dev.klepto.kweb3.type.*;
 import dev.klepto.kweb3.type.sized.Uint256;
 import lombok.RequiredArgsConstructor;
@@ -99,12 +100,15 @@ public class ContractProxy implements InvocationHandler {
                 parameters.add(encodedParameter);
             }
         }
-        val events = ContractEncoder.encodeEvents(method.getDeclaringClass());
-        return new Web3Request(address, function, parameters, value, events);
+        return new Web3Request(address, client.getAddress(), function, parameters, value, ContractEvents.EVENTS);
     }
 
     private Object getResponse(Method method, Web3Request request) {
         val response = client.send(request);
+
+        if (response == null || response.getResult() == null) {
+            return null;
+        }
 
         if (method.getReturnType() == Web3Response.class) {
             return response;
@@ -112,10 +116,6 @@ public class ContractProxy implements InvocationHandler {
 
         if (method.getReturnType() == ContractResponse.class) {
             return createContractResponse(response, method.getDeclaringClass());
-        }
-
-        if (response == null || response.getResult() == null) {
-            return null;
         }
 
         val returnType = TypeToken.of(method.getGenericReturnType());
@@ -136,7 +136,7 @@ public class ContractProxy implements InvocationHandler {
             name = method.getName();
         }
 
-        val parameterTypes = new ArrayList<Class<?>>();
+        val parameterTypes = new ArrayList<>();
         for (val parameter : method.getParameters()) {
             if (parameter.isAnnotationPresent(Value.class)) {
                 continue;
@@ -155,33 +155,35 @@ public class ContractProxy implements InvocationHandler {
 
     @SneakyThrows
     private ContractResponse createContractResponse(Web3Response web3Response, Class<?> contractClass) {
-        val eventClasses = ContractEncoder.encodeEventClasses(contractClass);
+        val eventClasses = ContractEvents.EVENT_CLASSES;
+        val request = web3Response.getRequest();
         val transactionHash = web3Response.getTransactionHash();
         val error = web3Response.getError();
         val result = web3Response.getResult();
         val events = new ArrayList<>();
         for (val event : web3Response.getEvents()) {
-            val eventClass = eventClasses.stream()
-                    .filter(type -> ContractEncoder.encodeEventName(type).equals(event.getName()))
-                    .findFirst().orElse(null);
-            if (eventClass == null) {
-                continue;
-            }
+            val eventTypes = eventClasses.stream()
+                    .filter(type -> ContractEvents.encodeEventName(type).equals(event.getName()))
+                    .toList();
+            for (val eventType : eventTypes) {
+                try {
+                    val fields = eventType.getDeclaredFields();
+                    val values = new Object[event.getValues().size()];
+                    for (var i = 0; i < values.length; i++) {
+                        val type = TypeToken.of(fields[i].getGenericType());
+                        val value = event.getValues().get(i);
+                        values[i] = ContractDecoder.decodeReturnValue(value, type);
+                    }
 
-            val fields = eventClass.getDeclaredFields();
-            val values = new Object[event.getValues().size()];
-            for (var i = 0; i < values.length; i++) {
-                val type = TypeToken.of(fields[i].getGenericType());
-                val value = event.getValues().get(i);
-                values[i] = ContractDecoder.decodeReturnValue(value, type);
+                    val valueTypes = Arrays.stream(values).map(Object::getClass).toArray(Class[]::new);
+                    val constructor = eventType.getDeclaredConstructor(valueTypes);
+                    events.add(constructor.newInstance(values));
+                } catch (Exception e) {
+                }
             }
-
-            val valueTypes = Arrays.stream(values).map(Object::getClass).toArray(Class[]::new);
-            val constructor = eventClass.getDeclaredConstructor(valueTypes);
-            events.add(constructor.newInstance(values));
         }
 
-        return new ContractResponse(contractClass, transactionHash, error, result, events, eventClasses);
+        return new ContractResponse(contractClass, request, transactionHash, error, result, events, eventClasses);
     }
 
 }

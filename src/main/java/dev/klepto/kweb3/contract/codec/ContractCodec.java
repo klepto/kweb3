@@ -37,8 +37,10 @@ public class ContractCodec {
         // Map List type to array, they should be inter-changeable.
         if (type.isSubtypeOf(TypeToken.of(List.class))) {
             val componentType = getListComponentType(type);
-            val arrayType = Array.newInstance(componentType.getRawType(), 0);
-            return arrayType.getClass();
+            if (isSolidityType(componentType)) {
+                val arrayType = Array.newInstance(componentType.getRawType(), 0);
+                return arrayType.getClass();
+            }
         }
 
         return null;

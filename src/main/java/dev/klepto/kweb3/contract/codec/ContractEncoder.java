@@ -10,6 +10,7 @@ import dev.klepto.kweb3.contract.event.Indexed;
 import dev.klepto.kweb3.type.SolidityType;
 import dev.klepto.kweb3.type.Struct;
 import dev.klepto.kweb3.util.reflection.Reflection;
+import io.github.classgraph.ClassGraph;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -103,7 +104,7 @@ public class ContractEncoder {
     }
 
     @SneakyThrows
-    public static List<Class<?>> encodeReturnTypes(TypeToken<?> type, Type annotation) {
+    public static List<Object> encodeReturnTypes(TypeToken<?> type, Type annotation) {
         // If annotated, use that before anything else.
         if (annotation != null) {
             return Arrays.stream(annotation.value()).collect(Collectors.toList());
@@ -126,52 +127,20 @@ public class ContractEncoder {
         }
 
         // Otherwise it's a struct, parse fields to find out the types.
-        val fields = type.getRawType().getDeclaredFields();
-        val fieldTypes = new ArrayList<Class<?>>();
+        val componentType = ContractCodec.getComponentType(type);
+        val isArray = componentType != null;
+        val structType = isArray ? componentType : type;
+
+        val fields = structType.getRawType().getDeclaredFields();
+        val fieldTypes = new ArrayList<>();
         for (val field : fields) {
             val fieldType = TypeToken.of(field.getGenericType());
             val fieldAnnotation = field.getAnnotation(Type.class);
             fieldTypes.add(encodeParameterType(fieldType, fieldAnnotation));
         }
-        return fieldTypes;
+
+        return isArray ? List.of((Object) fieldTypes.toArray(Class[]::new)) : fieldTypes;
     }
 
-    public static List<Web3Request.Event> encodeEvents(Class<?> contractType) {
-        val eventClasses = encodeEventClasses(contractType);
-        val events = new ArrayList<Web3Request.Event>();
-        for (val eventClass : eventClasses) {
-            events.add(encodeEvent(eventClass));
-        }
-        return events;
-    }
-
-    public static List<Class<?>> encodeEventClasses(Class<?> contractType) {
-        return Arrays.stream(contractType.getDeclaredClasses())
-                .filter(type -> type.isAnnotationPresent(Event.class))
-                .collect(Collectors.toList());
-    }
-
-    public static String encodeEventName(Class<?> eventClass) {
-        var name = eventClass.getAnnotation(Event.class).value();
-        if (name.isBlank()) {
-            name = eventClass.getSimpleName();
-        }
-        return name;
-    }
-
-    public static Web3Request.Event encodeEvent(Class<?> eventClass) {
-        val name = encodeEventName(eventClass);
-        val valueTypes = new ArrayList<Class<?>>();
-        val fields = eventClass.getDeclaredFields();
-        val indexedValues = new boolean[fields.length];
-        for (var i = 0; i < fields.length; i++) {
-            val field = fields[i];
-            val fieldType = TypeToken.of(field.getGenericType());
-            val fieldAnnotation = field.getAnnotation(Type.class);
-            indexedValues[i] = field.isAnnotationPresent(Indexed.class);
-            valueTypes.add(encodeParameterType(fieldType, fieldAnnotation));
-        }
-        return new Web3Request.Event(name, valueTypes, indexedValues);
-    }
 
 }
