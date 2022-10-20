@@ -27,7 +27,7 @@ public interface Web3Client {
 
     Web3Response send(Web3Request request);
 
-    List<Object> abiDecode(String abi, List<Class<?>> types);
+    List<Object> abiDecode(String abi, List<Object> types);
 
     String abiEncode(Web3Request request);
 
@@ -37,11 +37,17 @@ public interface Web3Client {
 
     List<Uint256> estimateGas(Runnable runnable);
 
+    Uint256 estimateGasPrice(Web3Request request);
+
+    Uint256 estimateGasPrice(Runnable runnable);
+
     Address getAddress();
 
     List<Web3Request> getLogs(Runnable runnable);
 
     boolean isLogging();
+
+    GasFeeProvider getGasFeeProvider();
 
     void setGasFeeProvider(GasFeeProvider provider);
 

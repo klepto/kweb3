@@ -4,6 +4,7 @@ import dev.klepto.kweb3.contract.Contract;
 import dev.klepto.kweb3.contract.ContractProxy;
 import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
+import dev.klepto.kweb3.util.number.Numeric;
 import lombok.Getter;
 import lombok.val;
 
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static dev.klepto.kweb3.type.sized.Uint256.uint256;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -56,6 +59,11 @@ public abstract class AbstractWeb3Client implements Web3Client {
     @Override
     public List<Uint256> estimateGas(Runnable runnable) {
         return getLogs(runnable).stream().map(this::estimateGas).toList();
+    }
+
+    @Override
+    public Uint256 estimateGasPrice(Runnable runnable) {
+        return getLogs(runnable).stream().map(this::estimateGasPrice).reduce(Numeric::add).orElse(uint256(0));
     }
 
     @Override

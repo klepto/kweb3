@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.klepto.kweb3.type.sized.Uint256.uint256;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_FREQUENCY;
 
@@ -51,7 +52,7 @@ public class Web3jClient extends AbstractWeb3Client {
             return new Web3Response(null, request, null, result, Collections.emptyList());
         } else {
             val gasLimit = estimateGas(request, session, data).toBigInteger();
-            val gasProvider = gasFeeProvider != null ? gasFeeProvider : new Web3jGasProvider(session.getWeb3j());
+            val gasProvider = getGasFeeProvider();
             val gasFee = gasProvider.getGasFee();
             val legacyGasFee = gasProvider.getLegacyGasFee();
             val useLegacy = gasFee.getMaxFeePerGas().getValue().equals(BigInteger.ZERO)
@@ -112,7 +113,7 @@ public class Web3jClient extends AbstractWeb3Client {
     }
 
     @Override
-    public List<Object> abiDecode(String abi, List<Class<?>> types) {
+    public List<Object> abiDecode(String abi, List<Object> types) {
         val encodedTypes = Web3jEncoder.encodeTypes(types);
         return Web3jDecoder.decodeResult(abi, encodedTypes);
     }
@@ -131,6 +132,13 @@ public class Web3jClient extends AbstractWeb3Client {
         return estimateGas(request, session, data);
     }
 
+    @Override
+    public Uint256 estimateGasPrice(Web3Request request) {
+        val gasAmount = estimateGas(request);
+        val gasPrice = getGasFeeProvider().getLegacyGasFee().getGasPrice();
+        return gasAmount.mul(gasPrice);
+    }
+
     @SneakyThrows
     private Uint256 estimateGas(Web3Request request, Web3jSession session, String data) {
         val nonce = session.getWeb3j().ethGetTransactionCount(
@@ -142,7 +150,14 @@ public class Web3jClient extends AbstractWeb3Client {
                 ? Transaction.createEthCallTransaction(from, to, data)
                 : Transaction.createFunctionCallTransaction(from, nonce, BigInteger.ZERO, BigInteger.ZERO, to, data);
         val estimateGasResult = session.getWeb3j().ethEstimateGas(transaction).send();
-        return new Uint256(estimateGasResult.getAmountUsed()).mul(1.1);
+        if (estimateGasResult.getResult() == null) {
+           return uint256(0);
+        }
+        return new Uint256(estimateGasResult. getAmountUsed()).mul(1.1);
+    }
+
+    public GasFeeProvider getGasFeeProvider() {
+        return gasFeeProvider != null ? gasFeeProvider : new Web3jGasProvider(createSession().getWeb3j());
     }
 
     public Address getAddress() {
