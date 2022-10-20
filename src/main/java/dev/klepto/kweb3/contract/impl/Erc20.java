@@ -7,6 +7,10 @@ import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
 import dev.klepto.kweb3.type.sized.Uint8;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import static dev.klepto.kweb3.contract.Cache.INDEFINITE;
 
 /**
@@ -19,9 +23,22 @@ public interface Erc20 extends Contract {
     @lombok.Value
     @Event("Transfer")
     class TransferEvent {
-        @Indexed Address from;
-        @Indexed Address to;
+        @Indexed Address sender;
+        @Indexed Address receiver;
         Uint256 value;
+
+        public static Stream<TransferEvent> find(ContractResponse response, Predicate<TransferEvent> predicate) {
+            return response.getEvents(TransferEvent.class).stream().filter(predicate);
+        }
+
+        public static Stream<TransferEvent> findBySender(ContractResponse response) {
+            return find(response, event -> event.getSender().equals(response.getRequest().getCallerAddress()));
+        }
+
+        public static Stream<TransferEvent> findByReceiver(ContractResponse response)  {
+            return find(response, event -> event.getReceiver().equals(response.getRequest().getCallerAddress()));
+        }
+
     }
 
     @lombok.Value
