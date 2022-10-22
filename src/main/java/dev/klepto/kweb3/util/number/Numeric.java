@@ -72,7 +72,11 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     default Decimal toDecimal() {
-        return toDecimal(getValue());
+        return toDecimal(DEFAULT_DECIMALS);
+    }
+
+    default Decimal toDecimal(int scale) {
+        return toDecimal(getValue(), scale);
     }
 
     default float toFloat() {
@@ -226,8 +230,8 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return (T) result;
     }
 
-    static Decimal toDecimal(Object value) {
-        return new Decimal(toBigDecimal(value).setScale(DEFAULT_DECIMALS));
+    static Decimal toDecimal(Object value, int scale) {
+        return new Decimal(new BigDecimal(toBigInteger(value), scale));
     }
 
     static float toFloat(Object value) {
@@ -321,7 +325,7 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static Numeric.Decimal numeric(Object value) {
-        return toDecimal(value);
+        return toDecimal(value, DEFAULT_DECIMALS);
     }
 
     static Uint256 tokens(Object value) {
