@@ -46,6 +46,11 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return create(newValue);
     }
 
+    default T negate() {
+        val newValue = toBigDecimal().negate();
+        return create(newValue);
+    }
+
     default boolean moreThan(Object value) {
         return compareTo(value) > 0;
     }
@@ -72,11 +77,11 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     default Decimal toDecimal() {
-        return toDecimal(DEFAULT_DECIMALS);
+        return toDecimal(0);
     }
 
-    default Decimal toDecimal(int scale) {
-        return toDecimal(getValue(), scale);
+    default Decimal toDecimal(Object scale) {
+        return decimal(getValue(), scale);
     }
 
     default float toFloat() {
@@ -230,10 +235,6 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return (T) result;
     }
 
-    static Decimal toDecimal(Object value, int scale) {
-        return new Decimal(new BigDecimal(toBigInteger(value), scale));
-    }
-
     static float toFloat(Object value) {
         return toBigDecimal(value).floatValue();
     }
@@ -263,22 +264,26 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static String toHex(Object value) {
-        if (value instanceof byte[] || value instanceof Bytes) {
-            val bytes = value instanceof Bytes ? ((Bytes) value).getValue() : (byte[]) value;
-            return "0x" + BaseEncoding.base16().encode(bytes);
+        var data = new byte[0];
+        val encoding = BaseEncoding.base16().omitPadding();
+
+        if (value instanceof byte[] byteArary) {
+            data = byteArary;
+        } else if (value instanceof Bytes bytes) {
+            data = bytes.getValue();
+        } else if (value instanceof String string) {
+            data = encoding.decode(stripHexPrefix(string.toUpperCase()));
+        } else {
+            data = toBigInteger(value).toByteArray();
         }
 
-        if (value instanceof String && ((String) value).startsWith("0x")) {
-            return (String) value;
-        }
-
-        return "0x" + toBigInteger(value).toString(16);
+        return "0x" + encoding.encode(data).toLowerCase();
     }
 
     static byte[] toByteArray(Object value) {
-        val hex = value instanceof String ? (String) value : toHex(value);
-        val stripped = stripHexPrefix(hex).toUpperCase();
-        return BaseEncoding.base16().decode(stripped);
+        val encoding = BaseEncoding.base16().omitPadding();
+        val hex = stripHexPrefix(toHex(value)).toUpperCase();
+        return encoding.decode(hex);
     }
 
     static Bytes toBytes(Object value) {
@@ -324,8 +329,12 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return value.toLowerCase().replace("0x", "");
     }
 
-    static Numeric.Decimal numeric(Object value) {
-        return toDecimal(value, DEFAULT_DECIMALS);
+    static Numeric.Decimal decimal(Object value) {
+        return decimal(value, 0);
+    }
+
+    static Numeric.Decimal decimal(Object value, Object scale) {
+        return Decimal.create(toBigDecimal(value), toInt(scale));
     }
 
     static Uint256 tokens(Object value) {
@@ -333,9 +342,8 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static Uint256 tokens(Object value, Object decimals) {
-        return numeric(value)
-                .mul(numeric(10).pow(decimals))
-                .toUint256();
+        val scale = decimal(decimals).negate();
+        return decimal(value, scale).toUint256();
     }
 
     /**
@@ -345,7 +353,7 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     class Decimal implements Numeric<Decimal, BigDecimal> {
         private final BigDecimal value;
 
-        public Decimal(BigDecimal value) {
+        private Decimal(BigDecimal value) {
             this.value = value;
         }
 
@@ -363,6 +371,17 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         public String toString() {
             return getValue().toPlainString();
         }
+
+        public static Decimal create(BigDecimal value, int scale) {
+            val unscaledValue = value.setScale(DEFAULT_DECIMALS, RoundingMode.FLOOR);
+            val scaledDown = scale >= 0;
+            val scalePower = BigDecimal.valueOf(10).pow(Math.abs(scale));
+            val scaledValue = scaledDown
+                    ? unscaledValue.divide(scalePower, RoundingMode.FLOOR)
+                    : unscaledValue.multiply(scalePower);
+            return new Decimal(scaledValue);
+        }
+
     }
 
 
