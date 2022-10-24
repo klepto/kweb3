@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.chain;
 
 import lombok.Value;
+import lombok.With;
 
 /**
  * Contains information about an ethereum network chain.
@@ -8,6 +9,7 @@ import lombok.Value;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Value
+@With
 public class Chain {
 
     long chainId;
