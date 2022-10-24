@@ -266,6 +266,11 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static String toHex(Object value) {
+        if (value instanceof byte[] || value instanceof Bytes) { // For byte buffers, we don't strip 0s.
+            val buffer = value instanceof Bytes ? ((Bytes) value).getValue() : (byte[]) value;
+            return "0x" + BaseEncoding.base16().encode(buffer).toLowerCase();
+        }
+
         val integerValue = toBigInteger(value);
         var result = integerValue.toString(16).toLowerCase();
         if (result.length() % 2 != 0) {
