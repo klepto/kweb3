@@ -329,15 +329,15 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         return value.toLowerCase().replace("0x", "");
     }
 
-    static Numeric.Decimal decimal(Object value) {
+    static Decimal decimal(Object value) {
         return decimal(value, 0);
     }
 
-    static Numeric.Decimal decimal(Object value, Object scale) {
+    static Decimal decimal(Object value, Object scale) {
         val bigDecimal = toBigDecimal(value);
         require(bigDecimal != null, "Couldn't parse numeric value.");
 
-        return Decimal.create(bigDecimal, toInt(scale));
+        return Decimal.create(bigDecimal, toInt(scale), DEFAULT_DECIMALS);
     }
 
     static Uint256 tokens(Object value) {
@@ -348,44 +348,5 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         val scale = decimal(decimals).negate();
         return decimal(value, scale).toUint256();
     }
-
-    /**
-     * Numeric that supports decimal values.
-     */
-    @Getter
-    class Decimal implements Numeric<Decimal, BigDecimal> {
-        private final BigDecimal value;
-
-        private Decimal(BigDecimal value) {
-            this.value = value;
-        }
-
-        @Override
-        public Decimal div(Object value) {
-            val newValue = this.value.divide(
-                    Numeric.toBigDecimal(value),
-                    this.value.scale(),
-                    RoundingMode.FLOOR
-            );
-            return new Decimal(newValue);
-        }
-
-        @Override
-        public String toString() {
-            return getValue().toPlainString();
-        }
-
-        public static Decimal create(BigDecimal value, int scale) {
-            val unscaledValue = value.setScale(DEFAULT_DECIMALS, RoundingMode.FLOOR);
-            val scaledDown = scale >= 0;
-            val scalePower = BigDecimal.valueOf(10).pow(Math.abs(scale));
-            val scaledValue = scaledDown
-                    ? unscaledValue.divide(scalePower, RoundingMode.FLOOR)
-                    : unscaledValue.multiply(scalePower);
-            return new Decimal(scaledValue);
-        }
-
-    }
-
 
 }
