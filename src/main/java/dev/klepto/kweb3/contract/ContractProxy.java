@@ -106,6 +106,10 @@ public class ContractProxy implements InvocationHandler {
     private Object getResponse(Method method, Web3Request request) {
         val response = client.send(request);
 
+        if (response != null && response.getError() != null) {
+            throw response.getError();
+        }
+
         if (response == null || response.getResult() == null) {
             return null;
         }
