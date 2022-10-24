@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
+import static dev.klepto.kweb3.Web3Error.require;
+
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
@@ -172,12 +174,12 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         if (type == String.class) return toBigDecimal((String) value);
         if (type == byte[].class) return toBigDecimal((byte[]) value);
         if (type == BigDecimal.class) return (BigDecimal) value;
-        if (Numeric.class.isAssignableFrom(type)) return ((Numeric) value).toBigDecimal();
+        if (Numeric.class.isAssignableFrom(type)) return toBigDecimal((Numeric<?, ?>) value);
         return null;
     }
 
     static BigDecimal toBigDecimal(Float value) {
-        return toBigDecimal(value.doubleValue());
+        return new BigDecimal(value.toString());
     }
 
     static BigDecimal toBigDecimal(Double value) {
@@ -264,6 +266,10 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static String toHex(Object value) {
+        if (value instanceof String string) {
+            return "0x" + stripHexPrefix(string.toLowerCase());
+        }
+
         var data = new byte[0];
         val encoding = BaseEncoding.base16().omitPadding();
 
@@ -271,8 +277,6 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
             data = byteArary;
         } else if (value instanceof Bytes bytes) {
             data = bytes.getValue();
-        } else if (value instanceof String string) {
-            data = encoding.decode(stripHexPrefix(string.toUpperCase()));
         } else {
             data = toBigInteger(value).toByteArray();
         }
@@ -311,15 +315,11 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static Address toAddress(Object value) {
-        if (value instanceof Contract) {
-            return ((Contract) value).getAddress();
-        }
-
         if (value instanceof Address) {
             return ((Address) value);
         }
 
-        return new Address(toHex(value));
+        return new Address(toBigInteger(value));
     }
 
     /*
@@ -334,7 +334,10 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
     }
 
     static Numeric.Decimal decimal(Object value, Object scale) {
-        return Decimal.create(toBigDecimal(value), toInt(scale));
+        val bigDecimal = toBigDecimal(value);
+        require(bigDecimal != null, "Couldn't parse numeric value.");
+
+        return Decimal.create(bigDecimal, toInt(scale));
     }
 
     static Uint256 tokens(Object value) {

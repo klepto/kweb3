@@ -1,5 +1,7 @@
 package dev.klepto.kweb3.util.number;
 
+import dev.klepto.kweb3.type.Address;
+import dev.klepto.kweb3.type.Bytes;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -7,9 +9,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
+import static dev.klepto.kweb3.type.Address.address;
 import static dev.klepto.kweb3.type.sized.Uint256.uint256;
-import static dev.klepto.kweb3.util.number.Numeric.decimal;
-import static dev.klepto.kweb3.util.number.Numeric.tokens;
+import static dev.klepto.kweb3.util.number.Numeric.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NumericTest {
 
     public String stripDecimal(Object value, int scale) {
-        return  Numeric.toBigDecimal(value).setScale(scale, RoundingMode.FLOOR).toPlainString();
+        return Numeric.toBigDecimal(value).setScale(scale, RoundingMode.FLOOR).toPlainString();
     }
 
     @Test
@@ -80,7 +82,6 @@ public class NumericTest {
         val decimal = decimal(5.55, 0);
 
         assertEquals(uint256(Math.pow(10, 5)), uint.pow(decimal));
-        System.out.println(Math.pow(5.55, 10));
         assertEquals(stripDecimal(Math.pow(5.55, 10), 5), stripDecimal(decimal.pow(uint), 5)); // floating-point rounding
     }
 
@@ -122,10 +123,10 @@ public class NumericTest {
         val uint = uint256(10);
         val decimal = decimal(5.55, 0);
 
-        assertFalse(uint.lessThanOrEquals(decimal));
-        assertTrue(decimal.lessThanOrEquals(uint));
-        assertTrue(uint.lessThanOrEquals(uint));
-        assertTrue(decimal.lessThanOrEquals(decimal));
+        assertFalse(uint.lessThan(decimal));
+        assertTrue(decimal.lessThan(uint));
+        assertFalse(uint.lessThan(uint));
+        assertFalse(decimal.lessThan(decimal));
     }
 
     @Test
@@ -235,30 +236,47 @@ public class NumericTest {
 
     @Test
     public void testToBigDecimal() {
-        val uint = uint256(10);
-        val decimal = decimal(5.55, 0);
+        val ten = new BigDecimal(10);
+        val fivePointFiveFive = new BigDecimal("5.55");
 
-        assertEquals(new BigDecimal(10), uint.toBigDecimal());
-        assertEquals(new BigDecimal("5.55").setScale(Numeric.DEFAULT_DECIMALS), decimal.toBigDecimal());
+        assertEquals(ten, uint256(10).toBigDecimal());
+        assertEquals(fivePointFiveFive.setScale(Numeric.DEFAULT_DECIMALS), decimal(5.55).toBigDecimal());
+
+        assertEquals(fivePointFiveFive, toBigDecimal((Object) 5.55f));
+        assertEquals(fivePointFiveFive, toBigDecimal((Object) 5.55d));
+        assertEquals(ten, toBigDecimal((Object) (byte) 10));
+        assertEquals(ten, toBigDecimal((Object) (short) 10));
+        assertEquals(ten, toBigDecimal((Object) 10));
+        assertEquals(ten, toBigDecimal((Object) (long) 10));
+        assertEquals(ten, toBigDecimal((Object) BigInteger.valueOf(10)));
+        assertEquals(ten, toBigDecimal((Object) "0x0a"));
+        assertEquals(ten, toBigDecimal((Object) new byte[]{10}));
+        assertEquals(ten, toBigDecimal((Object) ten));
+        assertEquals(ten, toBigDecimal((Object) uint256(10)));
+        assertNull(toBigDecimal(new Object()));
     }
 
     @Test
     public void testToHex() {
         assertEquals("0x00", uint256(0).toHex());
         assertEquals("0x0a", uint256(10).toHex());
-        assertEquals("0x075bcd15",uint256(123456789).toHex());
+        assertEquals("0x075bcd15", uint256(123456789).toHex());
+
+        assertEquals("0x0a", Numeric.toHex(new byte[]{10}));
+        assertEquals("0x0a", Numeric.toHex(new Bytes(new byte[]{10})));
+        assertEquals("0x0a", Numeric.toHex("0x0a"));
     }
 
     @Test
     public void testToByteArray() {
-        assertArrayEquals(new byte[] { 0 }, uint256(0).toByteArray());
-        assertArrayEquals(new byte[] { 10 }, uint256(10).toByteArray());
-        assertArrayEquals(new byte[] { 7, 91, -51, 21 }, uint256(123456789).toByteArray());
+        assertArrayEquals(new byte[]{0}, uint256(0).toByteArray());
+        assertArrayEquals(new byte[]{10}, uint256(10).toByteArray());
+        assertArrayEquals(new byte[]{7, 91, -51, 21}, uint256(123456789).toByteArray());
     }
 
     @Test
     public void testToBytes() {
-        val data = new byte[] { 7, 91, -51, 21 };
+        val data = new byte[]{7, 91, -51, 21};
         assertArrayEquals(data, uint256(123456789).toBytes().getValue());
     }
 
@@ -270,15 +288,19 @@ public class NumericTest {
         assertEquals(bigInteger, decimal(value).toUint8().getValue());
         assertEquals(bigInteger, decimal(value).toUint32().getValue());
         assertEquals(bigInteger, decimal(value).toUint112().getValue());
+        assertEquals(bigInteger, decimal(value).toUint160().getValue());
         assertEquals(bigInteger, decimal(value).toUint256().getValue());
         assertEquals(BigInteger.valueOf(5), decimal(5.5).toUint256().getValue());
     }
 
     @Test
     public void testToAddress() {
-        assertEquals(42, decimal(0).toAddress().toString().length());
-        assertEquals(42, decimal(123456789).toAddress().toString().length());
-        assertEquals("0x00000000000000000000000000000000075BCd15", decimal(123456789).toAddress().toString());
+        val address = address(123456789);
+        val hex = "0x00000000000000000000000000000000075BCd15";
+        assertEquals(new Address(0), decimal(0).toAddress());
+        assertEquals(address, decimal(123456789).toAddress());
+        assertEquals(address, Numeric.toAddress(hex));
+        assertEquals(address, Numeric.toAddress(address));
     }
 
     @Test
@@ -300,7 +322,7 @@ public class NumericTest {
         assertEquals(123456789111213L, Numeric.to(Long.class, 123456789111213L));
         assertEquals(BigInteger.valueOf(123456789111213L), Numeric.to(BigInteger.class, 123456789111213L));
         assertEquals("0x075bcd15", Numeric.to(String.class, 123456789));
-        assertArrayEquals(new byte[] { 7, 91, -51, 21 }, Numeric.to(byte[].class, 123456789));
+        assertArrayEquals(new byte[]{7, 91, -51, 21}, Numeric.to(byte[].class, 123456789));
         assertEquals(new BigDecimal("123456.789"), Numeric.to(BigDecimal.class, 123456.789));
     }
 
