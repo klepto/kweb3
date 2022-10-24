@@ -9,6 +9,7 @@ import org.web3j.abi.*;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.response.PollingTransactionReceiptProcessor;
@@ -17,6 +18,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.klepto.kweb3.type.Address.address;
 import static dev.klepto.kweb3.type.sized.Uint256.uint256;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH;
 import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_FREQUENCY;
@@ -46,10 +48,14 @@ public class Web3jClient extends AbstractWeb3Client {
         val to = request.getAddress().toString();
         val defaultBlockParameter = DefaultBlockParameter.valueOf("latest");
 
+        var transactionHash = (String) null;
+        var events = Collections.<Web3Response.Event>emptyList();
+        var error = (Web3Error) null;
+        var response = (Response<String>) null;
+
         if (request.getFunction().isView()) {
-            val response = session.getTransactionManager().sendCall(to, data, defaultBlockParameter);
-            val result = Web3jDecoder.decodeResult(response, function.getOutputParameters());
-            return new Web3Response(null, request, null, result, Collections.emptyList());
+            val transaction = Transaction.createEthCallTransaction(getAddress().toString(), to, data);
+            response = session.getWeb3j().ethCall(transaction, defaultBlockParameter).send();
         } else {
             val gasLimit = estimateGas(request, session, data).toBigInteger();
             val gasProvider = getGasFeeProvider();
@@ -60,7 +66,6 @@ public class Web3jClient extends AbstractWeb3Client {
                     || legacyGasFee.getGasPrice().getValue().compareTo(gasFee.getMaxFeePerGas().getValue()) < 0;
             val value = request.getValue().getValue();
 
-            var response = (EthSendTransaction) null;
             if (useLegacy) {
                 val gasPrice = legacyGasFee.getGasPrice().getValue();
                 response = session.getTransactionManager().sendTransaction(
@@ -84,22 +89,22 @@ public class Web3jClient extends AbstractWeb3Client {
                 );
             }
 
+            transactionHash = ((EthSendTransaction) response).getTransactionHash();
             val processor = new PollingTransactionReceiptProcessor(
                     session.getWeb3j(), DEFAULT_POLLING_FREQUENCY, DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH
             );
-            val receipt = processor.waitForTransactionReceipt(response.getTransactionHash());
-            val events = Web3jDecoder.decodeEvents(request.getEventTypes(), receipt.getLogs());
-            var error = (Web3Error) null;
-            var result = Collections.emptyList();
-
-            if (response.getError() != null) {
-                error = new Web3Error("RPC error: {}", response.getError().getMessage());
-            } else {
-                result = Web3jDecoder.decodeResult(response.getResult(), function.getOutputParameters());
-            }
-
-            return new Web3Response(response.getTransactionHash(), request, error, result, events);
+            val receipt = processor.waitForTransactionReceipt(transactionHash);
+            events = Web3jDecoder.decodeEvents(request.getEventTypes(), receipt.getLogs());
         }
+
+        var result = Collections.emptyList();
+        if (response.getError() != null) {
+            error = new Web3Error("RPC error: {}", response.getError().getMessage());
+        } else {
+            result = Web3jDecoder.decodeResult(response.getResult(), function.getOutputParameters());
+        }
+
+        return new Web3Response(transactionHash, request, error, result, events);
     }
 
     @Override
@@ -161,7 +166,11 @@ public class Web3jClient extends AbstractWeb3Client {
     }
 
     public Address getAddress() {
-        return new Address(Credentials.create(privateKey).getAddress());
+        if (privateKey == null) {
+            return address(0);
+        }
+
+        return address(Credentials.create(privateKey).getAddress());
     }
 
 }

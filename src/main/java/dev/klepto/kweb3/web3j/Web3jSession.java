@@ -22,8 +22,8 @@ public class Web3jSession {
 
     public Web3jSession(String rpcUrl, long chainId, String privateKey) {
         this.web3j = Web3j.build(new HttpService(rpcUrl));
-        this.credentials = Credentials.create(privateKey);
-        this.transactionManager = new RawTransactionManager(web3j, credentials, chainId);
+        this.credentials = privateKey != null ? Credentials.create(privateKey) : null;
+        this.transactionManager = privateKey != null ?  new RawTransactionManager(web3j, credentials, chainId) : null;
         this.chainId = chainId;
     }
 

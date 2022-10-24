@@ -8,6 +8,7 @@ import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
 import dev.klepto.kweb3.util.number.Numeric;
 import dev.klepto.kweb3.web3j.Web3jClient;
+import lombok.val;
 
 import java.util.List;
 
@@ -51,8 +52,15 @@ public interface Web3Client {
 
     void setGasFeeProvider(GasFeeProvider provider);
 
+    static Web3Client createClient(Chain chain) {
+        return createClient(null, chain);
+    }
+
     static Web3Client createClient(Web3Wallet wallet, Chain chain) {
-        return new Web3jClient(chain.getRpcUrls()[0], chain.getChainId(), wallet.getPrivateKey());
+        val rpcUrl = chain.getRpcUrls()[0];
+        val chainId = chain.getChainId();
+        val privateKey = wallet != null ? wallet.getPrivateKey() : null;
+        return new Web3jClient(rpcUrl, chainId, privateKey);
     }
 
 }
