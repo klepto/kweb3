@@ -240,7 +240,7 @@ public class NumericTest {
         val fivePointFiveFive = new BigDecimal("5.55");
 
         assertEquals(ten, uint256(10).toBigDecimal());
-        assertEquals(fivePointFiveFive.setScale(Numeric.DEFAULT_DECIMALS), decimal(5.55).toBigDecimal());
+        assertEquals(fivePointFiveFive.setScale(Numeric.MINIMUM_DECIMALS), decimal(5.55).toBigDecimal());
 
         assertEquals(fivePointFiveFive, toBigDecimal((Object) 5.55f));
         assertEquals(fivePointFiveFive, toBigDecimal((Object) 5.55d));
@@ -328,7 +328,7 @@ public class NumericTest {
 
     @Test
     public void testDecimal() {
-        assertEquals(Numeric.DEFAULT_DECIMALS, decimal(0).getValue().scale());
+        assertEquals(Numeric.MINIMUM_DECIMALS, decimal(0).getValue().scale());
         assertEquals(new BigDecimal("123.000000000000000000"), decimal(123).getValue());
         assertEquals(new BigDecimal("12.300000000000000000"), decimal(123, 1).getValue());
         assertEquals(new BigDecimal("1230.000000000000000000"), decimal(123, -1).getValue());
@@ -336,7 +336,7 @@ public class NumericTest {
 
     @Test
     public void testTokens() {
-        assertEquals(BigInteger.TEN.pow(Numeric.DEFAULT_DECIMALS), tokens(1).getValue());
+        assertEquals(BigInteger.TEN.pow(Numeric.MINIMUM_DECIMALS), tokens(1).getValue());
         assertEquals(BigInteger.TEN.pow(5), tokens(1, 5).getValue());
         assertEquals(BigInteger.TEN.pow(5).multiply(BigInteger.valueOf(123)), tokens(123, 5).getValue());
     }

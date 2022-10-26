@@ -20,11 +20,7 @@ public class Decimal implements Numeric<Decimal, BigDecimal> {
 
     @Override
     public Decimal div(Object value) {
-        val newValue = this.value.divide(
-                Numeric.toBigDecimal(value),
-                this.value.scale(),
-                RoundingMode.FLOOR
-        );
+        val newValue = this.value.divide(Numeric.toBigDecimal(value), RoundingMode.FLOOR);
         return new Decimal(newValue);
     }
 
@@ -34,7 +30,7 @@ public class Decimal implements Numeric<Decimal, BigDecimal> {
     }
 
     public static Decimal create(BigDecimal value, int initialScale, int decimals) {
-        val unscaledValue = value.setScale(decimals, RoundingMode.FLOOR);
+        val unscaledValue = value.scale() < decimals ? value.setScale(decimals, RoundingMode.FLOOR) : value;
         val scaledDown = initialScale >= 0;
         val scalePower = BigDecimal.valueOf(10).pow(Math.abs(initialScale));
         val scaledValue = scaledDown

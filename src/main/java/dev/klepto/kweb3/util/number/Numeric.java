@@ -2,12 +2,10 @@ package dev.klepto.kweb3.util.number;
 
 import com.google.common.io.BaseEncoding;
 import com.google.gson.internal.Primitives;
-import dev.klepto.kweb3.contract.Contract;
 import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.Bytes;
 import dev.klepto.kweb3.type.sized.*;
 import dev.klepto.kweb3.util.reflection.Creatable;
-import lombok.Getter;
 import lombok.val;
 
 import java.math.BigDecimal;
@@ -21,7 +19,7 @@ import static dev.klepto.kweb3.Web3Error.require;
  */
 public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Object> {
 
-    int DEFAULT_DECIMALS = 18;
+    int MINIMUM_DECIMALS = 18;
 
     default T add(Object value) {
         val newValue = toBigDecimal().add(toBigDecimal(value));
@@ -333,11 +331,11 @@ public interface Numeric<T, V> extends Valuable<V>, Creatable<T>, Comparable<Obj
         val bigDecimal = toBigDecimal(value);
         require(bigDecimal != null, "Couldn't parse numeric value.");
 
-        return Decimal.create(bigDecimal, toInt(scale), DEFAULT_DECIMALS);
+        return Decimal.create(bigDecimal, toInt(scale), MINIMUM_DECIMALS);
     }
 
     static Uint256 tokens(Object value) {
-        return tokens(value, DEFAULT_DECIMALS);
+        return tokens(value, MINIMUM_DECIMALS);
     }
 
     static Uint256 tokens(Object value, Object decimals) {

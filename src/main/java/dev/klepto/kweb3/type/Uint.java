@@ -21,7 +21,7 @@ public abstract class Uint<T extends Uint<T>> extends NumericType<T, BigInteger>
 
     @Override
     public String toString() {
-        return toString(DEFAULT_DECIMALS);
+        return toString(MINIMUM_DECIMALS);
     }
 
 }
