@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static dev.klepto.kweb3.util.Collections.cast;
+
 /**
  * Decodes Web3j types into solidity types.
  *
@@ -26,10 +28,11 @@ public interface Web3jDecoder {
 
     static Object decodeValue(Object value) {
         if (value instanceof DynamicArray) {
-            return ((DynamicArray) value).getValue()
+            val array = ((DynamicArray) value).getValue()
                     .stream()
                     .map(Web3jDecoder::decodeValue)
                     .toArray();
+            return cast(array, array[0].getClass());
         } else if (value instanceof Uint) {
             val className = "dev.klepto.kweb3.type.sized." + value.getClass().getSimpleName();
             return Reflection.create(className, ((Uint) value).getValue());
