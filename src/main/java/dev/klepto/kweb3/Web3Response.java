@@ -1,5 +1,6 @@
 package dev.klepto.kweb3;
 
+import dev.klepto.kweb3.type.Address;
 import lombok.Value;
 
 import javax.annotation.Nullable;
@@ -30,6 +31,7 @@ public class Web3Response {
     @Value
     public static class Event {
         String name;
+        Address address;
         List<Object> values;
     }
 

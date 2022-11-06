@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static dev.klepto.kweb3.type.Address.address;
 import static dev.klepto.kweb3.util.Collections.cast;
 
 /**
@@ -66,13 +67,13 @@ public interface Web3jDecoder {
                 if (parameters == null) {
                     continue;
                 }
-                result.add(decodeEvent(eventType, parameters));
+                result.add(decodeEvent(eventType, log.getAddress(), parameters));
             }
         }
         return result;
     }
 
-    static Web3Response.Event decodeEvent(Web3Request.Event eventType, EventValues parameters) {
+    static Web3Response.Event decodeEvent(Web3Request.Event eventType, String address, EventValues parameters) {
         val indexQueue = new LinkedList<>(parameters.getIndexedValues());
         val nonIndexQueue = new LinkedList<>(parameters.getNonIndexedValues());
         val values = new ArrayList<>();
@@ -80,7 +81,7 @@ public interface Web3jDecoder {
             val value = eventType.getIndexedValues()[i] ? indexQueue.poll() : nonIndexQueue.poll();
             values.add(decodeValue(value));
         }
-        return new Web3Response.Event(eventType.getName(), values);
+        return new Web3Response.Event(eventType.getName(), address(address), values);
     }
 
 }

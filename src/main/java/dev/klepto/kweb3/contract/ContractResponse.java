@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import dev.klepto.kweb3.Web3Response;
 
@@ -35,24 +36,18 @@ public class ContractResponse {
     @Nullable
     List<Object> result;
 
-    @Nullable
     List<Object> events;
 
-    List<Class<?>> eventClasses;
+    List<Class<?>> eventTypes;
 
     public <T> T getEvent(Class<T> eventType) {
-        val events = getEvents(eventType);
-        return events.isEmpty() ? null : events.get(0);
+        return getEvents(eventType).findFirst().orElse(null);
     }
 
-    public <T> List<T> getEvents(Class<T> eventType) {
-        if (events == null) {
-            return Collections.emptyList();
-        }
+    public <T> Stream<T> getEvents(Class<T> eventType) {
         return events.stream()
                 .filter(eventType::isInstance)
-                .map(eventType::cast)
-                .collect(Collectors.toList());
+                .map(eventType::cast);
     }
 
 }

@@ -23,27 +23,16 @@ public interface Erc20 extends Contract {
     @lombok.Value
     @Event("Transfer")
     class TransferEvent {
+        Address address;
         @Indexed Address sender;
         @Indexed Address receiver;
         Uint256 value;
-
-        public static Stream<TransferEvent> find(ContractResponse response, Predicate<TransferEvent> predicate) {
-            return response.getEvents(TransferEvent.class).stream().filter(predicate);
-        }
-
-        public static Stream<TransferEvent> findBySender(ContractResponse response) {
-            return find(response, event -> event.getSender().equals(response.getRequest().getCallerAddress()));
-        }
-
-        public static Stream<TransferEvent> findByReceiver(ContractResponse response)  {
-            return find(response, event -> event.getReceiver().equals(response.getRequest().getCallerAddress()));
-        }
-
     }
 
     @lombok.Value
     @Event("Approval")
     class ApprovalEvent {
+        Address address;
         @Indexed Address owner;
         @Indexed Address spender;
         Uint256 value;

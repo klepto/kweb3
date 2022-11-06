@@ -1,11 +1,13 @@
 package dev.klepto.kweb3.util.reflection;
 
+import com.google.common.collect.Iterables;
 import com.google.gson.internal.Primitives;
 import lombok.SneakyThrows;
 import lombok.val;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Collection;
 
 import static dev.klepto.kweb3.Web3Error.require;
 
@@ -21,6 +23,11 @@ public class Reflection {
     public static <T> T create(String className, Object... values) {
         val type = Reflection.class.getClassLoader().loadClass(className);
         return (T) create(type, values);
+    }
+
+    @SneakyThrows
+    public static <T> T create(Class<T> type, Iterable<Object> values) {
+        return create(type, Iterables.toArray(values, Object.class));
     }
 
     @SneakyThrows

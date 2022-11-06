@@ -159,35 +159,13 @@ public class ContractProxy implements InvocationHandler {
 
     @SneakyThrows
     private ContractResponse createContractResponse(Web3Response web3Response, Class<?> contractClass) {
-        val eventClasses = ContractEvents.EVENT_CLASSES;
         val request = web3Response.getRequest();
         val transactionHash = web3Response.getTransactionHash();
         val error = web3Response.getError();
         val result = web3Response.getResult();
-        val events = new ArrayList<>();
-        for (val event : web3Response.getEvents()) {
-            val eventTypes = eventClasses.stream()
-                    .filter(type -> ContractEvents.encodeEventName(type).equals(event.getName()))
-                    .toList();
-            for (val eventType : eventTypes) {
-                try {
-                    val fields = eventType.getDeclaredFields();
-                    val values = new Object[event.getValues().size()];
-                    for (var i = 0; i < values.length; i++) {
-                        val type = TypeToken.of(fields[i].getGenericType());
-                        val value = event.getValues().get(i);
-                        values[i] = ContractDecoder.decodeReturnValue(value, type);
-                    }
-
-                    val valueTypes = Arrays.stream(values).map(Object::getClass).toArray(Class[]::new);
-                    val constructor = eventType.getDeclaredConstructor(valueTypes);
-                    events.add(constructor.newInstance(values));
-                } catch (Exception e) {
-                }
-            }
-        }
-
-        return new ContractResponse(contractClass, request, transactionHash, error, result, events, eventClasses);
+        val events = ContractEvents.decodeEvents(web3Response);
+        val eventTypes = events.stream().<Class<?>>map(Object::getClass).distinct().toList();
+        return new ContractResponse(contractClass, request, transactionHash, error, result, events, eventTypes);
     }
 
 }
