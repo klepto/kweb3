@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.web3j;
 
 import dev.klepto.kweb3.*;
+import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.gas.GasFeeProvider;
 import dev.klepto.kweb3.type.Address;
 import dev.klepto.kweb3.type.sized.Uint256;
@@ -28,16 +29,17 @@ import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_FREQUENCY;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
+@Getter
 @RequiredArgsConstructor
 public class Web3jClient extends AbstractWeb3Client {
 
     private final String rpcUrl;
-    private final long chainId;
+    private final Chain chain;
     private final String privateKey;
     @Setter private GasFeeProvider gasFeeProvider;
 
     private Web3jSession createSession() {
-        return new Web3jSession(rpcUrl, chainId, privateKey);
+        return new Web3jSession(rpcUrl, chain.getChainId(), privateKey);
     }
 
     @SneakyThrows
@@ -79,7 +81,7 @@ public class Web3jClient extends AbstractWeb3Client {
                 val maxPriorityFeePerGas = gasFee.getMaxPriorityFeePerGas().getValue();
                 val maxFeePerGas = gasFee.getMaxFeePerGas().getValue();
                 response = session.getTransactionManager().sendEIP1559Transaction(
-                        chainId,
+                        chain.getChainId(),
                         maxPriorityFeePerGas,
                         maxFeePerGas,
                         gasLimit,

@@ -18,11 +18,23 @@ import java.util.List;
  */
 public interface Web3Client {
 
+    static Web3Client createClient(Chain chain) {
+        return createClient(null, chain);
+    }
+
+    static Web3Client createClient(Web3Wallet wallet, Chain chain) {
+        val rpcUrl = chain.getRpcUrls()[0];
+        val privateKey = wallet != null ? wallet.getPrivateKey() : null;
+        return new Web3jClient(rpcUrl, chain, privateKey);
+    }
+
     default <T extends Contract> T getContract(Class<T> type, String address) {
         return getContract(type, Numeric.toAddress(address));
     }
 
     <T extends Contract> T getContract(Class<T> type, Address address);
+
+    Chain getChain();
 
     Uint256 balanceOf(Address address);
 
@@ -51,16 +63,5 @@ public interface Web3Client {
     GasFeeProvider getGasFeeProvider();
 
     void setGasFeeProvider(GasFeeProvider provider);
-
-    static Web3Client createClient(Chain chain) {
-        return createClient(null, chain);
-    }
-
-    static Web3Client createClient(Web3Wallet wallet, Chain chain) {
-        val rpcUrl = chain.getRpcUrls()[0];
-        val chainId = chain.getChainId();
-        val privateKey = wallet != null ? wallet.getPrivateKey() : null;
-        return new Web3jClient(rpcUrl, chainId, privateKey);
-    }
 
 }
