@@ -1,67 +1,36 @@
 package dev.klepto.kweb3;
 
-
+import dev.klepto.kweb3.abi.type.Address;
 import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.contract.Contract;
-import dev.klepto.kweb3.gas.GasFeeProvider;
-import dev.klepto.kweb3.type.Address;
-import dev.klepto.kweb3.type.sized.Uint256;
-import dev.klepto.kweb3.util.number.Numeric;
-import dev.klepto.kweb3.web3j.Web3jClient;
-import lombok.val;
+import dev.klepto.kweb3.net.EthClient;
+import dev.klepto.kweb3.net.web3j.Web3jClient;
+import dev.klepto.kweb3.util.multicall.MulticallContract;
+import dev.klepto.kweb3.util.multicall.MulticallBuilder;
 
-import java.util.List;
+import static dev.klepto.kweb3.abi.type.util.Types.address;
 
 /**
- *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Web3Client {
+public interface Web3Client extends EthClient {
 
-    static Web3Client createClient(Chain chain) {
-        return createClient(null, chain);
+    static Web3Client create(Chain chain) {
+        return create(chain, null);
     }
 
-    static Web3Client createClient(Web3Wallet wallet, Chain chain) {
-        val rpcUrl = chain.getRpcUrls()[0];
-        val privateKey = wallet != null ? wallet.getPrivateKey() : null;
-        return new Web3jClient(rpcUrl, chain, privateKey);
+    static Web3Client create(Chain chain, String privateKey) {
+        return new Web3jClient(chain, privateKey);
     }
 
-    default <T extends Contract> T getContract(Class<T> type, String address) {
-        return getContract(type, Numeric.toAddress(address));
+    default <T extends Contract> T contract(Class<T> type, String address) {
+        return contract(type, address(address));
     }
 
-    <T extends Contract> T getContract(Class<T> type, Address address);
+    <T extends Contract> T contract(Class<T> type, Address address);
 
-    Chain getChain();
+    void setMulticallContract(MulticallContract contract);
 
-    Uint256 balanceOf(Address address);
-
-    Web3Response send(Web3Request request);
-
-    List<Object> abiDecode(String abi, List<Object> types);
-
-    String abiEncode(Web3Request request);
-
-    List<String> abiEncode(Runnable runnable);
-
-    Uint256 estimateGas(Web3Request request);
-
-    List<Uint256> estimateGas(Runnable runnable);
-
-    Uint256 estimateGasPrice(Web3Request request);
-
-    Uint256 estimateGasPrice(Runnable runnable);
-
-    Address getAddress();
-
-    List<Web3Request> getLogs(Runnable runnable);
-
-    boolean isLogging();
-
-    GasFeeProvider getGasFeeProvider();
-
-    void setGasFeeProvider(GasFeeProvider provider);
+    MulticallBuilder multicall();
 
 }

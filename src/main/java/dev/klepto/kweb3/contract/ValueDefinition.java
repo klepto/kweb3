@@ -1,17 +1,16 @@
 package dev.klepto.kweb3.contract;
 
+import com.google.common.reflect.TypeToken;
 import lombok.Value;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Value
-public class Function {
+public class ValueDefinition {
 
-    String name;
-    String hash;
-    boolean view;
-    ValueType parametersType;
-    ValueType returnType;
+    TypeToken<?> type;
+    Type annotation;
+    boolean indexed;
 
 }

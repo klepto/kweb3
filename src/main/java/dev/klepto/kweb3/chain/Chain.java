@@ -4,8 +4,6 @@ import lombok.Value;
 import lombok.With;
 
 /**
- * Contains information about an ethereum network chain.
- *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Value
@@ -16,14 +14,22 @@ public class Chain {
     String name;
     String tokenSymbol;
     String tokenAddress;
-    String[] rpcUrls;
+    String rpcUrl;
 
-    public Chain(long chainId, String name, String tokenSymbol, String tokenAddress, String... rpcUrls) {
+    public Chain() {
+        this.chainId = -1;
+        this.name = null;
+        this.tokenSymbol = null;
+        this.tokenAddress = null;
+        this.rpcUrl = null;
+    }
+
+    public Chain(long chainId, String name, String tokenSymbol, String tokenAddress, String rpcUrl) {
         this.chainId = chainId;
         this.name = name;
         this.tokenSymbol = tokenSymbol;
         this.tokenAddress = tokenAddress;
-        this.rpcUrls = rpcUrls;
+        this.rpcUrl = rpcUrl;
     }
 
 }

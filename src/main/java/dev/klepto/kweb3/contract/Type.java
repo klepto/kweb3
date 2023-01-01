@@ -14,6 +14,10 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD})
 public @interface Type {
 
-    Class<?>[] value();
+    Class<?> value() default Type.class;
+
+    int valueSize() default 0;
+
+    int arraySize() default 0;
 
 }

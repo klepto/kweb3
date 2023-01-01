@@ -4,19 +4,15 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
+ * Annotates that contract function parameter is a value field. Value field is associated price with the transaction in
+ * network's native currency. Only applicable to {@link Transaction} functions.
+ *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface Cache {
-
-    long value();
-
-    TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
-
-    long INDEFINITE = -1;
+@Target({ElementType.PARAMETER})
+public @interface Cost {
 
 }

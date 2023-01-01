@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.gas;
 
-import dev.klepto.kweb3.type.sized.Uint256;
+import dev.klepto.kweb3.abi.type.Uint;
 import lombok.Value;
 
 /**
@@ -11,6 +11,6 @@ import lombok.Value;
 @Value
 public class LegacyGasFee {
 
-    Uint256 gasPrice;
+    Uint gasPrice;
 
 }

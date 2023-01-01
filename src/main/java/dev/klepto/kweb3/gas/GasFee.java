@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.gas;
 
-import dev.klepto.kweb3.type.sized.Uint256;
+import dev.klepto.kweb3.abi.type.Uint;
 import lombok.Value;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Value;
 @Value
 public class GasFee {
 
-    Uint256 maxFeePerGas;
-    Uint256 maxPriorityFeePerGas;
+    Uint maxFeePerGas;
+    Uint maxPriorityFeePerGas;
 
 }

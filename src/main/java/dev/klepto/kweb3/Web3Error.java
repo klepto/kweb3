@@ -1,10 +1,11 @@
 package dev.klepto.kweb3;
 
+
 import org.slf4j.helpers.MessageFormatter;
 
 /**
  * Represents web3 error. Contains utility methods such as {@link Web3Error#require(boolean, String, Object...)} and
- * {@link Web3Error#error(String, Object...)} in-order to easier invoke errors within contract interaction procedure.
+ * {@link Web3Error#error(String, Object...)} in-order to easier invoke errors within kweb3 API.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */

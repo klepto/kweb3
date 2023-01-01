@@ -1,15 +1,11 @@
 package dev.klepto.kweb3.contract.impl;
 
+import dev.klepto.kweb3.Web3Response;
+import dev.klepto.kweb3.abi.type.Address;
+import dev.klepto.kweb3.abi.type.Uint;
 import dev.klepto.kweb3.contract.*;
-import dev.klepto.kweb3.contract.event.Event;
-import dev.klepto.kweb3.contract.event.Indexed;
-import dev.klepto.kweb3.type.Address;
-import dev.klepto.kweb3.type.sized.Uint256;
-import dev.klepto.kweb3.type.sized.Uint8;
+import lombok.Value;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static dev.klepto.kweb3.contract.Cache.INDEFINITE;
 
@@ -20,22 +16,22 @@ import static dev.klepto.kweb3.contract.Cache.INDEFINITE;
  */
 public interface Erc20 extends Contract {
 
-    @lombok.Value
+    @Value
     @Event("Transfer")
     class TransferEvent {
-        Address address;
-        @Indexed Address sender;
-        @Indexed Address receiver;
-        Uint256 value;
+        @Event.Address Address eventAddress;
+        @Event.Indexed Address sender;
+        @Event.Indexed Address receiver;
+        Uint value;
     }
 
-    @lombok.Value
+    @Value
     @Event("Approval")
     class ApprovalEvent {
-        Address address;
-        @Indexed Address owner;
-        @Indexed Address spender;
-        Uint256 value;
+        @Event.Address Address eventAddress;
+        @Event.Indexed Address owner;
+        @Event.Indexed Address spender;
+        Uint value;
     }
 
     @View
@@ -47,31 +43,32 @@ public interface Erc20 extends Contract {
     String symbol();
 
     @View
+    @Type(value = Uint.class, valueSize = 8)
     @Cache(INDEFINITE)
-    Uint8 decimals();
+    Uint decimals();
 
     @View
-    Uint256 totalSupply();
+    Uint totalSupply();
 
     @View
-    Uint256 balanceOf(Address account);
+    Uint balanceOf(Address account);
 
     @View
-    Uint256 allowance(Address owner, Address spender);
+    Uint allowance(Address owner, Address spender);
 
     @Transaction
-    ContractResponse transfer(Address to, Uint256 amount);
+    Web3Response transfer(Address to, Uint amount);
 
     @Transaction
-    ContractResponse transferFrom(Address from, Address to, Uint256 amount);
+    Web3Response transferFrom(Address from, Address to, Uint amount);
 
     @Transaction
-    ContractResponse approve(Address spender, Uint256 amount);
+    Web3Response approve(Address spender, Uint amount);
 
     @Transaction
-    ContractResponse increaseAllowance(Address spender, Uint256 addedValue);
+    Web3Response increaseAllowance(Address spender, Uint addedValue);
 
     @Transaction
-    ContractResponse decreaseAllowance(Address spender, Uint256 subtractedValue);
+    Web3Response decreaseAllowance(Address spender, Uint subtractedValue);
 
 }
