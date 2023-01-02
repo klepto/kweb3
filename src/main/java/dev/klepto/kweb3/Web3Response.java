@@ -1,38 +1,37 @@
 package dev.klepto.kweb3;
 
-import dev.klepto.kweb3.type.Address;
+import dev.klepto.kweb3.abi.type.Address;
+import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Uint;
+import dev.klepto.kweb3.contract.event.Events;
 import lombok.Value;
+import lombok.With;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Contains basic information about web3 contract response.
- *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Value
+@With
 public class Web3Response {
 
-    @Nullable
-    String transactionHash;
-
+    Web3Client client;
     Web3Request request;
-
-    @Nullable
     Web3Error error;
 
-    @Nullable
-    List<Object> result;
-
-    @Nullable
-    List<Event> events;
+    String transactionHash;
+    Uint blockNumber;
+    Struct result;
+    List<Log> logs;
+    Events events;
 
     @Value
-    public static class Event {
-        String name;
+    public static class Log {
         Address address;
-        List<Object> values;
+        List<String> topics;
+        String data;
     }
+
 
 }

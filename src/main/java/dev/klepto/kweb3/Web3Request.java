@@ -1,32 +1,32 @@
 package dev.klepto.kweb3;
 
+import dev.klepto.kweb3.abi.type.Address;
+import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Uint;
 import dev.klepto.kweb3.contract.Function;
-import dev.klepto.kweb3.type.Address;
-import dev.klepto.kweb3.type.sized.Uint256;
+import dev.klepto.kweb3.contract.ValueType;
 import lombok.Value;
+import lombok.With;
 
 import java.util.List;
 
 /**
- * Contains basic information about web3 contract request.
- *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Value
+@With
 public class Web3Request {
 
-    Address address;
+    Address contractAddress;
     Address callerAddress;
     Function function;
-    List<Object> parameters;
-    Uint256 value;
-    List<Event> eventTypes;
+    Uint value;
+    Struct parameters;
+    List<Event> events;
 
-    @Value
     public static class Event {
         String name;
-        List<Class<?>> valueTypes;
-        boolean[] indexedValues;
+        List<ValueType> valueTypes;
     }
 
 }
