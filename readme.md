@@ -48,9 +48,9 @@ Solidity types of `string` and `bool` are supported via Java primitive types.
 
 Types are accessible through static initializers for simplicity:
 ```java
-address("0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684"); // dev.klepto.kweb3.Address
-uint8(123); // dev.klepto.kweb3.Uint(size=8)
-uint256(123); // dev.klepto.kweb3.Uint(size=256)
+address("0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684"); // dev.klepto.kweb3.abi.type.Address
+uint8(123); // dev.klepto.kweb3.abi.type.Uint(size=8)
+uint256(123); // dev.klepto.kweb3.abi.type.Uint(size=256)
 // and so on
 ```
 
@@ -179,7 +179,7 @@ uint256(3).compareTo(10); // -1
 // etc
 ```
 To maintain interchangeability and all utility functions that solidity types support, 
-it's generally encouraged to use custom `dev.klepto.kweb3.type.util.Decimal` 
+it's generally encouraged to use custom `dev.klepto.kweb3.abi.type.util.Decimal` 
 type for arbitrary numbers instead of java's `BigInteger` and `BigDecimal`.
 
 ### Contract cache
@@ -217,7 +217,7 @@ var usdtCalldata = client.abiEncode(requests.get(0)); // java.lang.String
 
 ### Multicall
 
-Multicall is a widely used smart contract that batches multiple web3 calls into single request,
+Multicall is a widely used smart contract that batches multiple web3 calls into a single request,
 this allows you to minimize RPC requests and process large amounts of data very quickly. For this reason,
 kweb3 provides multicall builder utility that allows you to very easily batch and deserialize multiple requests.
 
@@ -249,4 +249,4 @@ client.multicall()
 # Contribute
 
 This is a passion project solely developed by me on my own free time.
-Feel free to contribute by opening issues or creating pull reqeusts.
+Feel free to contribute by opening issues or creating pull requests.
