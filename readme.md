@@ -1,26 +1,28 @@
-# kWeb3
+# kweb3
 
-Web3j wrapper that enables simplified web3 contract function calls.
-Supports annotation-driven contract interfaces in-order to avoid verbose definitions required by Web3j,
-and/or need of having contract's code in-order to generate java wrappers for contracts.
+Annotation-driven web3 client for JVM with a focus on API simplicity and ease-of-use.
 
-# Sample code
+In Solidity, in-order to interact with a smart contract,
+all you need to do is define an interface and bind it to an address.
+This library enables you to do exactly that but in JVM environment.
 
-Getting USDT balance on BSC Testnet using kWeb3:
-
+We simply define an interface for any smart contract:
 ```java
-interface Erc20 extends Contract {
+public interface Erc20 extends Contract {
     @View
-    Uint256 balanceOf(Address account);
+    Uint balanceOf(Address account);
 }
-
-var client = Web3Client.createClient(new Web3Wallet(privateKey), Chains.BSC_TESTNET);
-var usdt = client.getContract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
-var balance = usdt.balanceOf(client.getAddress());  // Uint256
+```
+And now we are ready to interact with it:
+```java
+var client = Web3Client.create(chain, privateKey);
+var usdt = client.contract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684"); // USDT on BSC testnet
+var balance = usdt.balanceOf(client.getAddress());  // uint256 - USDT balance of our wallet
 ```
 
-Getting USDT balance on BSC Testnet using Web3j:
+As simple as that.
 
+Comparison with boilerplate that comes with competing libraries, such as Web3j:
 ```java
 var web3j = Web3j.build(new HttpService(rpcUrl));
 var credentials = Credentials.create(privateKey);
@@ -37,23 +39,56 @@ var transaction = Transaction.createEthCallTransaction(
 );
 var result = web3j.ethCall(transaction,DefaultBlockParameter.valueOf("latest")).send().getResult();
 var values = FunctionReturnDecoder.decode(function.getOutputParameters());
-var balance = values.get(0); // Uint256
+var balance = values.get(0); // uint256
 ```
 
-# Convertible Types
+# Types
+Currently supported solidity types are: `Address, Bytes, Int, Uint, Struct` and their respective arrays. 
+Solidity types of `string` and `bool` are supported via Java primitive types.
 
-A lot of solidity types can be converted to Java types and vice-versa.
+Types are accessible through static initializers for simplicity:
+```java
+address("0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684"); // dev.klepto.kweb3.Address
+uint8(123); // dev.klepto.kweb3.Uint(size=8)
+uint256(123); // dev.klepto.kweb3.Uint(size=256)
+// and so on
+```
+
+Available static initializers are: `address, uint8-256, int8-256, bytes, bytes1-32, struct `
+
+Majority of value types are interchangeable to aid with custom contract calldata encoding. 
+All of the following types:
+`byte, short, int, long, float, double, BigInteger, BigDecimal, Decimal, Int, Uint, Bytes, byte[], String (hex)`,
+can be seamlessly converted to one another either through use of
+static initializers or by calling `value#to()` methods:
+
+```java
+value = uint256(123);
+
+// is also
+value = uint256("0x7b");
+
+// is also
+value = uint256(new BigInteger("123"));
+```
+
+For contract interface encoding/decoding, value conversion is done automatically.
 This can be achieved with `@Type` annotation. Some examples of valid `balanceOf` implementations.
 
 ```java
 @View
-@Type(Uint256.class)
+Uint balanceOf(Address account);
+```
+
+```java
+@View
+@Type(Uint.class)
 BigInteger balanceOf(Address account);
 ```
 
 ```java
 @View
-@Type(Uint256.class)
+@Type(value = Uint.class, valueSize = 256)
 BigDecimal balanceOf(@Type(Address.class) String account);
 ```
 
@@ -64,100 +99,154 @@ functions.
 
 ```java
 @View("balanceOf")
-Uint256 getBalance(Address account);
+Uint getBalance(Address account);
 ```
 
 # Transactions
 
 Avoid unnecessary boilerplate when dealing with transactions. Private key is all you need to start transacting with
-kWeb3.
-
+kweb3. By default, the average gas price of the latest block is used as a gas price.
 ```java
-interface Erc20 extends Contract {
+public interface Erc20 extends Contract {
     @Transaction
-    ContractResponse transfer(Address to, Uint256 amount);
+    Web3Response transfer(Address to, Uint amount);
 }
 
-var usdt = client.getContract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
-usdt.transfer(address, ether(1)); // Sends 1 USDT to given address.
+var usdt = client.contract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
+usdt.transfer(address, tokens(1, usdt.decimals())); // Sends 1 USDT to given address.
 ```
 
 # Payable Functions
 
-Payble amount can be defined as function parameter using `@Value` annotation.
+Payble amount can be defined as function parameter using `@Cost` annotation.
 
 ```java
 @Transaction
-ContractResponse deposit(@Value Uint256 amount);
+Web3Response deposit(@Cost Uint amount);
 ```
 
 # Events
 
 Events are decoded based on their container classess. All fields of Event container class represent an event value,
-container class must contain constructor with all it's fields. Event containers must be defined inside contract
-interface.
+container class must contain constructor with all it's fields. By default kweb3 scans entire classpath to discover event containers.
 
 ```java
 interface Erc20 extends Contract {
 
-    @lombok.Value
+    @Value
     @Event("Transfer")
     class TransferEvent {
-        @Indexed Address from;
-        @Indexed Address to;
-        Uint256 value;
+        @Event.Address Address eventAddress;
+        @Event.Indexed Address from;
+        @Event.Indexed Address to;
+        Uint value;
     }
 
     @Transaction
-    ContractResponse transfer(Address to, Uint256 amount);
+    Web3Response transfer(Address to, Uint amount);
 
 }
 
-var usdt = client.getContract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
-var response = usdt.transfer(address, ether(1));
-var transferEvent = response.getEvent(Erc20.TransferEvent.class);
+var usdt = client.contract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
+var response = usdt.transfer(address, tokens(1, usdt.decimals()));
+var transferEvent = response.getEvents()
+        .stream(Erc20.TransferEvent.class)
+        .first();
 ```
 
-# Gas estimation & ABI encoding
-
-In-case you need to figure out gas usage before you execute your transactions,
-you can simply call your transactions as a lambda function:
+Events contain utility features to make filtering by value(s) slightly more convenient:
 
 ```java
-List<Uint256> gasUsed = client.estimateGas(() -> {
-        weth.deposit(ether(1));
-        usdt.transfer(address,ether(1));
-});
+var transferEvent = response.getEvents()
+        .stream(Erc20.TransferEvent.class)
+        .with(Erc20.TransferEvent::getReceiver, client.getAddress())
+        .first();
 ```
 
-Sometimes you need ABI encoding for contracts like Multicall,
-in which case you can call your functions in ABI encoding lambda.
+# Utilities
+
+### Numeric values
+Because of type interchangeability, numeric solidity types allow for math of any other type.
+```java
+uint256(10).mul(1.5); // uint256(15)
+uint256(10).div("0x3"); // uint256(3)
+```
+That also means that all types are comparable to each other.
+```java
+uint256(10).equalTo(BigInteger.TEN); // true
+uint256(10).lessThan(address(0)); // false
+uint256(3).compareTo(10); // -1
+// etc
+```
+To maintain interchangeability and all utility functions that solidity types support, 
+it's generally encouraged to use custom `dev.klepto.kweb3.type.util.Decimal` 
+type for arbitrary numbers instead of java's `BigInteger` and `BigDecimal`.
+
+### Contract cache
+Some contract calls might return constant values, or may only need to be updated periodically.
+For this you can annotate your contract functions with `@Cache` 
+annotation to avoid unnecessary requests.
 
 ```java
-List<String> data = client.abiEncode(() -> {
-        weth.deposit(ether(1));
-        usdt.transfer(address,ether(1));
-});
+@View
+@Type(value = Uint.class, valueSize = 8)
+@Cache(INDEFINITE)
+Uint decimals(); // Unlikely to ever change, cache indefinitely.
+
+@View
+@Cache(value = 24, timeUnit = TimeUnit.HOURS)
+Uint totalSupply(); // Rarely changes, maybe we care about updating this only once every 24 hours.
 ```
 
-# Solidity and Java types
+### Logging requests
 
-Type representation and convertability.
+To generate web3 requests without executing them, you can use `client#getLogs(runnable)`.
+This can be useful if you want to generate ABI from contract functions, or delay/re-use requests in the future.
 
-| Solidity Type     | Java Types                                            |
-|-------------------|-------------------------------------------------------|
-| Address (uint160) | String, BigInteger                                    |
-| uint              | int, long, double, String, BigInteger, BigDecimal     |
-| bytes             | byte[]                                                |
-| dynamic array     | `Type[]` or `List<Type>` of any java or solidity type |
-| <b>bool*</b>      | boolean                                               |
-| <b>string*</b>    | String                                                |
-| <b>struct**</b>   | java.lang.Class                                       |
-| int               | <i>to be implemented</i>                              |
-| fixed             | <i>to be implemented</i>                              |
-| array\[size]      | <i>to be implemented</i>                              |
-| bytes\<size>      | <i>to be implemented</i>                              |
+```java
+var usdt = client.contract(Erc20.class, "0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684");
+var usdc = client.contract(Erc20.class, "0x64544969ed7EBf5f083679233325356EbE738930");
 
-<b>*</b> doesn't have solidity representation, only represented in Java primitive type
+var requests = client.getLogs(() -> {
+    usdt.balanceOf(client.getAddress());
+    usdc.balanceOf(client.getAddress());
+}); // java.util.List<Web3Request>
 
-<b>**</b> can and should be represented by data classes
+var usdtCalldata = client.abiEncode(requests.get(0)); // java.lang.String
+```
+
+### Multicall
+
+Multicall is a widely used smart contract that batches multiple web3 calls into single request,
+this allows you to minimize RPC requests and process large amounts of data very quickly. For this reason,
+kweb3 provides multicall builder utility that allows you to very easily batch and deserialize multiple requests.
+
+
+Since there are a lot of different implementations of this contract and they tend to be different on every chain,
+you have to implement this generic interface in-order to use the builder:
+```java
+public interface MulticallContract extends Contract {
+    Bytes[] execute(Uint gasLimit, Uint sizeLimit, List<Address> addresses, List<Bytes> data);
+}
+```
+After implementing this interface with the multicall contract of your choice,
+we can simply tell kweb3 client to use it:
+```java
+val multicallContract = client.contract(UniswapMulticall.class, "0x4445286592CaADEB59917f16826B964C3e7B2D36"); // Univ2 Multicall on Mumbai
+client.setMulticallContract(multicallContract);
+```
+Which allows us to access multicall builder with this client instance:
+```java
+// Fetch token information in a single request!
+client.multicall()
+        .queue(usdt::symbol, symbol -> ...) // String
+        .queue(usdt::decimals, decimals -> ... ) // uint8
+        .queue(usdt::totalSupply, totalSupply -> ... ) // uint256
+        .queue(() -> usdt.balanceOf(client.getAddress()), ourBalance -> ...) // uint256
+        .execute();
+```
+
+# Contribute
+
+This is a passion project solely developed by me on my own free time.
+Feel free to contribute by opening issues or creating pull reqeusts.
