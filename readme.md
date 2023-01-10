@@ -2,9 +2,9 @@
 
 Annotation-driven web3 client for JVM with a focus on API simplicity and ease-of-use.
 
-In Solidity, in-order to interact with a smart contract,
+In Solidity, in order to interact with a smart contract,
 all you need to do is define an interface and bind it to an address.
-This library enables you to do exactly that but in JVM environment.
+This library enables you to do exactly that but in the JVM environment.
 
 We simply define an interface for any smart contract:
 ```java
@@ -22,7 +22,7 @@ var balance = usdt.balanceOf(client.getAddress());  // uint256 - USDT balance of
 
 As simple as that.
 
-Comparison with boilerplate that comes with competing libraries, such as Web3j:
+Comparing with boilerplate that comes with competing libraries, such as Web3j:
 ```java
 var web3j = Web3j.build(new HttpService(rpcUrl));
 var credentials = Credentials.create(privateKey);
@@ -43,7 +43,7 @@ var balance = values.get(0); // uint256
 ```
 
 # Types
-Currently supported solidity types are: `Address, Bytes, Int, Uint, Struct` and their respective arrays. 
+Currently, the supported solidity types are: `Address, Bytes, Int, Uint, Struct` and their respective arrays. 
 Solidity types of `string` and `bool` are supported via Java primitive types.
 
 Types are accessible through static initializers for simplicity:
@@ -56,10 +56,10 @@ uint256(123); // dev.klepto.kweb3.abi.type.Uint(size=256)
 
 Available static initializers are: `address, uint8-256, int8-256, bytes, bytes1-32, struct `
 
-Majority of value types are interchangeable to aid with custom contract calldata encoding. 
+Majority of the value types are interchangeable to aid with custom contract calldata encoding. 
 All of the following types:
-`byte, short, int, long, float, double, BigInteger, BigDecimal, Decimal, Int, Uint, Bytes, byte[], String (hex)`,
-can be seamlessly converted to one another either through use of
+`byte, short, int, long, float, double, BigInteger, BigDecimal, Decimal, Int, Uint, Bytes, byte[], String (hex)`
+can be seamlessly converted to one another either through the use of
 static initializers or by calling `value#to()` methods:
 
 ```java
@@ -73,7 +73,7 @@ value = uint256(new BigInteger("123"));
 ```
 
 For contract interface encoding/decoding, value conversion is done automatically.
-This can be achieved with `@Type` annotation. Some examples of valid `balanceOf` implementations.
+This can be achieved with `@Type` annotation. Some examples of valid `balanceOf` implementations:
 
 ```java
 @View
@@ -94,7 +94,7 @@ BigDecimal balanceOf(@Type(Address.class) String account);
 
 # Named Functions
 
-Contract function names don't have to match your implementation. Match conventions of your codebase with named
+Contract function names don't have to match your implementation. Match the conventions of your codebase with named
 functions.
 
 ```java
@@ -104,7 +104,7 @@ Uint getBalance(Address account);
 
 # Transactions
 
-Avoid unnecessary boilerplate when dealing with transactions. Private key is all you need to start transacting with
+Avoid unnecessary boilerplate when dealing with transactions. A private key is all you need to start transacting with
 kweb3. By default, the average gas price of the latest block is used as a gas price.
 ```java
 public interface Erc20 extends Contract {
@@ -118,7 +118,7 @@ usdt.transfer(address, tokens(1, usdt.decimals())); // Sends 1 USDT to given add
 
 # Payable Functions
 
-Payble amount can be defined as function parameter using `@Cost` annotation.
+Payble amount can be defined as function parameter using the `@Cost` annotation.
 
 ```java
 @Transaction
@@ -127,8 +127,9 @@ Web3Response deposit(@Cost Uint amount);
 
 # Events
 
-Events are decoded based on their container classess. All fields of Event container class represent an event value,
-container class must contain constructor with all it's fields. By default kweb3 scans entire classpath to discover event containers.
+Events are decoded based on their container classes. All fields of the Event container class represent an event value,
+container class must contain constructor with all of its fields. By default, kweb3 scans the entire classpath to discover
+event containers.
 
 ```java
 interface Erc20 extends Contract {
@@ -165,7 +166,7 @@ var transferEvent = response.getEvents()
 
 # Utilities
 
-### Numeric values
+## Numeric values
 Because of type interchangeability, numeric solidity types allow for math of any other type.
 ```java
 uint256(10).mul(1.5); // uint256(15)
@@ -179,10 +180,10 @@ uint256(3).compareTo(10); // -1
 // etc
 ```
 To maintain interchangeability and all utility functions that solidity types support, 
-it's generally encouraged to use custom `dev.klepto.kweb3.abi.type.util.Decimal` 
+it's generally encouraged to use a custom `dev.klepto.kweb3.abi.type.util.Decimal` 
 type for arbitrary numbers instead of java's `BigInteger` and `BigDecimal`.
 
-### Contract cache
+## Contract cache
 Some contract calls might return constant values, or may only need to be updated periodically.
 For this you can annotate your contract functions with `@Cache` 
 annotation to avoid unnecessary requests.
@@ -198,7 +199,7 @@ Uint decimals(); // Unlikely to ever change, cache indefinitely.
 Uint totalSupply(); // Rarely changes, maybe we care about updating this only once every 24 hours.
 ```
 
-### Logging requests
+## Logging requests
 
 To generate web3 requests without executing them, you can use `client#getLogs(runnable)`.
 This can be useful if you want to generate ABI from contract functions, or delay/re-use requests in the future.
@@ -215,7 +216,7 @@ var requests = client.getLogs(() -> {
 var usdtCalldata = client.abiEncode(requests.get(0)); // java.lang.String
 ```
 
-### Multicall
+## Multicall
 
 Multicall is a widely used smart contract that batches multiple web3 calls into a single request,
 this allows you to minimize RPC requests and process large amounts of data very quickly. For this reason,
@@ -223,7 +224,7 @@ kweb3 provides multicall builder utility that allows you to very easily batch an
 
 
 Since there are a lot of different implementations of this contract and they tend to be different on every chain,
-you have to implement this generic interface in-order to use the builder:
+you have to implement this generic interface in order to use the builder:
 ```java
 public interface MulticallContract extends Contract {
     Bytes[] execute(Uint gasLimit, Uint sizeLimit, List<Address> addresses, List<Bytes> data);

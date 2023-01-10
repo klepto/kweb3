@@ -1,5 +1,9 @@
 package dev.klepto.kweb3.net.web3j;
 
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
+import dev.klepto.kweb3.abi.type.Uint;
+import dev.klepto.kweb3.abi.type.util.Types;
 import dev.klepto.kweb3.gas.GasFee;
 import dev.klepto.kweb3.gas.GasFeeProvider;
 import dev.klepto.kweb3.gas.LegacyGasFee;
@@ -9,11 +13,17 @@ import lombok.Value;
 import lombok.val;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.Transaction;
 
 import java.math.BigInteger;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.abi.type.util.Types.uint256;
@@ -26,105 +36,52 @@ import static dev.klepto.kweb3.util.Logging.debug;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@RequiredArgsConstructor
 public class Web3jGasProvider implements GasFeeProvider {
 
+    private final Duration UPDATE_RATE = Duration.ofSeconds(5);
+
     private final Web3j client;
+    private final AtomicReference<GasFeeStats> stats = new AtomicReference<>(null);
+    private final Stopwatch lastUpdate = Stopwatch.createUnstarted();
 
-    @SneakyThrows
-    public List<Transaction> getLatestTransactions() {
-        val blockNumber = client.ethBlockNumber().send().getBlockNumber();
-        val block = client.ethGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true)
-                .send().getResult();
-
-        return block.getTransactions().stream()
-                .map(Transaction.class::cast).toList();
+    public Web3jGasProvider(Web3j client) {
+        this.client = client;
     }
 
-    public Fee getFee(List<BigInteger> values) {
-        values = values.stream()
-                .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
-                .sorted(BigInteger::compareTo).toList();
-        if (values.isEmpty()) {
-            return new Fee(BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO);
+    private GasFeeStats getStats() {
+        if (!lastUpdate.isRunning() || lastUpdate.elapsed(TimeUnit.NANOSECONDS) > UPDATE_RATE.toNanos()) {
+            lastUpdate.reset();
+            lastUpdate.start();
+            stats.set(fetchStats());
         }
 
-        val min = values.get(0);
-        val max = values.get(values.size() - 1);
-        val median = values.size() < 3 ? min : values.get(values.size() / 2);
-        val average = values.stream().reduce(BigInteger::add)
-                .orElse(BigInteger.ZERO)
-                .divide(BigInteger.valueOf(values.size()));
-        return new Fee(min, max, average, median);
+        return stats.get();
     }
 
     @SneakyThrows
-    public GasFeeStats getStats() {
-        val blockNumber = client.ethBlockNumber().send().getBlockNumber();
-        val block = client.ethGetBlockByNumber(
-                DefaultBlockParameter.valueOf(blockNumber),
-                true
-        ).send().getResult();
+    private GasFeeStats fetchStats() {
+        val transactions = getLatestTransactions(50);
+        val baseFeePerGas = getLatestBaseFeePerGas();
 
-        val baseFeePerGas = block.getBaseFeePerGas() == null
-                ? BigInteger.ZERO
-                : block.getBaseFeePerGas().multiply(BigInteger.TEN.pow(9));
-
-        val transactions = block.getTransactions().stream()
-                .map(Transaction.class::cast).toList();
-
-        var gasPrices = transactions.stream()
-                .map(tryOrElse(Transaction::getGasPrice, BigInteger.ZERO))
-                .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
-                .sorted(BigInteger::compareTo)
-                .toList();
-        if (gasPrices.isEmpty()) {
-            gasPrices = List.of(BigInteger.ZERO);
-        }
-
-        var maxFeesPerGas = transactions.stream()
-                .map(tryOrElse(Transaction::getMaxFeePerGas, BigInteger.ZERO))
-                .filter(Objects::nonNull)
-                .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
-                .sorted(BigInteger::compareTo)
-                .toList();
-        if (maxFeesPerGas.isEmpty()) {
-            maxFeesPerGas = List.of(BigInteger.ZERO);
-        }
-
-        var maxPriorityFeesPerGas = transactions.stream()
-                .map(tryOrElse(Transaction::getMaxPriorityFeePerGas, BigInteger.ZERO))
-                .filter(Objects::nonNull)
-                .filter(price -> price.compareTo(BigInteger.ZERO) > 0)
-                .sorted(BigInteger::compareTo)
-                .toList();
-        if (maxPriorityFeesPerGas.isEmpty()) {
-            maxPriorityFeesPerGas = List.of(BigInteger.ZERO);
-        }
+        val gasPrices = getTransactionValues(transactions, Transaction::getGasPrice);
+        val maxFeesPerGas = getTransactionValues(transactions, Transaction::getMaxFeePerGas);
+        val maxPriorityFeesPerGas = getTransactionValues(transactions, Transaction::getMaxPriorityFeePerGas);
 
         val minGasPrice = gasPrices.get(0);
         val minMaxFee = maxFeesPerGas.get(0);
         val minMaxPriorityFee = maxPriorityFeesPerGas.get(0);
-        val maxGasPrice = gasPrices.get(gasPrices.size() - 1);
-        val maxMaxFee = maxFeesPerGas.get(maxFeesPerGas.size() - 1);
-        val maxMaxPriorityFee = maxPriorityFeesPerGas.get(maxPriorityFeesPerGas.size() - 1);
-
-
-        val avgGasPrice = gasPrices.stream()
-                .reduce(BigInteger.ZERO, BigInteger::add)
-                .divide(BigInteger.valueOf(gasPrices.size()));
-
-        val avgMaxFee = maxFeesPerGas.stream()
-                .reduce(BigInteger.ZERO, BigInteger::add)
-                .divide(BigInteger.valueOf(maxFeesPerGas.size()));
-
-        val avgMaxPriorityFee = maxPriorityFeesPerGas.stream()
-                .reduce(BigInteger.ZERO, BigInteger::add)
-                .divide(BigInteger.valueOf(maxPriorityFeesPerGas.size()));
 
         val medianGasPrice = gasPrices.get(gasPrices.size() / 2);
         val medianMaxFee = maxFeesPerGas.get(maxFeesPerGas.size() / 2);
         val medianMaxPriorityFee = maxPriorityFeesPerGas.get(maxPriorityFeesPerGas.size() / 2);
+
+        val maxGasPrice = gasPrices.get(gasPrices.size() - 1);
+        val maxMaxFee = maxFeesPerGas.get(maxFeesPerGas.size() - 1);
+        val maxMaxPriorityFee = maxPriorityFeesPerGas.get(maxPriorityFeesPerGas.size() - 1);
+
+        val avgGasPrice = getAverage(gasPrices);
+        val avgMaxFee = getAverage(maxFeesPerGas);
+        val avgMaxPriorityFee = getAverage(maxPriorityFeesPerGas);
 
         val gasPrice = new Fee(minGasPrice, maxGasPrice, avgGasPrice, medianGasPrice);
         val maxFee = new Fee(minMaxFee, maxMaxFee, avgMaxFee, medianMaxFee);
@@ -135,9 +92,6 @@ public class Web3jGasProvider implements GasFeeProvider {
                 medianMaxPriorityFee
         );
 
-        debug("Latest gas price: {}", gasPrice);
-        debug("Latest max fee: {}", maxFee);
-        debug("Latest priority fee: {}", maxPriorityFee);
         return new GasFeeStats(
                 gasPrice,
                 maxFee,
@@ -151,44 +105,91 @@ public class Web3jGasProvider implements GasFeeProvider {
         val stats = getStats();
 
         val maxPriorityFeePerGas = stats.getMaxPriorityFee().getMedian()
-                .add(stats.getMaxPriorityFee().getMax())
-                .divide(BigInteger.TWO);
+                .add(stats.getMaxPriorityFee().getMin())
+                .div(2);
 
         val maxFeePerGas = stats.getMaxFeePerGas().getMedian()
-                .add(stats.getMaxFeePerGas().getMax())
-                .divide(BigInteger.TWO);
+                .add(stats.getMaxFeePerGas().getMin())
+                .div(2);
 
-        return new GasFee(uint256(maxFeePerGas), uint256(maxPriorityFeePerGas));
+        return new GasFee(maxFeePerGas, maxPriorityFeePerGas);
     }
 
     @Override
     @SneakyThrows
     public LegacyGasFee getLegacyGasFee() {
-        val gasPrices = getLatestTransactions().stream()
-                .map(tryOrElse(Transaction::getGasPrice, BigInteger.ZERO))
+        val stats = getStats();
+        val gasPrice = stats.getGasPrice().getMedian()
+                .add(stats.getGasPrice().getMin())
+                .div(2);
+        return new LegacyGasFee(gasPrice);
+    }
+
+    @SneakyThrows
+    private Uint getLatestBlockNumber() {
+        return uint256(client.ethBlockNumber().send().getBlockNumber());
+    }
+
+    private Uint getLatestBaseFeePerGas() {
+        val block = getBlock(getLatestBlockNumber());
+        val baseFeePerGas = block.getBaseFeePerGas();
+        return baseFeePerGas == null ? uint256(0) : uint256(baseFeePerGas);
+    }
+
+    @SneakyThrows
+    private EthBlock.Block getBlock(Uint blockNumber) {
+        return client.ethGetBlockByNumber(
+                DefaultBlockParameter.valueOf(blockNumber.toBigInteger()), true
+        ).send().getResult();
+    }
+
+    @SneakyThrows
+    private List<Transaction> getTransactions(Uint blockNumber) {
+        val block = getBlock(blockNumber);
+        return block.getTransactions().stream()
+                .map(Transaction.class::cast).toList();
+    }
+
+    @SneakyThrows
+    private List<Transaction> getLatestTransactions(int count) {
+        val result = new ArrayList<Transaction>();
+        var blockNumber = getLatestBlockNumber();
+        while (result.size() < count) {
+            result.addAll(getTransactions(blockNumber));
+            blockNumber = blockNumber.sub(1);
+        }
+        return Lists.partition(result, count).get(0);
+    }
+
+    private static Uint getAverage(List<Uint> values) {
+        return values.stream()
+                .reduce(uint256(0), Uint::add)
+                .div(values.size());
+    }
+
+    private static <T extends BigInteger> List<Uint> getTransactionValues(List<Transaction> transactions,
+                                                                          Function<Transaction, T> remapper) {
+        val result = transactions.stream()
+                .filter(Objects::nonNull)
+                .map(tryOrElse(remapper, BigInteger.ZERO))
+                .filter(value -> value.compareTo(BigInteger.ZERO) > 0)
+                .sorted(BigInteger::compareTo)
+                .map(Types::uint256)
                 .toList();
-
-        val fee = getFee(gasPrices);
-        val gasPrice = fee.getMedian()
-                .add(fee.getAverage())
-                .divide(BigInteger.TWO);
-
-        return new LegacyGasFee(uint256(gasPrice));
+        return !result.isEmpty() ? result : List.of(uint256(0));
     }
 
     @Value
     public static class GasFeeStats {
-
         Fee gasPrice;
         Fee maxFeePerGas;
         Fee maxPriorityFee;
-        BigInteger baseFee;
-
+        Uint baseFee;
     }
 
     @Value
     public static class Fee {
-        BigInteger min, max, average, median;
+        Uint min, max, average, median;
     }
 
 }

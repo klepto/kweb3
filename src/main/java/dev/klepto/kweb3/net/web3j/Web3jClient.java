@@ -92,18 +92,28 @@ public class Web3jClient extends ContractClient {
 
     @SneakyThrows
     public Response<String> sendTransaction(Web3Request request, String contractAddress, String data) {
-        val gasLimit = getGasLimit() != null ? getGasLimit().getValue() : estimateGas(request).getValue();
-        val gasPrice = getGasPrice().getValue();
-
+        val providerGasPrice = getGasFeeProvider().getLegacyGasFee().getGasPrice();
+        val providerMaxFeePerGas = getGasFeeProvider().getGasFee().getMaxFeePerGas();
+        val useLegacy = this.gasPrice != null || providerGasPrice.lessThan(providerMaxFeePerGas);
+        val gasLimit = this.gasLimit != null ? getGasLimit().getValue() : estimateGas(request).getValue();
         val value = request.getValue().getValue();
-        return session.getTransactionManager().sendTransaction(gasPrice, gasLimit, contractAddress, data, value);
-//        if (useLegacy) {
 
-//        } else {
-//            val maxPriorityFeePerGas = gasFee.getMaxPriorityFeePerGas().getValue();
-//            val maxFeePerGas = gasFee.getMaxFeePerGas().getValue();
-//            return session.getTransactionManager().sendEIP1559Transaction(getChain().getChainId(), maxPriorityFeePerGas, maxFeePerGas, gasLimit, contractAddress, data, value);
-//        }
+        if (useLegacy) {
+            val gasPrice = this.gasPrice != null ? this.gasPrice.getValue() : providerGasPrice.getValue();
+            return session.getTransactionManager().sendTransaction(gasPrice, gasLimit, contractAddress, data, value);
+        } else {
+            val maxPriorityFeePerGas = getGasFeeProvider().getGasFee().getMaxPriorityFeePerGas().getValue();
+            val maxFeePerGas = getGasFeeProvider().getGasFee().getMaxFeePerGas().getValue();
+            return session.getTransactionManager().sendEIP1559Transaction(
+                    getChain().getChainId(),
+                    maxPriorityFeePerGas,
+                    maxFeePerGas,
+                    gasLimit,
+                    contractAddress,
+                    data,
+                    value
+            );
+        }
     }
 
     @Override
@@ -139,15 +149,19 @@ public class Web3jClient extends ContractClient {
 
     @SneakyThrows
     private Uint estimateGas(Web3Request request, String data) {
-        val nonce = session.getWeb3j().ethGetTransactionCount(getAddress().toHex(), DefaultBlockParameterName.PENDING).send().getTransactionCount();
+        val nonce = session.getWeb3j()
+                .ethGetTransactionCount(getAddress().toHex(), DefaultBlockParameterName.PENDING)
+                .send().getTransactionCount();
         val from = getAddress().toHex();
         val to = request.getContractAddress().toHex();
-        val transaction = request.getFunction().isView() ? Transaction.createEthCallTransaction(from, to, data) : Transaction.createFunctionCallTransaction(from, nonce, BigInteger.ZERO, BigInteger.ZERO, to, data);
+        val transaction = request.getFunction().isView()
+                ? Transaction.createEthCallTransaction(from, to, data)
+                : Transaction.createFunctionCallTransaction(from, nonce, BigInteger.ZERO, BigInteger.ZERO, to, data);
         val estimateGasResult = session.getWeb3j().ethEstimateGas(transaction).send();
         if (estimateGasResult.getResult() == null) {
             return uint256(0);
         }
-        return uint256(estimateGasResult.getAmountUsed());
+        return uint256(estimateGasResult.getAmountUsed()).mul(2);
     }
 
 }
