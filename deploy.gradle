@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = 'dev.klepto.kweb3'
 archivesBaseName = 'kweb3'
-version = '0.0.4'
+version = '1.0.0'
 
 java {
     withJavadocJar()
