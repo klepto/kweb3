@@ -1,10 +1,7 @@
 package dev.klepto.kweb3.abi.type.util;
 
 import com.google.common.primitives.Primitives;
-import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.abi.type.Bytes;
-import dev.klepto.kweb3.abi.type.Int;
-import dev.klepto.kweb3.abi.type.Uint;
+import dev.klepto.kweb3.abi.type.*;
 import lombok.val;
 
 import java.math.BigDecimal;
@@ -121,6 +118,14 @@ public class Convertibles {
 
         error("Couldn't convert {} to {}.", value.getClass(), type);
         return null;
+    }
+
+    public static <T> T to(Object value, T reference) {
+        val converted = to(value, reference.getClass());
+        if (reference instanceof AbiSizedValue<?,?> sized) {
+            return (T) ((AbiSizedValue<?,?>) converted).withSize(sized.getSize());
+        }
+        return (T) converted;
     }
 
     public static byte toByte(Object value) {
@@ -635,6 +640,14 @@ public class Convertibles {
             return result;
         }
         return Hex.toByteArray(toHex(value));
+    }
+
+    public static <T extends Numeric<T>> T max(T objectA, Object objectB) {
+        return objectA.moreThan(objectB) ? objectA : to(objectB, objectA);
+    }
+
+    public static <T extends Numeric<T>> T min(T objectA, Object objectB) {
+        return objectA.lessThan(objectB) ? objectA : to(objectB, objectA);
     }
 
 }
