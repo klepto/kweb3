@@ -172,6 +172,7 @@ public class Web3jGasProvider implements GasFeeProvider {
         val result = transactions.stream()
                 .filter(Objects::nonNull)
                 .map(tryOrElse(remapper, BigInteger.ZERO))
+                .filter(Objects::nonNull)
                 .filter(value -> value.compareTo(BigInteger.ZERO) > 0)
                 .sorted(BigInteger::compareTo)
                 .map(Types::uint256)
