@@ -61,6 +61,11 @@ public class Decimal implements Numeric<Decimal> {
         return getValue().toPlainString();
     }
 
+    @Override
+    public String toString(Object scale) {
+        return getValue().setScale(Convertibles.toInteger(scale), FLOOR).toPlainString();
+    }
+
     public static Decimal ensureScale(BigDecimal valueA, BigDecimal valueB, BigDecimal product) {
         val scale = Math.max(valueA.scale(), valueB.scale());
         return new Decimal(product.setScale(scale, FLOOR));
