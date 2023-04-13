@@ -17,7 +17,7 @@ public class Hex {
     }
 
     public static String toHex(byte[] value) {
-        return BaseEncoding.base16().encode(value);
+        return "0x" + BaseEncoding.base16().encode(value).toLowerCase();
     }
 
     public static String toHex(BigInteger value) {
