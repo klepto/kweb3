@@ -3,11 +3,10 @@ package dev.klepto.kweb3.contract;
 import com.google.common.reflect.TypeToken;
 import dev.klepto.kweb3.Web3Client;
 import dev.klepto.kweb3.Web3Request;
-import dev.klepto.kweb3.Web3Response;
 import dev.klepto.kweb3.abi.type.Address;
 import dev.klepto.kweb3.abi.type.Struct;
 import dev.klepto.kweb3.abi.type.Uint;
-import dev.klepto.kweb3.contract.event.EventDecoder;
+import dev.klepto.kweb3.abi.type.util.Types;
 import dev.klepto.kweb3.util.Keccak;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -17,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static dev.klepto.kweb3.Web3Error.require;
-import static dev.klepto.kweb3.abi.type.util.Types.struct;
+import static dev.klepto.kweb3.abi.type.util.Types.tuple;
 import static dev.klepto.kweb3.abi.type.util.Types.uint256;
 import static dev.klepto.kweb3.util.Logging.log;
 
@@ -103,7 +102,7 @@ public class ContractProxy implements InvocationHandler {
             }
         }
 
-        return new Web3Request(address, client.getAddress(), function, value, struct(values), List.of());
+        return new Web3Request(address, client.getAddress(), function, value, Types.tuple(values), List.of());
     }
 
     private Object getResponse(Web3Request request) {
@@ -148,14 +147,20 @@ public class ContractProxy implements InvocationHandler {
         val signature = name + parameterType.getAbiType().toString();
         log().debug("Function signature: {}", signature);
 
-        val returnType = ContractCodec.parseValueType(
+        val typeAnnotation = method.getAnnotation(Type.class);
+        val isStruct = typeAnnotation != null && typeAnnotation.value() == Struct.class;
+
+        var returnType = ContractCodec.parseValueType(
                 returnTypeToken,
                 method.getAnnotation(Type.class),
                 method.isAnnotationPresent(Event.Indexed.class)
         );
+        if (isStruct) {
+            returnType = returnType.wrapTuple();
+        }
 
         val hash = "0x" + Keccak.hash(signature).substring(0, 8).toLowerCase();
-        val function = new Function(name, hash, view, parameterType, returnType);
+        val function = new Function(name, hash, view, isStruct, parameterType, returnType);
         functionCache.put(method, function);
         return function;
     }

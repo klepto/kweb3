@@ -2,9 +2,10 @@ package dev.klepto.kweb3.abi;
 
 import dev.klepto.kweb3.abi.type.AbiType;
 import dev.klepto.kweb3.abi.type.AbiValue;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
+import dev.klepto.kweb3.abi.type.util.Types;
 
-import static dev.klepto.kweb3.abi.type.util.Types.struct;
+import static dev.klepto.kweb3.abi.type.util.Types.tuple;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -12,13 +13,13 @@ import static dev.klepto.kweb3.abi.type.util.Types.struct;
 public interface AbiEncoder {
 
     default <T extends AbiValue> String encode(T value) {
-        return encode(struct(value), value.getType());
+        return encode(Types.tuple(value), value.getType());
     }
 
-    default String encode(Struct values) {
+    default String encode(Tuple values) {
         return encode(values, values.getType());
     }
     
-    String encode(Struct values, AbiType type);
+    String encode(Tuple values, AbiType type);
 
 }

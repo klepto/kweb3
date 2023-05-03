@@ -11,6 +11,7 @@ public class Function {
     String name;
     String hash;
     boolean view;
+    boolean struct;
     ValueType parametersType;
     ValueType returnType;
 

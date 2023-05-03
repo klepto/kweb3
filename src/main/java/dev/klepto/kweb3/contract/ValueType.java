@@ -2,11 +2,13 @@ package dev.klepto.kweb3.contract;
 
 import com.google.common.reflect.TypeToken;
 import dev.klepto.kweb3.abi.type.AbiType;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
 import lombok.Value;
 import lombok.With;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -29,19 +31,23 @@ public class ValueType {
         return getAbiType().isArray();
     }
 
-    public boolean isStructType() {
-        return getAbiType().getType() == Struct.class && !getAbiType().isArray();
+    public boolean isTupleType() {
+        return getAbiType().getType() == Tuple.class && !getAbiType().isArray();
     }
 
-    public ValueType toStructType() {
-        if (isStructType()) {
-            return this;
-        }
-
-        return withType(TypeToken.of(Struct.class))
+    public ValueType wrapTuple() {
+        return withType(TypeToken.of(Tuple.class))
                 .withChildren(List.of(this))
-                .withAbiType(abiType.toStructType())
+                .withAbiType(abiType.wrapTuple())
                 .withIndexed(false);
+    }
+
+    public ValueType unwrapTuple() {
+        checkState(
+                getChildren().size() == 1 && getChildren().get(0).getAbiType().getType() == Tuple.class,
+                "Value type is not a tuple wrapper."
+        );
+        return getChildren().get(0);
     }
 
 }

@@ -1,7 +1,7 @@
 package dev.klepto.kweb3;
 
 import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
 import dev.klepto.kweb3.abi.type.Uint;
 import dev.klepto.kweb3.contract.event.Events;
 import lombok.Value;
@@ -22,7 +22,7 @@ public class Web3Response {
 
     String transactionHash;
     Uint blockNumber;
-    Struct result;
+    Tuple result;
     List<Log> logs;
     Events events;
 

@@ -1,13 +1,13 @@
 package dev.klepto.kweb3.abi;
 
 import dev.klepto.kweb3.abi.type.AbiType;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface AbiDecoder {
 
-    Struct decode(String abi, AbiType type);
+    Tuple decode(String abi, AbiType type);
 
 }

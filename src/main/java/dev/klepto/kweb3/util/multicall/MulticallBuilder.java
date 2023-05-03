@@ -108,9 +108,10 @@ public class MulticallBuilder {
 
             val request = requests.get(i);
             val abi = Convertibles.toHex(responseData);
-            val returnType = request.getFunction().getReturnType();
+            val function = request.getFunction();
+            val returnType = function.getReturnType();
             val result = contract.getClient().abiDecode(abi, returnType.getAbiType());
-            consumer.accept(ContractCodec.decodeResponse(returnType, result));
+            consumer.accept(ContractCodec.decodeResponse(function, result));
         }
     }
 

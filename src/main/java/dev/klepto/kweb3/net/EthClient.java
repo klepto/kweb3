@@ -4,7 +4,7 @@ import dev.klepto.kweb3.Web3Request;
 import dev.klepto.kweb3.Web3Response;
 import dev.klepto.kweb3.abi.type.AbiType;
 import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
 import dev.klepto.kweb3.abi.type.Uint;
 import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.gas.GasFeeProvider;
@@ -42,9 +42,9 @@ public interface EthClient {
 
     String abiEncode(Web3Request request);
 
-    String abiEncode(Struct value, AbiType type);
+    String abiEncode(Tuple value, AbiType type);
 
-    Struct abiDecode(String abi, AbiType type);
+    Tuple abiDecode(String abi, AbiType type);
 
     boolean isLogging();
 

@@ -184,16 +184,16 @@ public class Types {
         return Convertibles.toBytes32(value);
     }
 
-    public static Struct struct(Object... values) {
-        return struct(Arrays.stream(values));
+    public static Tuple tuple(Object... values) {
+        return tuple(Arrays.stream(values));
     }
 
-    public static Struct struct(Iterable<Object> values) {
-        return struct(Streams.stream(values));
+    public static Tuple tuple(Iterable<Object> values) {
+        return tuple(Streams.stream(values));
     }
 
-    public static Struct struct(Stream<Object> values) {
-        return new Struct(values.toList());
+    public static Tuple tuple(Stream<Object> values) {
+        return new Tuple(values.toList());
     }
 
     public static Uint uint8(Object value) {

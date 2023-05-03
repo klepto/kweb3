@@ -30,8 +30,8 @@ public class AbiTypeTest {
         assertEquals("string", stringType.toString());
         assertEquals("bool", booleanType.toString());
 
-        val addressStructType = addressType.toStructType();
-        assertEquals(Struct.class, addressStructType.getType());
+        val addressStructType = addressType.wrapTuple();
+        assertEquals(Tuple.class, addressStructType.getType());
         assertEquals("(address)", addressStructType.toString());
 
         val structArrayType = addressStructType.withArray(true);

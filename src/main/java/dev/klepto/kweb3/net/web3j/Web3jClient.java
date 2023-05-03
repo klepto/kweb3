@@ -4,7 +4,7 @@ import dev.klepto.kweb3.Web3Error;
 import dev.klepto.kweb3.Web3Request;
 import dev.klepto.kweb3.Web3Response;
 import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
 import dev.klepto.kweb3.abi.type.Uint;
 import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.gas.GasFeeProvider;
@@ -75,7 +75,7 @@ public class Web3jClient extends ContractClient {
             logs = receipt.getLogs().stream().map(log -> new Web3Response.Log(address(log.getAddress()), log.getTopics(), log.getData())).toList();
         }
 
-        var result = (Struct) null;
+        var result = (Tuple) null;
         val returnType = request.getFunction().getReturnType();
         if (returnType != null && response.getResult() != null) {
             result = abiDecode(response.getResult(), returnType.getAbiType());

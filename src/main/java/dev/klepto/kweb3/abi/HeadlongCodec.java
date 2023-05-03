@@ -1,6 +1,5 @@
 package dev.klepto.kweb3.abi;
 
-import com.esaulpaugh.headlong.abi.Tuple;
 import com.esaulpaugh.headlong.abi.TupleType;
 import com.esaulpaugh.headlong.util.FastHex;
 import dev.klepto.kweb3.abi.type.*;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static dev.klepto.kweb3.Web3Error.error;
-import static dev.klepto.kweb3.abi.type.util.Types.struct;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -22,8 +20,8 @@ import static dev.klepto.kweb3.abi.type.util.Types.struct;
 public class HeadlongCodec implements AbiEncoder, AbiDecoder {
 
     @Override
-    public Struct decode(String abi, AbiType type) {
-        type = type.getType() == Struct.class ? type : type.toStructType();
+    public Tuple decode(String abi, AbiType type) {
+        type = type.getType() == Tuple.class ? type : type.wrapTuple();
         val tuple = TupleType.parse(type.toString());
         val data = Hex.toByteArray(abi);
         if (data.length == 0) {
@@ -31,7 +29,7 @@ public class HeadlongCodec implements AbiEncoder, AbiDecoder {
         }
 
         val result = tuple.decode(data);
-        return (Struct) decodeValue(result, type);
+        return (Tuple) decodeValue(result, type);
     }
 
     private Object decodeValue(Object value, AbiType type) {
@@ -54,13 +52,13 @@ public class HeadlongCodec implements AbiEncoder, AbiDecoder {
             return value;
         } else if (type.getType() == boolean.class) {
             return value;
-        } else if (type.getType() == Struct.class) {
-            val tuple = (Tuple) value;
+        } else if (type.getType() == Tuple.class) {
+            val tuple = (com.esaulpaugh.headlong.abi.Tuple) value;
             val values = new ArrayList<>();
             for (var i = 0; i < tuple.size(); i++) {
                 values.add(decodeValue(tuple.get(i), type.getChildren().get(i)));
             }
-            return struct(values);
+            return Types.tuple(values);
         }
 
         error("Couldn't decode type {} to type {}.", value.getClass(), type.getType());
@@ -68,10 +66,10 @@ public class HeadlongCodec implements AbiEncoder, AbiDecoder {
     }
 
     @Override
-    public String encode(Struct value, AbiType type) {
-        type = type.getType() == Struct.class ? type : type.toStructType();
+    public String encode(Tuple value, AbiType type) {
+        type = type.getType() == Tuple.class ? type : type.wrapTuple();
         val tupleType = TupleType.parse(type.toString());
-        val result = tupleType.encode((Tuple) encodeValue(value)).array();
+        val result = tupleType.encode((com.esaulpaugh.headlong.abi.Tuple) encodeValue(value)).array();
         return FastHex.encodeToString(result, 0, result.length);
     }
 
@@ -101,12 +99,12 @@ public class HeadlongCodec implements AbiEncoder, AbiDecoder {
             return result;
         } else if (value instanceof Boolean result) {
             return result;
-        } else if (value instanceof Struct result) {
+        } else if (value instanceof Tuple result) {
             val values = new Object[result.size()];
             for (var i = 0; i < result.size(); i++) {
                 values[i] = encodeValue(result.get(i));
             }
-            return Tuple.of(values);
+            return com.esaulpaugh.headlong.abi.Tuple.of(values);
         }
 
         error("Couldn't encode type {}.", value.getClass());

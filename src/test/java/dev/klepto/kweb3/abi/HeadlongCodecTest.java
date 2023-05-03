@@ -29,10 +29,10 @@ public class HeadlongCodecTest {
                 "20000000000000000000000000000000000000000000000000000000000000000" +
                 "10000000000000000000000000000000000000000000000000000000000000001";
 
-        val innerType = new AbiType(Struct.class, List.of(new AbiType(Uint.class, List.of(), false, 256, 0)), true, 0, 0);
-        val type = new AbiType(Struct.class, List.of(innerType), false, 0, 0);
+        val innerType = new AbiType(Tuple.class, List.of(new AbiType(Uint.class, List.of(), false, 256, 0)), true, 0, 0);
+        val type = new AbiType(Tuple.class, List.of(innerType), false, 0, 0);
 
-        val expected = struct((Object) array(struct(uint256(1))));
+        val expected = tuple((Object) array(tuple(uint256(1))));
         val result = codec.decode(abi, type);
         assertEquals(expected.size(), result.size());
         assertTrue(result.getFirst().getClass().isArray());
@@ -41,10 +41,10 @@ public class HeadlongCodecTest {
         val resultArray = (Object[]) result.getFirst();
         assertEquals(expectedArray.length, resultArray.length);
         assertEquals(expectedArray[0].getClass(), resultArray[0].getClass());
-        assertEquals(Struct.class, resultArray[0].getClass());
+        assertEquals(Tuple.class, resultArray[0].getClass());
 
-        val expectedStruct = (Struct) expectedArray[0];
-        val resultStruct = (Struct) resultArray[0];
+        val expectedStruct = (Tuple) expectedArray[0];
+        val resultStruct = (Tuple) resultArray[0];
         assertIterableEquals(expectedStruct, resultStruct);
     }
 
@@ -128,7 +128,7 @@ public class HeadlongCodecTest {
 
     @Test
     public void testEncodeUnsupported() {
-        assertThrows(Web3Error.class, () -> codec.encode(struct(new Object()), new AbiType(Uint.class)));
+        assertThrows(Web3Error.class, () -> codec.encode(tuple(new Object()), new AbiType(Uint.class)));
     }
 
     @Test
@@ -136,7 +136,7 @@ public class HeadlongCodecTest {
         assertEquals("00000000000000000000000000000000000000000000000000000000000000" +
                         "20000000000000000000000000000000000000000000000000000000000000000" +
                         "10000000000000000000000000000000000000000000000000000000000000001",
-                codec.encode(struct((Object) array(struct(uint256(1)))))
+                codec.encode(tuple((Object) array(tuple(uint256(1)))))
         );
     }
 
@@ -160,7 +160,7 @@ public class HeadlongCodecTest {
                         "20000000000000000000000000000000000000000000000000000000000000000" +
                         "2000000000000000000000000ab5801a7d398351b8be11c439e05c5b3259aec9b" +
                         "000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
-                codec.encode(struct(addressArray))
+                codec.encode(tuple(addressArray))
         );
     }
 
@@ -226,7 +226,7 @@ public class HeadlongCodecTest {
                         "9490e294bce29594e29598e29691e296bae298bae2998020efac81efbfbde2" +
                         "9180e28282e1bca0e1b882d3a5e1ba84c990cb90e28d8ed790d4b1e1839000" +
                         "0000000000000000000000",
-                codec.encode(struct(value), new AbiType(String.class))
+                codec.encode(tuple(value), new AbiType(String.class))
         );
     }
 
@@ -265,11 +265,11 @@ public class HeadlongCodecTest {
     public void testEncodeBoolean() {
         assertEquals(
                 "0000000000000000000000000000000000000000000000000000000000000001",
-                codec.encode(struct(true), new AbiType(boolean.class))
+                codec.encode(tuple(true), new AbiType(boolean.class))
         );
         assertEquals(
                 "0000000000000000000000000000000000000000000000000000000000000000",
-                codec.encode(struct(false), new AbiType(boolean.class))
+                codec.encode(tuple(false), new AbiType(boolean.class))
         );
     }
 

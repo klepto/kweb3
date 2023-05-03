@@ -4,6 +4,7 @@ import com.google.common.reflect.TypeToken;
 import dev.klepto.kweb3.Web3Response;
 import dev.klepto.kweb3.abi.type.*;
 import dev.klepto.kweb3.abi.type.util.Convertibles;
+import dev.klepto.kweb3.abi.type.util.Types;
 import dev.klepto.kweb3.contract.event.EventDecoder;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -18,7 +19,6 @@ import java.util.List;
 
 import static dev.klepto.kweb3.Web3Error.require;
 import static dev.klepto.kweb3.abi.type.util.Types.arrayCast;
-import static dev.klepto.kweb3.abi.type.util.Types.struct;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -41,8 +41,8 @@ public class ContractCodec {
             return stream.map(element -> encodeValue(element, type)).toArray();
         }
 
-        // Encode structs.
-        if (type.getAbiType().getType() == Struct.class) {
+        // Encode tuples.
+        if (type.getAbiType().getType() == Tuple.class) {
             val fields = value.getClass().getDeclaredFields();
             val fieldTypes = type.getChildren();
             val values = new ArrayList<>();
@@ -54,7 +54,7 @@ public class ContractCodec {
                 val fieldType = fieldTypes.get(i);
                 values.add(encodeValue(fieldValue, fieldType));
             }
-            return struct(values);
+            return Types.tuple(values);
         }
 
         // Encode single values.
@@ -75,9 +75,9 @@ public class ContractCodec {
                     : arrayCast(stream.toArray(), componentType.getType().getRawType());
         }
 
-        // Decode structs.
-        if (type.getAbiType().getType() == Struct.class) {
-            val values = ((Struct) value).getValue();
+        // Decode tuples.
+        if (type.getAbiType().getType() == Tuple.class) {
+            val values = ((Tuple) value).getValue();
             val types = type.getChildren();
             val parameters = new ArrayList<>();
             for (var i = 0; i < values.size(); i++) {
@@ -111,22 +111,29 @@ public class ContractCodec {
         val events = eventDecoder.decode(response);
         response = response.withEvents(events);
 
-        val returnType = response.getRequest().getFunction().getReturnType();
+        val function = response.getRequest().getFunction();
+        val returnType = function.getReturnType();
         if (returnType == null) {
             return response;
         }
 
-        return decodeResponse(returnType, response.getResult());
+        return decodeResponse(function, response.getResult());
     }
 
-    public static Object decodeResponse(ValueType returnType, Struct result) {
+    public static Object decodeResponse(Function function, Tuple result) {
         if (result == null) {
             return null;
         }
 
-        val isStruct = returnType.getAbiType().getType() == Struct.class;
-        val returnValue = isStruct ? result : result.getFirst();
-        return decodeValue(returnValue, returnType);
+        val returnType = function.getReturnType();
+
+        if (function.isStruct()) {
+            return decodeValue(result.getFirst(), returnType.unwrapTuple());
+        } else if (returnType.getAbiType().getType() == Tuple.class) {
+            return decodeValue(result, returnType);
+        }
+
+        return decodeValue(result.getFirst(), returnType);
     }
 
     public static ValueType parseParametersType(List<Parameter> parameters) {
@@ -156,7 +163,7 @@ public class ContractCodec {
                 .map(def -> parseValueType(def.getType(), def.getAnnotation(), def.isIndexed()))
                 .toList();
         val abiChildren = children.stream().map(ValueType::getAbiType).toList();
-        return new ValueType(TypeToken.of(Struct.class), children, new AbiType(Struct.class, abiChildren, false, 0, 0), false);
+        return new ValueType(TypeToken.of(Tuple.class), children, new AbiType(Tuple.class, abiChildren, false, 0, 0), false);
     }
 
     public static ValueType parseValueType(TypeToken<?> type, Type annotation, boolean indexed) {
@@ -175,9 +182,14 @@ public class ContractCodec {
             int arraySize,
             boolean indexed
     ) {
+        if (valueType.getRawType() == Struct.class) {
+            valueType = TypeToken.of(Tuple.class);
+        }
+
         if (!isSolidityType(valueType)) {
             return null;
         }
+
         if (valueSize == 0) {
             if (valueType.getRawType() == Int.class) {
                 valueSize = Int.MAX_SIZE;
@@ -188,7 +200,7 @@ public class ContractCodec {
 
         val isCollection = isCollection(type);
         var children = List.<ValueType>of();
-        if (valueType.getRawType() == Struct.class) {
+        if (valueType.getRawType() == Tuple.class) {
             val componentType = getComponentType(type).getRawType();
             children = parseFieldsType(Arrays.asList(componentType.getDeclaredFields())).getChildren();
         }
@@ -204,7 +216,7 @@ public class ContractCodec {
         else if (unwrapped == Bytes.class) return true;
         else if (unwrapped == Int.class) return true;
         else if (unwrapped == Uint.class) return true;
-        else if (unwrapped == Struct.class) return true;
+        else if (unwrapped == Tuple.class) return true;
         else if (unwrapped == boolean.class) return true;
         else if (unwrapped == String.class) return true;
         return false;
@@ -219,9 +231,10 @@ public class ContractCodec {
     }
 
     public static boolean isList(TypeToken<?> type) {
-        if (type.getRawType() == Struct.class) {
+        if (Tuple.class.isAssignableFrom(type.getRawType())) {
             return false;
         }
+
         return List.class.isAssignableFrom(type.getRawType());
     }
 

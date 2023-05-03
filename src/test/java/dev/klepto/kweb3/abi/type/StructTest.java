@@ -16,11 +16,11 @@ public class StructTest {
     @Test
     public void testStruct() {
         val values = List.of(array(address(0)), uint256(0), "");
-        val struct = new Struct(values);
+        val struct = new Tuple(values);
         assertEquals(3, struct.size());
         assertEquals("(address[],uint256,string)", struct.getType().toString());
 
-        val structOfStructs = new Struct(List.of((Object) array(struct)));
+        val structOfStructs = new Tuple(List.of((Object) array(struct)));
         assertEquals(1, structOfStructs.size());
         assertEquals("((address[],uint256,string)[])", structOfStructs.getType().toString());
     }

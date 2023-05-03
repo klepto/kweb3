@@ -8,7 +8,7 @@ import dev.klepto.kweb3.abi.AbiEncoder;
 import dev.klepto.kweb3.abi.HeadlongCodec;
 import dev.klepto.kweb3.abi.type.AbiType;
 import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.abi.type.Struct;
+import dev.klepto.kweb3.abi.type.Tuple;
 import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.contract.Contract;
 import dev.klepto.kweb3.contract.ContractProxy;
@@ -90,12 +90,12 @@ public abstract class ContractClient implements Web3Client {
     }
 
     @Override
-    public String abiEncode(Struct value, AbiType type) {
+    public String abiEncode(Tuple value, AbiType type) {
         return encoder.encode(value, type);
     }
 
     @Override
-    public Struct abiDecode(String abi, AbiType type) {
+    public Tuple abiDecode(String abi, AbiType type) {
         return decoder.decode(abi, type);
     }
 

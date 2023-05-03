@@ -7,6 +7,8 @@ import lombok.val;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
@@ -32,8 +34,16 @@ public class AbiType {
         this.arraySize = arraySize;
     }
 
-    public AbiType toStructType() {
-        return new AbiType(Struct.class).withChildren(List.of(this));
+    public AbiType wrapTuple() {
+        return new AbiType(Tuple.class).withChildren(List.of(this));
+    }
+
+    public AbiType unwrapTuple() {
+        checkState(
+                getChildren().size() == 1 && getChildren().get(0).getType() == Tuple.class,
+                "Value type is not a tuple wrapper."
+        );
+        return getChildren().get(0);
     }
 
     @Override
@@ -41,7 +51,7 @@ public class AbiType {
         val name = getTypeName();
         val suffix = getTypeSuffix();
         val result = name + suffix;
-        if (type != Struct.class) {
+        if (type != Tuple.class) {
             return result;
         }
         return "(" + name + ")" + suffix;
@@ -66,7 +76,7 @@ public class AbiType {
             return "string";
         } else if (type == boolean.class) {
             return "bool";
-        } else if (type == Struct.class) {
+        } else if (type == Tuple.class) {
             return children.stream().map(AbiType::toString).collect(Collectors.joining(","));
         }
         return null;
