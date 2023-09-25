@@ -7,8 +7,6 @@ import dev.klepto.kweb3.abi.type.Address;
 import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.contract.Contract;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
@@ -24,7 +22,7 @@ public abstract class SafeContractClient extends ContractClient {
     private final Striped<Lock> striped;
 
     public SafeContractClient(Chain chain, String privateKey, int concurrencyLevel) {
-        super(chain, privateKey, new ArrayList<>(), new HashMap<>());
+        super(chain, privateKey);
         this.striped = Striped.lock(concurrencyLevel);
     }
 
