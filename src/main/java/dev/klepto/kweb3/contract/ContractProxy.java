@@ -14,9 +14,9 @@ import lombok.val;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static dev.klepto.kweb3.Web3Error.require;
-import static dev.klepto.kweb3.abi.type.util.Types.tuple;
 import static dev.klepto.kweb3.abi.type.util.Types.uint256;
 import static dev.klepto.kweb3.util.Logging.log;
 
@@ -34,7 +34,7 @@ public class ContractProxy implements InvocationHandler {
     private final Address address;
 
     private final ContractCache responseCache = new ContractCache();
-    private final Map<Method, Function> functionCache = new HashMap<>();
+    private final Map<Method, Function> functionCache = new ConcurrentHashMap<>();
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
