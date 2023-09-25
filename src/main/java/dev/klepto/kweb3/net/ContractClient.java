@@ -41,11 +41,18 @@ public abstract class ContractClient implements Web3Client {
     private boolean logging;
     private MulticallContract multicallContract;
 
-    private final List<Web3Request> logs = new ArrayList<>();
-    private final Map<Class<?>, Map<Address, Contract>> contractCache = new HashMap<>();
+    private final List<Web3Request> logs;
+    private final Map<Class<?>, Map<Address, Contract>> contractCache;
 
     @Delegate private final AbiEncoder encoder = new HeadlongCodec();
     @Delegate private final AbiDecoder decoder = new HeadlongCodec();
+
+    public ContractClient(Chain chain, String privateKey) {
+        this.chain = chain;
+        this.privateKey = privateKey;
+        this.logs = new ArrayList<>();
+        this.contractCache = new HashMap<>();
+    }
 
     @Override
     public <T extends Contract> T contract(Class<T> type, Address address) {
