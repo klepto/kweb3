@@ -38,7 +38,7 @@ public abstract class ContractClient implements Web3Client {
     private final Chain chain;
     private final String privateKey;
 
-    private boolean logging;
+    private volatile boolean logging;
     private MulticallContract multicallContract;
 
     private final List<Web3Request> logs;
