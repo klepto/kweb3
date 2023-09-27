@@ -7,6 +7,7 @@ import lombok.val;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
  */
 public class ContractCache {
 
-    private Map<String, CacheItem> items = new HashMap<>();
+    private final Map<String, CacheItem> items = new ConcurrentHashMap<>();
 
     public void put(String key, CacheItem item) {
         removeExpired();

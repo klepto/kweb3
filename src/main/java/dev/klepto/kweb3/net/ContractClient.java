@@ -23,9 +23,11 @@ import lombok.val;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -38,18 +40,21 @@ public abstract class ContractClient implements Web3Client {
     private final Chain chain;
     private final String privateKey;
 
-    private boolean logging;
+    private volatile boolean logging;
     private MulticallContract multicallContract;
 
+    private final Lock logsLock = new ReentrantLock();
+
     private final List<Web3Request> logs = new ArrayList<>();
-    private final Map<Class<?>, Map<Address, Contract>> contractCache = new HashMap<>();
+
+    private final Map<Class<?>, Map<Address, Contract>> contractCache = new ConcurrentHashMap<>();
 
     @Delegate private final AbiEncoder encoder = new HeadlongCodec();
     @Delegate private final AbiDecoder decoder = new HeadlongCodec();
 
     @Override
     public <T extends Contract> T contract(Class<T> type, Address address) {
-        val contracts = contractCache.computeIfAbsent(type, key -> new HashMap<>());
+        val contracts = contractCache.computeIfAbsent(type, key -> new ConcurrentHashMap<>());
         val contract = contracts.computeIfAbsent(address, key ->
                 (Contract) Proxy.newProxyInstance(
                         ContractClient.class.getClassLoader(),
@@ -64,7 +69,12 @@ public abstract class ContractClient implements Web3Client {
     @Override
     public Web3Response send(Web3Request request) {
         if (isLogging()) {
-            logs.add(request);
+            try {
+                logsLock.lock();
+                logs.add(request);
+            } finally {
+                logsLock.unlock();
+            }
             return null;
         }
 
@@ -75,11 +85,16 @@ public abstract class ContractClient implements Web3Client {
 
     @Override
     public List<Web3Request> getLogs(Runnable runnable) {
-        logs.clear();
+        logsLock.lock();
         logging = true;
-        runnable.run();
-        logging = false;
-        return new ArrayList<>(logs);
+        try {
+            logs.clear();
+            runnable.run();
+            return new ArrayList<>(logs);
+        } finally {
+            logging = false;
+            logsLock.unlock();
+        }
     }
 
     public String abiEncode(Web3Request request) {
