@@ -39,6 +39,32 @@ public final class Hex {
     }
 
     /**
+     * Converts {@link BigInteger} to a hexadecimal string with <code>0x</code> prefix and leading zeros.
+     *
+     * @param value the integer value
+     * @return a hexadecimal representation of integer
+     */
+    public static String toHex(BigInteger value) {
+        return toHex(value, true, true);
+    }
+
+    /**
+     * Converts {@link BigInteger} to a hexadecimal string.
+     *
+     * @param value       the integer value
+     * @param prefix      if true, appends <code>0x</code> prefix to the resulting string
+     * @param leadingZero if true, ensures that result length is divisible by 2
+     * @return a hexadecimal representation of integer
+     */
+    public static String toHex(BigInteger value, boolean prefix, boolean leadingZero) {
+        var hex = value.toString(16);
+        if (leadingZero && hex.length() % 2 != 0) {
+            hex = "0" + hex;
+        }
+        return (prefix ? "0x" : "") + hex;
+    }
+
+    /**
      * Converts given hexadecimal string to {@link BigInteger}.
      *
      * @param hex the hexadecimal string
