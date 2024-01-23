@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.type;
 
+import dev.klepto.kweb3.util.Hex;
 import dev.klepto.kweb3.util.hash.Keccak256;
 
 import java.math.BigInteger;
@@ -18,7 +19,7 @@ import static dev.klepto.kweb3.util.Hex.toBigInteger;
 public record EthAddress(BigInteger value) implements EthNumericType {
 
     public EthAddress {
-        require(value.bitCount() == size(), "Malformed address: {}", toChecksumHex());
+        require(value.bitLength() == size(), "Malformed address: {}", Hex.toHex(value));
     }
 
     @Override
