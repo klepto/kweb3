@@ -1,36 +1,50 @@
 package dev.klepto.kweb3;
 
-import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.chain.Chain;
 import dev.klepto.kweb3.contract.Contract;
-import dev.klepto.kweb3.net.EthClient;
-import dev.klepto.kweb3.net.web3j.Web3jClient;
-import dev.klepto.kweb3.util.multicall.MulticallContract;
-import dev.klepto.kweb3.util.multicall.MulticallBuilder;
+import dev.klepto.kweb3.contract.Contracts;
+import dev.klepto.kweb3.rpc.RpcClient;
+import dev.klepto.kweb3.rpc.Web3jRpcClient;
+import dev.klepto.kweb3.type.EthAddress;
+import lombok.Getter;
 
-import static dev.klepto.kweb3.abi.type.util.Types.address;
+import static dev.klepto.kweb3.type.EthAddress.address;
 
 /**
- * @author <a href="http://github.com/klepto">Augustinas R.</a>
+ * Web3Client implementation.
  */
-public interface Web3Client extends EthClient {
+@Getter
+public class Web3Client {
 
-    static Web3Client create(Chain chain) {
-        return create(chain, null);
+    private final Web3Network network;
+    private final RpcClient rpc;
+    private final Contracts contracts;
+
+    public Web3Client(Web3Network network) {
+        this.network = network;
+        this.rpc = new Web3jRpcClient(network);
+        this.contracts = new Contracts(this);
     }
 
-    static Web3Client create(Chain chain, String privateKey) {
-        return new Web3jClient(chain, privateKey);
+    /**
+     * Binds contract of a given type to a blockchain address for seamless transacting.
+     *
+     * @param type    the contract type, must be an interface extending Contract
+     * @param address the blockchain address of the contract
+     * @return the contract instance for direct blockchain transactions
+     */
+    public <T extends Contract> T contract(Class<T> type, EthAddress address) {
+        return contracts.createProxy(type, address);
     }
 
-    default <T extends Contract> T contract(Class<T> type, String address) {
+    /**
+     * Binds contract of a given type to a blockchain address string for seamless transacting.
+     *
+     * @param type    the contract type, must be an interface extending Contract
+     * @param address the blockchain address string of the contract
+     * @return the contract instance for direct blockchain transactions
+     */
+    public <T extends Contract> T contract(Class<T> type, String address) {
         return contract(type, address(address));
     }
-
-    <T extends Contract> T contract(Class<T> type, Address address);
-
-    void setMulticallContract(MulticallContract contract);
-
-    MulticallBuilder multicall();
 
 }

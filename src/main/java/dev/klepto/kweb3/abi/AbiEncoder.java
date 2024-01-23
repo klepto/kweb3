@@ -1,25 +1,31 @@
 package dev.klepto.kweb3.abi;
 
-import dev.klepto.kweb3.abi.type.AbiType;
-import dev.klepto.kweb3.abi.type.AbiValue;
-import dev.klepto.kweb3.abi.type.Tuple;
-import dev.klepto.kweb3.abi.type.util.Types;
-
-import static dev.klepto.kweb3.abi.type.util.Types.tuple;
+import dev.klepto.kweb3.type.EthType;
 
 /**
+ * Represents ABI encoder for converting between string and ethereum data types.
+ *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface AbiEncoder {
 
-    default <T extends AbiValue> String encode(T value) {
-        return encode(Types.tuple(value), value.getType());
-    }
+    /**
+     * Attempts to encode given {@link EthType} value into an ABI string by automatically detecting type information.
+     * This will work most of the time except some edge cases where we are dealing with empty arrays etc. Hence why more
+     * delicate features of the API rely on {@link #encode(EthType, AbiTypeDescriptor)}.
+     *
+     * @param value the ethereum type value
+     * @return the ABI encoded string containing the ethereum value
+     */
+    String encode(EthType value);
 
-    default String encode(Tuple values) {
-        return encode(values, values.getType());
-    }
-    
-    String encode(Tuple values, AbiType type);
+    /**
+     * Attempts to encode given {@link EthType} value into an ABI string according to provided type description.
+     *
+     * @param value          the ethereum type value
+     * @param typeDescriptor the type description
+     * @return the ABI encoded string containing the ethereum value
+     */
+    String encode(EthType value, AbiTypeDescriptor typeDescriptor);
 
 }

@@ -1,7 +1,6 @@
-.gradle/
-.idea/
-out/
 build/
-
-pk
-key
+out/
+secret/
+.gradle
+.idea
+.env

@@ -1,114 +1,134 @@
 package dev.klepto.kweb3.abi;
 
+import com.esaulpaugh.headlong.abi.Address;
+import com.esaulpaugh.headlong.abi.Tuple;
 import com.esaulpaugh.headlong.abi.TupleType;
 import com.esaulpaugh.headlong.util.FastHex;
-import dev.klepto.kweb3.abi.type.*;
-import dev.klepto.kweb3.abi.type.util.Convertibles;
-import dev.klepto.kweb3.abi.type.util.Hex;
-import dev.klepto.kweb3.abi.type.util.Types;
+import dev.klepto.kweb3.type.*;
 import lombok.val;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static dev.klepto.kweb3.Web3Error.error;
+import static dev.klepto.kweb3.type.EthAddress.address;
+import static dev.klepto.kweb3.type.EthArray.array;
+import static dev.klepto.kweb3.type.EthBool.bool;
+import static dev.klepto.kweb3.type.EthBytes.bytes;
+import static dev.klepto.kweb3.type.EthInt.int256;
+import static dev.klepto.kweb3.type.EthString.string;
+import static dev.klepto.kweb3.type.EthTuple.tuple;
+import static dev.klepto.kweb3.type.EthUint.uint256;
+import static dev.klepto.kweb3.util.Collections.arrayCast;
+import static dev.klepto.kweb3.util.Hex.toByteArray;
 
 /**
+ * Implementation of {@link AbiCodec} using {@link com.esaulpaugh.headlong} library.
+ *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class HeadlongCodec implements AbiEncoder, AbiDecoder {
+public class HeadlongCodec implements AbiCodec {
 
     @Override
-    public Tuple decode(String abi, AbiType type) {
-        type = type.getType() == Tuple.class ? type : type.wrapTuple();
-        val tuple = TupleType.parse(type.toString());
-        val data = Hex.toByteArray(abi);
+    public EthTuple decode(String abi, AbiTypeDescriptor descriptor) {
+        descriptor = descriptor.type() == EthTuple.class ? descriptor : descriptor.wrap();
+        val tuple = TupleType.parse(descriptor.toString());
+        val data = toByteArray(abi);
         if (data.length == 0) {
             return null;
         }
 
         val result = tuple.decode(data);
-        return (Tuple) decodeValue(result, type);
+        return (EthTuple) decodeHeadlongValue(result, descriptor);
     }
 
-    private Object decodeValue(Object value, AbiType type) {
-        if (value.getClass() != byte[].class && value.getClass().isArray()) {
-            return Arrays.stream((Object[]) value)
-                    .map(element -> decodeValue(element, type))
-                    .toArray();
-        }
-
-        val size = type.getValueSize();
-        if (type.getType() == Address.class) {
-            return Types.address(((com.esaulpaugh.headlong.abi.Address) value).value());
-        } else if (type.getType() == Bytes.class) {
-            return Convertibles.toBytes(value).withSize(size);
-        } else if (type.getType() == Int.class) {
-            return Convertibles.toInt256(value).withSize(size);
-        } else if (type.getType() == Uint.class) {
-            return Convertibles.toUint256(value).withSize(size);
-        } else if (type.getType() == String.class) {
-            return value;
-        } else if (type.getType() == boolean.class) {
-            return value;
-        } else if (type.getType() == Tuple.class) {
-            val tuple = (com.esaulpaugh.headlong.abi.Tuple) value;
+    private Object decodeHeadlongValue(Object value, AbiTypeDescriptor descriptor) {
+        val valueSize = descriptor.valueSize();
+        if (value.getClass().isArray() && descriptor.array()) {
+            val array = (Object[]) value;
+            val result = arrayCast(
+                    Arrays.stream(array)
+                            .map(element -> decodeHeadlongValue(element, descriptor))
+                            .toArray(),
+                    descriptor.type()
+            );
+            return array(descriptor.arraySize(), result);
+        } else if (descriptor.type() == EthAddress.class) {
+            return address(((Address) value).toString());
+        } else if (descriptor.type() == EthBytes.class) {
+            return bytes((byte[]) value).withSize(valueSize);
+        } else if (descriptor.type() == EthInt.class) {
+            return int256((BigInteger) value).withSize(valueSize);
+        } else if (descriptor.type() == EthUint.class) {
+            return uint256((BigInteger) value).withSize(valueSize);
+        } else if (descriptor.type() == EthString.class) {
+            return string((String) value);
+        } else if (descriptor.type() == EthBool.class) {
+            return bool((boolean) value);
+        } else if (descriptor.type() == EthTuple.class) {
+            val tuple = (Tuple) value;
             val values = new ArrayList<>();
             for (var i = 0; i < tuple.size(); i++) {
-                values.add(decodeValue(tuple.get(i), type.getChildren().get(i)));
+                values.add(decodeHeadlongValue(tuple.get(i), descriptor.children().get(i)));
             }
-            return Types.tuple(values);
+            return tuple(values.stream().map(EthType.class::cast).toArray(EthType[]::new));
         }
 
-        error("Couldn't decode type {} to type {}.", value.getClass(), type.getType());
-        return null;
+        throw new IllegalArgumentException("Couldn't decode headlong type: " + value);
     }
 
     @Override
-    public String encode(Tuple value, AbiType type) {
-        type = type.getType() == Tuple.class ? type : type.wrapTuple();
-        val tupleType = TupleType.parse(type.toString());
-        val result = tupleType.encode((com.esaulpaugh.headlong.abi.Tuple) encodeValue(value)).array();
+    public String encode(EthType value) {
+        return encode(value, AbiTypeDescriptor.parse(value));
+    }
+
+    @Override
+    public String encode(EthType value, AbiTypeDescriptor descriptor) {
+        if (value instanceof EthTuple) {
+            return encode((EthTuple) value, descriptor);
+        } else {
+            return encode(tuple(value), descriptor.wrap());
+        }
+    }
+
+    private String encode(EthTuple value, AbiTypeDescriptor descriptor) {
+        val tupleType = TupleType.parse(descriptor.toString());
+        val result = tupleType.encode((Tuple) encodeHeadlongValue(value)).array();
         return FastHex.encodeToString(result, 0, result.length);
     }
 
-    private Object encodeValue(Object value) {
-        if (value.getClass().isArray()) {
-            val result = Arrays.stream((Object[]) value)
-                    .map(element -> element.getClass().cast(element))
-                    .map(this::encodeValue)
+    private Object encodeHeadlongValue(Object value) {
+        if (value instanceof EthArray<?> array) {
+            val result = array.stream()
+                    .map(this::encodeHeadlongValue)
                     .toArray();
-            return Types.arrayCast(result, result[0].getClass());
-        }
-
-        if (value instanceof Address result) {
-            val checksum = com.esaulpaugh.headlong.abi.Address.toChecksumAddress(result.toHex());
-            return com.esaulpaugh.headlong.abi.Address.wrap(checksum);
-        } else if (value instanceof Bytes result) {
-            return result.getValue();
-        } else if (value instanceof AbiNumericValue result) {
-            val bigInteger = (BigInteger) result.getValue();
-            if (result.getSize() <= 32) {
+            return arrayCast(result, result[0].getClass());
+        } else if (value instanceof EthAddress address) {
+            return Address.wrap(address.toChecksumHex());
+        } else if (value instanceof EthBytes bytes) {
+            return bytes.toByteArray();
+        } else if (value instanceof EthNumericType numeric) {
+            val bigInteger = (BigInteger) numeric.value();
+            if (numeric.size() <= 32) {
                 return bigInteger.intValue();
-            } else if (result.getSize() <= 64) {
+            } else if (numeric.size() <= 64) {
                 return bigInteger.longValue();
             }
-            return result.getValue();
-        } else if (value instanceof String result) {
-            return result;
-        } else if (value instanceof Boolean result) {
-            return result;
-        } else if (value instanceof Tuple result) {
-            val values = new Object[result.size()];
-            for (var i = 0; i < result.size(); i++) {
-                values[i] = encodeValue(result.get(i));
+            return bigInteger;
+        } else if (value instanceof EthString string) {
+            return string.value();
+        } else if (value instanceof EthBool bool) {
+            return bool.value();
+        } else if (value instanceof EthTuple tuple) {
+            val values = new Object[tuple.size()];
+            for (var i = 0; i < values.length; i++) {
+                values[i] = encodeHeadlongValue(tuple.get(i));
             }
-            return com.esaulpaugh.headlong.abi.Tuple.of(values);
+            return Tuple.of(values);
         }
 
-        error("Couldn't encode type {}.", value.getClass());
-        return null;
+        throw new IllegalArgumentException("Couldn't encode ethereum type: " + value);
     }
+
 
 }

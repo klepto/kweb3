@@ -1,169 +1,95 @@
 package dev.klepto.kweb3.contract;
 
-import com.google.common.reflect.TypeToken;
 import dev.klepto.kweb3.Web3Client;
-import dev.klepto.kweb3.Web3Request;
-import dev.klepto.kweb3.abi.type.Address;
-import dev.klepto.kweb3.abi.type.Struct;
-import dev.klepto.kweb3.abi.type.Uint;
-import dev.klepto.kweb3.abi.type.util.Types;
-import dev.klepto.kweb3.util.Keccak;
+import dev.klepto.kweb3.type.EthAddress;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.*;
-
-import static dev.klepto.kweb3.Web3Error.require;
-import static dev.klepto.kweb3.abi.type.util.Types.tuple;
-import static dev.klepto.kweb3.abi.type.util.Types.uint256;
-import static dev.klepto.kweb3.util.Logging.log;
+import java.util.Objects;
 
 /**
- * Generates web3 request from a contract Java interface call. Encodes request into solidity types, which later gets passed
- * on to web3 client implementation, results are returned in solidity types which later get decoded into desired return
- * types based on the contract interface implementation and it's annotations.
+ * Intercepts calls on un-implemented methods in the contract interface. Encodes and executes appropriate blockchain
+ * transactions and returns the result.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
+@Getter
 @RequiredArgsConstructor
 public class ContractProxy implements InvocationHandler {
 
+    private static final ContractExecutor executor = new ContractExecutor();
+
+    private final Class<? extends Contract> type;
     private final Web3Client client;
-    private final Address address;
+    private final EthAddress address;
 
-    private final ContractCache responseCache = new ContractCache();
-    private final Map<Method, Function> functionCache = new HashMap<>();
-
+    /**
+     * Intercepts contract interface method call. Called automatically by JVM {@link java.lang.reflect.Proxy} via
+     * {@link InvocationHandler} interface.
+     *
+     * @param proxy  the proxy instance that the method was invoked on
+     * @param method the {@code Method} instance corresponding to the interface method invoked on the proxy instance.
+     *               The declaring class of the {@code Method} object will be the interface that the method was declared
+     *               in, which may be a superinterface of the proxy interface that the proxy class inherits the method
+     *               through.
+     * @param args   an array of objects containing the values of the arguments passed in the method invocation on the
+     *               proxy instance, or {@code null} if interface method takes no arguments. Arguments of primitive
+     *               types are wrapped in instances of the appropriate primitive wrapper class, such as
+     *               {@code java.lang.Integer} or {@code java.lang.Boolean}.
+     * @return the result of this method call
+     * @throws Throwable a runtime error occurred
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // Invoke interface default methods first. Allows for custom logic/helper methods in contract implementations.
         if (method.isDefault()) {
             return InvocationHandler.invokeDefault(proxy, method, args);
         }
 
         switch (method.getName()) {
-            case "equals":
-                return address.equals(args[0]);
+            case "getContractClass":
+                return type;
             case "toString":
-                val className = proxy.getClass().getInterfaces()[0].getSimpleName();
-                return className + "(" + address.toHex() + ")";
+                return type.getSimpleName();
             case "hashCode":
-                return address.hashCode();
+                return hashCode();
+            case "equals":
+                return equals(args[0]);
             case "getAddress":
                 return address;
             case "getClient":
                 return client;
             default:
-                return contractCall(method, args);
+                return executor.execute(this, method, args);
         }
     }
 
-    private Object contractCall(Method method, Object[] args) {
-        val request = parseRequest(method, args);
-
-        if (method.isAnnotationPresent(Cache.class) && !client.isLogging()) {
-            val annotation = method.getAnnotation(Cache.class);
-            val duration = annotation.timeUnit().toMillis(annotation.value());
-            val key = client.abiEncode(request);
-            return responseCache.get(key, () -> {
-                val result = getResponse(request);
-                return new ContractCache.CacheItem(result, System.currentTimeMillis(), duration);
-            });
-        }
-
-        return getResponse(request);
+    /**
+     * Generates hash code for this proxy. Contracts are equal if they are same type, on the same network and have same
+     * address.
+     *
+     * @return the contract hashcode
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(client.getNetwork(), type, address);
     }
 
-    private Web3Request parseRequest(Method method, Object[] args) {
-        val function = parseFunction(method);
-        var value = uint256(0);
-
-        var offset = 0;
-        val values = new ArrayList<>();
-        val parameters = method.getParameters();
-        for (var i = 0; i < parameters.length; i++) {
-            val parameter = parameters[i];
-            val parameterValue = args[i];
-
-            if (parameter.isAnnotationPresent(Cost.class)) {
-                val valueType = ContractCodec.parseValueType(
-                        TypeToken.of(parameter.getParameterizedType()),
-                        TypeToken.of(Uint.class),
-                        Uint.MAX_SIZE,
-                        0,
-                        false
-                );
-                value = (Uint) ContractCodec.encodeValue(parameterValue, valueType);
-                offset++;
-            } else {
-                val valueType = function.getParametersType().getChildren().get(i - offset);
-                values.add(ContractCodec.encodeValue(parameterValue, valueType));
-            }
+    /**
+     * Returns true if an object is equal to this contract. Contract is equal if it's hash code matches another
+     * contracts hash code.
+     *
+     * @param object the object to check
+     * @return true if given object is equal to this contract
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
         }
-
-        return new Web3Request(address, client.getAddress(), function, value, Types.tuple(values), List.of());
+        return hashCode() == object.hashCode();
     }
-
-    private Object getResponse(Web3Request request) {
-        var response = client.send(request);
-        if (response == null) {
-            return null;
-        }
-
-        if (response.getError() != null) {
-            throw response.getError();
-        }
-
-        return ContractCodec.decodeResponse(response);
-    }
-
-    private Function parseFunction(Method method) {
-        if (functionCache.containsKey(method)) {
-            return functionCache.get(method);
-        }
-
-        val view = method.isAnnotationPresent(View.class);
-        val transaction = method.isAnnotationPresent(Transaction.class);
-        require(
-                view || transaction,
-                "No @View or @Transaction annotation present on {}#{} contract function.",
-                method.getDeclaringClass().getSimpleName(), method.getName()
-        );
-
-        var name = view
-                ? method.getAnnotation(View.class).value()
-                : method.getAnnotation(Transaction.class).value();
-        if (name.isBlank()) {
-            name = method.getName();
-        }
-
-        val returnTypeToken = TypeToken.of(method.getGenericReturnType());
-        val parameters = Arrays.stream(method.getParameters())
-                .filter(parameter -> !parameter.isAnnotationPresent(Cost.class))
-                .toList();
-
-        val parameterType = ContractCodec.parseParametersType(parameters);
-        val signature = name + parameterType.getAbiType().toString();
-        log().debug("Function signature: {}", signature);
-
-        val typeAnnotation = method.getAnnotation(Type.class);
-        val isStruct = typeAnnotation != null && typeAnnotation.value() == Struct.class;
-
-        var returnType = ContractCodec.parseValueType(
-                returnTypeToken,
-                method.getAnnotation(Type.class),
-                method.isAnnotationPresent(Event.Indexed.class)
-        );
-        if (isStruct) {
-            returnType = returnType.wrapTuple();
-        }
-
-        val hash = "0x" + Keccak.hash(signature).substring(0, 8).toLowerCase();
-        val function = new Function(name, hash, view, isStruct, parameterType, returnType);
-        functionCache.put(method, function);
-        return function;
-    }
-
 
 }

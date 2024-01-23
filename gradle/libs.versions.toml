@@ -1,0 +1,15 @@
+[versions]
+slf4j = "2.0.5"
+
+[libraries]
+jetbrains-annotations = { module = "org.jetbrains:annotations", version = "24.0.0" }
+junit-bom = { module = "org.junit:junit-bom", version = "5.9.1" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+lombok = { module = "org.projectlombok:lombok", version = "1.18.24" }
+guava = { module = "com.google.guava:guava", version = "32.0.0-jre" }
+headlong = { module = "com.esaulpaugh:headlong", version = "9.1.1" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+
+[bundles]
+slf4j = ["slf4j-api", "slf4j-simple"]
