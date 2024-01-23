@@ -77,8 +77,8 @@ public final class Hex {
     /**
      * Converts given hexadecimal string to <code>byte</code> array.
      *
-     * @param value
-     * @return
+     * @param hex the hexadecimal string
+     * @return a byte array containing hexadecimal string value
      */
     public static byte[] toByteArray(String hex) {
         val encoding = BaseEncoding.base16().omitPadding();
