@@ -168,7 +168,136 @@ public record EthBytes(int size, ImmutableList<Byte> value) implements EthSizedT
     }
 
     public static EthBytes bytes(String hex) {
+        require(Hex.isValid(hex), "Malformed hex string: {}", hex);
         return bytes(Hex.toByteArray(hex));
+    }
+
+    public static EthBytes bytes1(String hex) {
+        return bytes(hex).withSize(1);
+    }
+
+    public static EthBytes bytes2(String hex) {
+        return bytes(hex).withSize(2);
+    }
+
+    public static EthBytes bytes3(String hex) {
+        return bytes(hex).withSize(3);
+    }
+
+    public static EthBytes bytes4(String hex) {
+        return bytes(hex).withSize(4);
+    }
+
+    public static EthBytes bytes5(String hex) {
+        return bytes(hex).withSize(5);
+    }
+
+    public static EthBytes bytes6(String hex) {
+        return bytes(hex).withSize(6);
+    }
+
+    public static EthBytes bytes7(String hex) {
+        return bytes(hex).withSize(7);
+    }
+
+    public static EthBytes bytes8(String hex) {
+        return bytes(hex).withSize(8);
+    }
+
+    public static EthBytes bytes9(String hex) {
+        return bytes(hex).withSize(9);
+    }
+
+    public static EthBytes bytes10(String hex) {
+        return bytes(hex).withSize(10);
+    }
+
+    public static EthBytes bytes11(String hex) {
+        return bytes(hex).withSize(11);
+    }
+
+    public static EthBytes bytes12(String hex) {
+        return bytes(hex).withSize(12);
+    }
+
+    public static EthBytes bytes13(String hex) {
+        return bytes(hex).withSize(13);
+    }
+
+    public static EthBytes bytes14(String hex) {
+        return bytes(hex).withSize(14);
+    }
+
+    public static EthBytes bytes15(String hex) {
+        return bytes(hex).withSize(15);
+    }
+
+    public static EthBytes bytes16(String hex) {
+        return bytes(hex).withSize(16);
+    }
+
+    public static EthBytes bytes17(String hex) {
+        return bytes(hex).withSize(17);
+    }
+
+    public static EthBytes bytes18(String hex) {
+        return bytes(hex).withSize(18);
+    }
+
+    public static EthBytes bytes19(String hex) {
+        return bytes(hex).withSize(19);
+    }
+
+    public static EthBytes bytes20(String hex) {
+        return bytes(hex).withSize(20);
+    }
+
+    public static EthBytes bytes21(String hex) {
+        return bytes(hex).withSize(21);
+    }
+
+    public static EthBytes bytes22(String hex) {
+        return bytes(hex).withSize(22);
+    }
+
+    public static EthBytes bytes23(String hex) {
+        return bytes(hex).withSize(23);
+    }
+
+    public static EthBytes bytes24(String hex) {
+        return bytes(hex).withSize(24);
+    }
+
+    public static EthBytes bytes25(String hex) {
+        return bytes(hex).withSize(25);
+    }
+
+    public static EthBytes bytes26(String hex) {
+        return bytes(hex).withSize(26);
+    }
+
+    public static EthBytes bytes27(String hex) {
+        return bytes(hex).withSize(27);
+    }
+
+    public static EthBytes bytes28(String hex) {
+        return bytes(hex).withSize(28);
+    }
+
+    public static EthBytes bytes29(String hex) {
+        return bytes(hex).withSize(29);
+    }
+
+    public static EthBytes bytes30(String hex) {
+        return bytes(hex).withSize(30);
+    }
+
+    public static EthBytes bytes31(String hex) {
+        return bytes(hex).withSize(31);
+    }
+
+    public static EthBytes bytes32(String hex) {
+        return bytes(hex).withSize(32);
     }
 
 }
