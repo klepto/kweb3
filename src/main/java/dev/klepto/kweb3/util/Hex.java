@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.util;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.io.BaseEncoding;
 import lombok.val;
 
@@ -39,6 +40,38 @@ public final class Hex {
     }
 
     /**
+     * Converts <code>byte</code> array to a hexadecimal string with <code>0x</code> prefix and leading zeros.
+     *
+     * @param value the integer value
+     * @return a hexadecimal representation of integer
+     */
+    public static String toHex(byte[] value) {
+        return toHex(value, true, true);
+    }
+
+    /**
+     * Converts <code>byte</code> array to a hexadecimal string.
+     *
+     * @param value       the byte array value
+     * @param prefix      if true, appends <code>0x</code> prefix to the resulting string
+     * @param leadingZero if true, ensures that result length is divisible by 2
+     * @return a hexadecimal representation of integer
+     */
+    public static String toHex(byte[] value, boolean prefix, boolean leadingZero) {
+        var hex = BaseEncoding.base16().encode(value).toLowerCase();
+        if (!leadingZero) {
+            hex = CharMatcher.is('0').trimLeadingFrom(hex);
+            if (hex.isEmpty()) {
+                hex = "0";
+            }
+        }
+        if (prefix) {
+            hex = "0x" + hex;
+        }
+        return hex;
+    }
+
+    /**
      * Converts {@link BigInteger} to a hexadecimal string with <code>0x</code> prefix and leading zeros.
      *
      * @param value the integer value
@@ -57,7 +90,7 @@ public final class Hex {
      * @return a hexadecimal representation of integer
      */
     public static String toHex(BigInteger value, boolean prefix, boolean leadingZero) {
-        var hex = value.toString(16);
+        var hex = value.toString(16).toLowerCase();
         if (leadingZero && hex.length() % 2 != 0) {
             hex = "0" + hex;
         }
