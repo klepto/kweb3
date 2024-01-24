@@ -1,1 +1,1 @@
-rootProject.name = "kweb3"
+rootProject.name = "kweb3-rework"
