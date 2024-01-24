@@ -21,6 +21,7 @@ public final class Collections {
      * @param componentType the  desired component type
      * @return the array of given component type
      */
+    @SuppressWarnings("unchecked")
     public static <T> T[] arrayCast(Object[] array, Class<T> componentType) {
         val newArray = Array.newInstance(componentType, array.length);
         System.arraycopy(array, 0, newArray, 0, array.length);
