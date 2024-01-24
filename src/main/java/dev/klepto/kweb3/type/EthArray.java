@@ -2,6 +2,9 @@ package dev.klepto.kweb3.type;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.Delegate;
+import lombok.val;
+
+import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.error.Conditions.require;
 
@@ -35,6 +38,18 @@ public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<
             return (Class<T>) EthType.class;
         }
         return (Class<T>) get(0).getClass();
+    }
+
+    @Override
+    public String toString() {
+        if (isEmpty()) {
+            return "unknown[]";
+        }
+
+        val solidityName = EthType.getSolidityName(get(0).getClass());
+        val size = capacity >= 0 ? "[" + capacity + "]" : "";
+        val children = values().stream().map(Object::toString).collect(Collectors.joining(","));
+        return solidityName + size + "[" + children + "]";
     }
 
     /* Solidity style array initializers */

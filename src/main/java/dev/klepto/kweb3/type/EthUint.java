@@ -21,6 +21,11 @@ public record EthUint(int size, BigInteger value) implements EthNumericType {
         require(size >= value.bitLength(), "uint{} cannot fit value: {}", size, value);
     }
 
+    @Override
+    public String toString() {
+        return "uint" + size + "(" + value + ")";
+    }
+
     /* Solidity style uint initializers */
     public static EthUint uint256(BigInteger value) {
         return new EthUint(256, value);

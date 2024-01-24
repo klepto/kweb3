@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Bytes;
 import dev.klepto.kweb3.util.Hex;
 import lombok.With;
+import lombok.val;
 
 import static dev.klepto.kweb3.error.Conditions.require;
 
@@ -24,6 +25,13 @@ public record EthBytes(int size, ImmutableList<Byte> value) implements EthSizedT
                 size, value.size()
         );
     }
+
+    @Override
+    public String toString() {
+        val sizeString = size > 0 ? size : "";
+        return "bytes" + sizeString + "(" + Hex.toHex(toByteArray()) + ")";
+    }
+
 
     /**
      * Converts this value to mutable <code>byte</code> array.

@@ -8,6 +8,11 @@ package dev.klepto.kweb3.type;
  */
 public record EthString(String value) implements EthType {
 
+    @Override
+    public String toString() {
+        return "string(" + value + ")";
+    }
+
     /* Solidity style string initializers */
     public static EthString string(String value) {
         return new EthString(value);

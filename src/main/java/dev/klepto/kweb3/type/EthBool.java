@@ -21,6 +21,11 @@ public record EthBool(boolean value) implements EthType {
         return new EthBool(value);
     }
 
+    @Override
+    public String toString() {
+        return "bool(" + value + ")";
+    }
+
     /**
      * Converts ethereum {@link EthUint} type to ethereum bool type.
      */

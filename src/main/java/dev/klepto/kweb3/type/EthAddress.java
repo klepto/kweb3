@@ -27,6 +27,11 @@ public record EthAddress(BigInteger value) implements EthNumericType {
         return 160;
     }
 
+    @Override
+    public String toString() {
+        return "address(" + toChecksumHex() + ")";
+    }
+
     /* Solidity style address initializers */
 
     /**

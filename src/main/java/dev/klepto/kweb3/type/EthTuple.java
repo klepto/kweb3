@@ -2,6 +2,9 @@ package dev.klepto.kweb3.type;
 
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.Delegate;
+import lombok.val;
+
+import java.util.stream.Collectors;
 
 /**
  * Represents ethereum <code>tuple</code> data type. All blockchain functions return this type and all solidity structs
@@ -11,6 +14,12 @@ import lombok.experimental.Delegate;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public record EthTuple(@Delegate ImmutableList<EthType> values) implements EthType {
+
+    @Override
+    public String toString() {
+        val children = values().stream().map(Object::toString).collect(Collectors.joining(","));
+        return "tuple(" + children + ")";
+    }
 
     /* Solidity style tuple initializers */
     public static EthTuple tuple(EthType... values) {
