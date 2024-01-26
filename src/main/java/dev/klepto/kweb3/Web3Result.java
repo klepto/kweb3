@@ -14,16 +14,14 @@ import java.util.function.Function;
  */
 public class Web3Result<T> {
 
-    /**
-     * Creates new, uncompleted result of given type.
-     *
-     * @return uncompleted web3 result
-     */
-    public static <T> Web3Result<T> create() {
-        return new Web3Result<>(new CompletableFuture<>());
-    }
-
     private final CompletionStage<T> stage;
+
+    /**
+     * Creates new, uncompleted web3 result.
+     */
+    public Web3Result() {
+        this(new CompletableFuture<>());
+    }
 
     private Web3Result(CompletionStage<T> stage) {
         this.stage = stage;

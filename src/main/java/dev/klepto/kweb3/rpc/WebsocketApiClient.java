@@ -62,7 +62,7 @@ public class WebsocketApiClient extends RpcClient {
     @Override
     public Web3Result<RpcResponse> request(RpcRequest request) {
         try {
-            val result = Web3Result.<RpcResponse>create();
+            val result = new Web3Result<RpcResponse>();
             request = beforeRequest(request, result);
             getWebsocketClient().send(GSON.toJson(request));
             return result;
