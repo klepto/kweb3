@@ -6,7 +6,7 @@ import dev.klepto.kweb3.util.Hex;
 import lombok.With;
 import lombok.val;
 
-import static dev.klepto.kweb3.error.Conditions.require;
+import static dev.klepto.kweb3.util.Conditions.require;
 
 /**
  * Represents ethereum <code>bytes</code> data type.

@@ -5,7 +5,7 @@ import lombok.With;
 
 import java.math.BigInteger;
 
-import static dev.klepto.kweb3.error.Conditions.require;
+import static dev.klepto.kweb3.util.Conditions.require;
 
 /**
  * Represents ethereum <code>uint</code> data type.

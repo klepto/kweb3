@@ -6,7 +6,7 @@ import dev.klepto.kweb3.util.hash.Keccak256;
 import java.math.BigInteger;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static dev.klepto.kweb3.error.Conditions.require;
+import static dev.klepto.kweb3.util.Conditions.require;
 import static dev.klepto.kweb3.util.Hex.stripPrefix;
 import static dev.klepto.kweb3.util.Hex.toBigInteger;
 

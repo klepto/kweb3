@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.error;
+package dev.klepto.kweb3;
 
 import org.slf4j.helpers.MessageFormatter;
 
@@ -11,6 +11,10 @@ public class Web3Error extends RuntimeException {
 
     public Web3Error() {
         super();
+    }
+
+    public Web3Error(Throwable cause) {
+        super(cause);
     }
 
     public Web3Error(String message, Object... args) {

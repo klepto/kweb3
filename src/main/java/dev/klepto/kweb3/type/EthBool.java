@@ -2,7 +2,7 @@ package dev.klepto.kweb3.type;
 
 import lombok.val;
 
-import static dev.klepto.kweb3.error.Conditions.require;
+import static dev.klepto.kweb3.util.Conditions.require;
 
 /**
  * Represents ethereum bool data type.

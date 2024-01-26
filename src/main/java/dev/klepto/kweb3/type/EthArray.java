@@ -6,7 +6,7 @@ import lombok.val;
 
 import java.util.stream.Collectors;
 
-import static dev.klepto.kweb3.error.Conditions.require;
+import static dev.klepto.kweb3.util.Conditions.require;
 
 /**
  * Represents ethereum array data type. Used in place of JVM arrays in-order to enable immutability and support proper

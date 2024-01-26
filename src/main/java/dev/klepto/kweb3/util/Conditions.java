@@ -1,4 +1,6 @@
-package dev.klepto.kweb3.error;
+package dev.klepto.kweb3.util;
+
+import dev.klepto.kweb3.Web3Error;
 
 /**
  * Utility methods for runtime argument and state checking.

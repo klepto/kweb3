@@ -5,7 +5,7 @@ import lombok.With;
 
 import java.math.BigInteger;
 
-import static dev.klepto.kweb3.error.Conditions.require;
+import static dev.klepto.kweb3.util.Conditions.require;
 
 /**
  * Represents ethereum <code>int</code> data type.
@@ -25,7 +25,7 @@ public record EthInt(int size, BigInteger value) implements EthNumericType {
     public String toString() {
         return "int" + size + "(" + value + ")";
     }
-    
+
     /* Solidity style int initializers */
     public static EthInt int256(BigInteger value) {
         return new EthInt(256, value);
