@@ -2,9 +2,8 @@ plugins {
     id("java")
 }
 
-group = 'dev.klepto.kweb3'
-archivesBaseName = 'kweb3'
-version = '0.0.1'
+group = "dev.klepto.kweb3"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
