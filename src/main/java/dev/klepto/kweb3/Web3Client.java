@@ -2,8 +2,8 @@ package dev.klepto.kweb3;
 
 import dev.klepto.kweb3.contract.Contract;
 import dev.klepto.kweb3.contract.Contracts;
-import dev.klepto.kweb3.rpc.RpcClient;
-import dev.klepto.kweb3.rpc.Web3jRpcClient;
+import dev.klepto.kweb3.rpc.RpcApi;
+import dev.klepto.kweb3.rpc.RpcApiClient;
 import dev.klepto.kweb3.type.EthAddress;
 import lombok.Getter;
 
@@ -16,12 +16,12 @@ import static dev.klepto.kweb3.type.EthAddress.address;
 public class Web3Client {
 
     private final Web3Network network;
-    private final RpcClient rpc;
+    private final RpcApi rpc;
     private final Contracts contracts;
 
     public Web3Client(Web3Network network) {
         this.network = network;
-        this.rpc = new Web3jRpcClient(network);
+        this.rpc = new RpcApiClient(network);
         this.contracts = new Contracts(this);
     }
 
