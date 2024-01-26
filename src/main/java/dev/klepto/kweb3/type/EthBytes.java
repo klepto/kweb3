@@ -16,14 +16,29 @@ import static dev.klepto.kweb3.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthBytes(int size, ImmutableList<Byte> value) implements EthSizedType {
+public record EthBytes(@With int size, ImmutableList<Byte> value) implements EthSizedType {
+
+    /**
+     * Empty bytes constant.
+     */
+    public static final EthBytes EMPTY = bytes(new byte[0]);
 
     public EthBytes {
         require(
-                size == -1 || size == value.size(),
+                size == -1 || size >= value.size(),
                 "bytes{} cannot contain {} bytes",
                 size, value.size()
         );
+    }
+
+    public EthBytes withSize(int size) {
+        if (value.size() < size) {
+            val currentBytes = toByteArray();
+            val newBytes = new byte[size];
+            System.arraycopy(currentBytes, 0, newBytes, 0, currentBytes.length);
+            return new EthBytes(size, ImmutableList.copyOf(Bytes.asList(newBytes)));
+        }
+        return new EthBytes(size, value);
     }
 
     @Override
