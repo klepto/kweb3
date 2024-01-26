@@ -67,8 +67,7 @@ public class ContractProxy implements InvocationHandler {
     }
 
     /**
-     * Generates hash code for this proxy. Contracts are equal if they are same type, on the same network and have same
-     * address.
+     * Generates hash code for this proxy contract.
      *
      * @return the contract hashcode
      */
@@ -78,8 +77,8 @@ public class ContractProxy implements InvocationHandler {
     }
 
     /**
-     * Returns true if an object is equal to this contract. Contract is equal if it's hash code matches another
-     * contracts hash code.
+     * Returns true if an object is equal to this contract. Contracts are equal if they are on the same network, have
+     * same type and have same address.
      *
      * @param object the object to check
      * @return true if given object is equal to this contract
@@ -89,7 +88,14 @@ public class ContractProxy implements InvocationHandler {
         if (object == null) {
             return false;
         }
-        return hashCode() == object.hashCode();
+
+        if (!(object instanceof Contract contract)) {
+            return false;
+        }
+
+        return Objects.equals(type, contract.getContractClass())
+                && Objects.equals(address, contract.getAddress())
+                && Objects.equals(client.getNetwork(), contract.getClient().getNetwork());
     }
 
 }
