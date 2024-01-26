@@ -2,6 +2,7 @@ package dev.klepto.kweb3.rpc.api;
 
 import dev.klepto.kweb3.Web3Result;
 import dev.klepto.kweb3.rpc.RpcMethod;
+import dev.klepto.kweb3.rpc.RpcRequest;
 import dev.klepto.kweb3.rpc.RpcResponse;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -36,12 +37,11 @@ public interface EthCall extends RpcMethod {
                                        @Nullable String blockNumber) {
         blockNumber = blockNumber == null ? "latest" : blockNumber;
         val transaction = new Transaction(from, to, gas, gasPrice, value, data);
-        val request = getClient().createRequest()
+        val request = new RpcRequest()
                 .withMethod("eth_call")
                 .withParams(transaction, blockNumber);
 
-        return getClient()
-                .request(request)
+        return request(request)
                 .map(RpcResponse::result);
     }
 

@@ -13,8 +13,11 @@ import lombok.With;
 @With
 public record RpcResponse(String jsonrpc, long id, String result) {
 
+    /**
+     * Creates a new rpc response using default values.
+     */
     public RpcResponse() {
-        this("2.0", 1, null);
+        this(RpcApi.JSON_VERSION, 1, null);
     }
 
 }

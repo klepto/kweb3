@@ -2,6 +2,7 @@ package dev.klepto.kweb3.rpc.api;
 
 import dev.klepto.kweb3.Web3Result;
 import dev.klepto.kweb3.rpc.RpcMethod;
+import dev.klepto.kweb3.rpc.RpcRequest;
 import dev.klepto.kweb3.rpc.RpcResponse;
 import lombok.val;
 
@@ -19,12 +20,11 @@ public interface EthSendRawTransaction extends RpcMethod {
      * @return the transaction hash, or the zero hash if the transaction is not yet available
      */
     default Web3Result<String> ethSendRawTransaction(String data) {
-        val request = getClient().createRequest()
+        val request = new RpcRequest()
                 .withMethod("eth_sendRawTransaction")
                 .withParams(new Request(data));
 
-        return getClient()
-                .request(request)
+        return request(request)
                 .map(RpcResponse::result);
     }
 

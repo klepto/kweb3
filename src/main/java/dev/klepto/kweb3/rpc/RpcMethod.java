@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.rpc;
 
-import com.google.gson.Gson;
+import dev.klepto.kweb3.Web3Result;
 
 /**
  * Indicates that class contains an ethereum RPC method.
@@ -10,17 +10,11 @@ import com.google.gson.Gson;
 public interface RpcMethod {
 
     /**
-     * Global {@link Gson} instance for JSON parsing.
-     */
-    Gson GSON = new Gson();
-
-    /**
-     * Gets {@link RpcApiClient}, default behavior is that this interface is implemented in {@link RpcApiClient}.
+     * Sends a new RPC request using underlying RPC client.
      *
-     * @return the instance of RpcApiClient
+     * @param request the rpc request object
+     * @return a {@link Web3Result} containing rpc response object that will be completed asynchronously
      */
-    default RpcApiClient getClient() {
-        return (RpcApiClient) this;
-    }
+    Web3Result<RpcResponse> request(RpcRequest request);
 
 }

@@ -2,6 +2,7 @@ package dev.klepto.kweb3.rpc.api;
 
 import dev.klepto.kweb3.Web3Result;
 import dev.klepto.kweb3.rpc.RpcMethod;
+import dev.klepto.kweb3.rpc.RpcRequest;
 import dev.klepto.kweb3.rpc.RpcResponse;
 import lombok.val;
 
@@ -18,11 +19,10 @@ public interface EthGasPrice extends RpcMethod {
      * @return the hexadecimal value of the current gas price in wei
      */
     default Web3Result<String> ethGasPrice() {
-        val request = getClient().createRequest()
+        val request = new RpcRequest()
                 .withMethod("eth_gasPrice");
 
-        return getClient()
-                .request(request)
+        return request(request)
                 .map(RpcResponse::result);
     }
 
