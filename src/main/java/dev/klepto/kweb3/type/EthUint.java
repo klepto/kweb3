@@ -17,6 +17,11 @@ import static dev.klepto.kweb3.util.Conditions.require;
 @With
 public record EthUint(int size, BigInteger value) implements EthNumericType {
 
+    /**
+     * Zero uint constant.
+     */
+    public static final EthUint ZERO = uint256(0);
+    
     public EthUint {
         require(size >= value.bitLength(), "uint{} cannot fit value: {}", size, value);
     }

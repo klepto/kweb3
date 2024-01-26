@@ -8,6 +8,11 @@ package dev.klepto.kweb3.type;
  */
 public record EthString(String value) implements EthType {
 
+    /**
+     * Empty string constant.
+     */
+    public static final EthString EMPTY = string("");
+
     @Override
     public String toString() {
         return "string(" + value + ")";

@@ -18,8 +18,13 @@ import static dev.klepto.kweb3.util.Hex.toBigInteger;
  */
 public record EthAddress(BigInteger value) implements EthNumericType {
 
+    /**
+     * Zero address constant.
+     */
+    public static final EthAddress ZERO = address("0x0");
+
     public EthAddress {
-        require(value.bitLength() == size(), "Malformed address: {}", Hex.toHex(value));
+        require(value.bitLength() <= size(), "Malformed address: {}", Hex.toHex(value));
     }
 
     @Override

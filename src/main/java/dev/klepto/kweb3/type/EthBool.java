@@ -12,6 +12,16 @@ import static dev.klepto.kweb3.util.Conditions.require;
  */
 public record EthBool(boolean value) implements EthType {
 
+    /**
+     * True bool constant.
+     */
+    public static final EthBool TRUE = bool(true);
+
+    /**
+     * False bool constant.
+     */
+    public static final EthBool FALSE = bool(false);
+
     /* Solidity style bool initializers */
 
     /**
