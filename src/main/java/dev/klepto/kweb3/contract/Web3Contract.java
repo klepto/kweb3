@@ -8,7 +8,7 @@ import dev.klepto.kweb3.type.EthAddress;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Contract {
+public interface Web3Contract {
 
     /**
      * Returns the client that initialized this contract and is responsible for this contract's execution.
@@ -31,6 +31,6 @@ public interface Contract {
      *
      * @return the actual contract class
      */
-    Class<? extends Contract> getContractClass();
+    Class<? extends Web3Contract> getContractClass();
 
 }
