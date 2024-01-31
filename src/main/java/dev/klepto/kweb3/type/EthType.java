@@ -25,7 +25,7 @@ public interface EthType {
      * @param type the type class
      * @return the solidity name of given ethereum data type or <code>null</code> if type does not have a name
      */
-    static String getSolidityName(Class<? extends EthType> type) {
+    static String getSolidityName(Class<?> type) {
         return SOLIDITY_NAMES.get(type);
     }
 
