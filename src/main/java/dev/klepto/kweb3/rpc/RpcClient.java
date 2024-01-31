@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.rpc;
 
+import dev.klepto.kweb3.Web3Error;
 import dev.klepto.kweb3.Web3Result;
 import lombok.val;
 
@@ -49,6 +50,12 @@ public abstract class RpcClient implements RpcApi {
         if (result == null) {
             return;
         }
+
+        if (response.error() != null) {
+            result.completeExceptionally(new Web3Error("RPC error occurred: {}", response.error().message()));
+            return;
+        }
+
         result.complete(response);
     }
 
