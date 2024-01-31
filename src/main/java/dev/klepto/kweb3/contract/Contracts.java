@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Contracts {
 
     private final Web3Client client;
-    private final Map<Class<?>, Map<EthAddress, Contract>> cache = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Map<EthAddress, Web3Contract>> cache = new ConcurrentHashMap<>();
 
     /**
      * Creates a blockchain contract proxy that binds java interface functions directly to blockchain transactions.
@@ -28,10 +28,10 @@ public class Contracts {
      * @param address the blockchain address of the contract
      * @return the contract proxy instance
      */
-    public <T extends Contract> T createProxy(Class<T> type, EthAddress address) {
+    public <T extends Web3Contract> T createProxy(Class<T> type, EthAddress address) {
         val contracts = cache.computeIfAbsent(type, key -> new HashMap<>());
         val contract = contracts.computeIfAbsent(address, key ->
-                (Contract) Proxy.newProxyInstance(
+                (Web3Contract) Proxy.newProxyInstance(
                         Contracts.class.getClassLoader(),
                         new Class[]{type},
                         new ContractProxy(type, client, address)
