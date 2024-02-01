@@ -4,6 +4,10 @@ import com.esaulpaugh.headlong.abi.Address;
 import com.esaulpaugh.headlong.abi.Tuple;
 import com.esaulpaugh.headlong.abi.TupleType;
 import com.esaulpaugh.headlong.util.FastHex;
+import dev.klepto.kweb3.abi.descriptor.EthArrayTypeDescriptor;
+import dev.klepto.kweb3.abi.descriptor.EthSizedTypeDescriptor;
+import dev.klepto.kweb3.abi.descriptor.EthTupleTypeDescriptor;
+import dev.klepto.kweb3.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.type.*;
 import lombok.val;
 
@@ -30,9 +34,12 @@ import static dev.klepto.kweb3.util.Hex.toByteArray;
 public class HeadlongCodec implements AbiCodec {
 
     @Override
-    public EthTuple decode(String abi, AbiTypeDescriptor descriptor) {
-        descriptor = descriptor.type() == EthTuple.class ? descriptor : descriptor.wrap();
-        val tuple = TupleType.parse(descriptor.toString());
+    public EthTuple decode(String abi, TypeDescriptor descriptor) {
+        descriptor = descriptor instanceof EthTupleTypeDescriptor
+                ? descriptor
+                : descriptor.wrap();
+
+        val tuple = TupleType.parse(descriptor.toAbiDescriptor());
         val data = toByteArray(abi);
         if (data.length == 0) {
             return null;
@@ -42,34 +49,34 @@ public class HeadlongCodec implements AbiCodec {
         return (EthTuple) decodeHeadlongValue(result, descriptor);
     }
 
-    private Object decodeHeadlongValue(Object value, AbiTypeDescriptor descriptor) {
-        val valueSize = descriptor.valueSize();
-        if (value.getClass().isArray() && descriptor.array()) {
+    private Object decodeHeadlongValue(Object value, TypeDescriptor descriptor) {
+        val valueSize = descriptor instanceof EthSizedTypeDescriptor sized ? sized.valueSize() : -1;
+        if (value.getClass().isArray() && descriptor instanceof EthArrayTypeDescriptor arrayDescriptor) {
             val array = (Object[]) value;
             val result = arrayCast(
                     Arrays.stream(array)
-                            .map(element -> decodeHeadlongValue(element, descriptor))
+                            .map(element -> decodeHeadlongValue(element, arrayDescriptor.descriptor()))
                             .toArray(),
-                    descriptor.type()
+                    (Class<? extends EthType>) arrayDescriptor.type().toClass()
             );
-            return array(descriptor.arraySize(), result);
-        } else if (descriptor.type() == EthAddress.class) {
+            return array(arrayDescriptor.arraySize(), result);
+        } else if (descriptor.type().matchesExact(EthAddress.class)) {
             return address(((Address) value).toString());
-        } else if (descriptor.type() == EthBytes.class) {
+        } else if (descriptor.type().matchesExact(EthBytes.class)) {
             return bytes((byte[]) value).withSize(valueSize);
-        } else if (descriptor.type() == EthInt.class) {
+        } else if (descriptor.type().matchesExact(EthInt.class)) {
             return int256((BigInteger) value).withSize(valueSize);
-        } else if (descriptor.type() == EthUint.class) {
+        } else if (descriptor.type().matchesExact(EthUint.class)) {
             return uint256((BigInteger) value).withSize(valueSize);
-        } else if (descriptor.type() == EthString.class) {
+        } else if (descriptor.type().matchesExact(EthString.class)) {
             return string((String) value);
-        } else if (descriptor.type() == EthBool.class) {
+        } else if (descriptor.type().matchesExact(EthBool.class)) {
             return bool((boolean) value);
-        } else if (descriptor.type() == EthTuple.class) {
+        } else if (descriptor instanceof EthTupleTypeDescriptor tupleDescriptor) {
             val tuple = (Tuple) value;
             val values = new ArrayList<>();
             for (var i = 0; i < tuple.size(); i++) {
-                values.add(decodeHeadlongValue(tuple.get(i), descriptor.children().get(i)));
+                values.add(decodeHeadlongValue(tuple.get(i), tupleDescriptor.children().get(i)));
             }
             return tuple(values.stream().map(EthType.class::cast).toArray(EthType[]::new));
         }
@@ -79,11 +86,11 @@ public class HeadlongCodec implements AbiCodec {
 
     @Override
     public String encode(EthType value) {
-        return encode(value, AbiTypeDescriptor.parse(value));
+        return encode(value, TypeDescriptor.parse(value));
     }
 
     @Override
-    public String encode(EthType value, AbiTypeDescriptor descriptor) {
+    public String encode(EthType value, TypeDescriptor descriptor) {
         if (value instanceof EthTuple) {
             return encode((EthTuple) value, descriptor);
         } else {
@@ -91,8 +98,8 @@ public class HeadlongCodec implements AbiCodec {
         }
     }
 
-    private String encode(EthTuple value, AbiTypeDescriptor descriptor) {
-        val tupleType = TupleType.parse(descriptor.toString());
+    private String encode(EthTuple value, TypeDescriptor descriptor) {
+        val tupleType = TupleType.parse(descriptor.toAbiDescriptor());
         val result = tupleType.encode((Tuple) encodeHeadlongValue(value)).array();
         return FastHex.encodeToString(result, 0, result.length);
     }
@@ -107,11 +114,12 @@ public class HeadlongCodec implements AbiCodec {
             return Address.wrap(address.toChecksumHex());
         } else if (value instanceof EthBytes bytes) {
             return bytes.toByteArray();
-        } else if (value instanceof EthNumericType numeric) {
+        } else if (value instanceof EthNumericType numeric
+                && value instanceof EthSizedType sized) {
             val bigInteger = (BigInteger) numeric.value();
-            if (numeric.size() <= 32) {
+            if (sized.size() <= 32) {
                 return bigInteger.intValue();
-            } else if (numeric.size() <= 64) {
+            } else if (sized.size() <= 64) {
                 return bigInteger.longValue();
             }
             return bigInteger;

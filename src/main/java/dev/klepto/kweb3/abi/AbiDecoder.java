@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.abi;
 
+import dev.klepto.kweb3.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.type.EthTuple;
 
 /**
@@ -16,6 +17,6 @@ public interface AbiDecoder {
      * @param typeDescriptor the type description of given string
      * @return a tuple containing decoded values
      */
-    EthTuple decode(String abi, AbiTypeDescriptor typeDescriptor);
+    EthTuple decode(String abi, TypeDescriptor typeDescriptor);
 
 }

@@ -1,6 +1,10 @@
 package dev.klepto.kweb3.abi;
 
 import com.google.common.collect.ImmutableList;
+import dev.klepto.kweb3.abi.descriptor.EthArrayTypeDescriptor;
+import dev.klepto.kweb3.abi.descriptor.EthSizedTypeDescriptor;
+import dev.klepto.kweb3.abi.descriptor.EthTupleTypeDescriptor;
+import dev.klepto.kweb3.abi.descriptor.EthTypeDescriptor;
 import dev.klepto.kweb3.type.*;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -28,7 +32,7 @@ public class HeadlongCodecTest {
 
     @Test
     public void testDecodeEmpty() {
-        assertNull(codec.decode("", new AbiTypeDescriptor().withType(EthUint.class)));
+        assertNull(codec.decode("", new EthTypeDescriptor(EthUint.class)));
     }
 
     @Test
@@ -37,19 +41,14 @@ public class HeadlongCodecTest {
                 "20000000000000000000000000000000000000000000000000000000000000000" +
                 "10000000000000000000000000000000000000000000000000000000000000001";
 
-        val uintType = new AbiTypeDescriptor()
-                .withType(EthUint.class)
-                .withValueSize(256);
 
-        val innerType = new AbiTypeDescriptor()
-                .withType(EthTuple.class)
-                .withArray(true)
-                .withChildren(ImmutableList.of(uintType));
+        val uintType = new EthSizedTypeDescriptor(EthUint.class, 256);
 
-        val type = new AbiTypeDescriptor()
-                .withType(EthTuple.class)
-                .withChildren(ImmutableList.of(innerType));
+        val innerType = new EthArrayTypeDescriptor(
+                new EthTupleTypeDescriptor().withChildren(ImmutableList.of(uintType))
+        );
 
+        val type = new EthTupleTypeDescriptor().withChildren(ImmutableList.of(innerType));
         val expected = tuple(array(tuple(uint256(1))));
         val result = codec.decode(abi, type);
         assertEquals(expected.size(), result.size());
@@ -71,14 +70,14 @@ public class HeadlongCodecTest {
                 address("0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"),
                 codec.decode(
                         "000000000000000000000000ab5801a7d398351b8be11c439e05c5b3259aec9b",
-                        new AbiTypeDescriptor().withType(EthAddress.class)
+                        new EthTypeDescriptor(EthAddress.class)
                 ).get(0)
         );
         assertEquals(
                 address("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"),
                 codec.decode(
                         "000000000000000000000000d8da6bf26964af9d7eed9e03e53415d37aa96045",
-                        new AbiTypeDescriptor().withType(EthAddress.class)
+                        new EthTypeDescriptor(EthAddress.class)
                 ).get(0)
         );
     }
@@ -91,7 +90,7 @@ public class HeadlongCodecTest {
                         "00000000000000000000000000000000000000000000000000000000000000" +
                                 "20000000000000000000000000000000000000000000000000000000000000" +
                                 "0015746869732069732061207465737420737472696e670000000000000000000000",
-                        new AbiTypeDescriptor().withType(EthString.class)
+                        new EthTypeDescriptor(EthString.class)
                 ).get(0)
         );
     }
@@ -102,7 +101,7 @@ public class HeadlongCodecTest {
                 new byte[]{0x11, 0x22, 0x33, 0x44, 0x55},
                 ((EthBytes) codec.decode(
                         "1122334455000000000000000000000000000000000000000000000000000000",
-                        new AbiTypeDescriptor().withType(EthBytes.class).withValueSize(5)
+                        new EthSizedTypeDescriptor(EthBytes.class, 5)
                 ).get(0)).toByteArray()
         );
     }
@@ -113,7 +112,7 @@ public class HeadlongCodecTest {
                 int256(-123456789),
                 codec.decode(
                         "fffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a432eb",
-                        new AbiTypeDescriptor().withType(EthInt.class).withValueSize(256)
+                        new EthSizedTypeDescriptor(EthInt.class, 256)
                 ).get(0)
         );
 
@@ -121,7 +120,7 @@ public class HeadlongCodecTest {
                 uint256(123456789),
                 codec.decode(
                         "00000000000000000000000000000000000000000000000000000000075bcd15",
-                        new AbiTypeDescriptor().withType(EthUint.class).withValueSize(256)
+                        new EthSizedTypeDescriptor(EthUint.class, 256)
                 ).get(0)
         );
     }
@@ -130,12 +129,12 @@ public class HeadlongCodecTest {
     public void testDecodeBoolean() {
         assertTrue(((EthBool) (codec.decode(
                 "0000000000000000000000000000000000000000000000000000000000000001",
-                new AbiTypeDescriptor().withType(EthBool.class)).get(0))).value()
+                new EthTypeDescriptor(EthBool.class)).get(0))).value()
         );
 
         assertFalse(((EthBool) (codec.decode(
                 "0000000000000000000000000000000000000000000000000000000000000000",
-                new AbiTypeDescriptor().withType(EthBool.class)).get(0))).value()
+                new EthTypeDescriptor(EthBool.class)).get(0))).value()
         );
     }
 
