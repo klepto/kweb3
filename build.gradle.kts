@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.google.guava)
     implementation(libs.google.gson)
     implementation(libs.headlong)
+    implementation(libs.unreflect)
     implementation(libs.java.websocket)
     implementation(libs.bundles.slf4j)
     testImplementation(platform(libs.junit.bom))
