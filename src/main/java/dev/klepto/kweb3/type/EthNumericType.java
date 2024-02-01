@@ -9,7 +9,7 @@ import static dev.klepto.kweb3.util.hash.Keccak256.keccak256Checksum;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthNumericType extends EthType, EthSizedType {
+public interface EthNumericType extends EthType {
 
     /**
      * Returns numeric value as {@link BigInteger}.

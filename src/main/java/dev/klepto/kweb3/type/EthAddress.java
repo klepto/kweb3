@@ -24,12 +24,7 @@ public record EthAddress(BigInteger value) implements EthNumericType {
     public static final EthAddress ZERO = address("0x0");
 
     public EthAddress {
-        require(value.bitLength() <= size(), "Malformed address: {}", Hex.toHex(value));
-    }
-
-    @Override
-    public int size() {
-        return 160;
+        require(value.bitLength() <= 160, "Malformed address: {}", Hex.toHex(value));
     }
 
     @Override
