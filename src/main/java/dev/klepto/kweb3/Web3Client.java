@@ -1,7 +1,7 @@
 package dev.klepto.kweb3;
 
-import dev.klepto.kweb3.contract.Contract;
 import dev.klepto.kweb3.contract.Contracts;
+import dev.klepto.kweb3.contract.Web3Contract;
 import dev.klepto.kweb3.rpc.RpcApi;
 import dev.klepto.kweb3.rpc.WebsocketApiClient;
 import dev.klepto.kweb3.type.EthAddress;
@@ -18,11 +18,13 @@ public class Web3Client {
     private final Web3Network network;
     private final RpcApi rpc;
     private final Contracts contracts;
+    private final EthAddress address;
 
     public Web3Client(Web3Network network) {
         this.network = network;
         this.rpc = new WebsocketApiClient(network);
         this.contracts = new Contracts(this);
+        this.address = null;
     }
 
     /**
@@ -32,7 +34,7 @@ public class Web3Client {
      * @param address the blockchain address of the contract
      * @return the contract instance for direct blockchain transactions
      */
-    public <T extends Contract> T contract(Class<T> type, EthAddress address) {
+    public <T extends Web3Contract> T contract(Class<T> type, EthAddress address) {
         return contracts.createProxy(type, address);
     }
 
@@ -43,7 +45,7 @@ public class Web3Client {
      * @param address the blockchain address string of the contract
      * @return the contract instance for direct blockchain transactions
      */
-    public <T extends Contract> T contract(Class<T> type, String address) {
+    public <T extends Web3Contract> T contract(Class<T> type, String address) {
         return contract(type, address(address));
     }
 
