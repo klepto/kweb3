@@ -60,8 +60,8 @@ public class Web3Result<T> {
     public T get() {
         try {
             return stage.toCompletableFuture().get();
-        } catch (Exception cause) {
-            throw new Web3Error(cause);
+        } catch (Throwable cause) {
+            throw new Web3Error(cause.getMessage());
         }
     }
 
