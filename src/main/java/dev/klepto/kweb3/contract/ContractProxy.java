@@ -1,13 +1,19 @@
 package dev.klepto.kweb3.contract;
 
 import dev.klepto.kweb3.Web3Client;
+import dev.klepto.kweb3.Web3Error;
+import dev.klepto.kweb3.contract.annotation.View;
 import dev.klepto.kweb3.type.EthAddress;
+import dev.klepto.kweb3.type.EthType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
+
+import static dev.klepto.kweb3.util.Collections.arrayCast;
 
 /**
  * Intercepts calls on un-implemented methods in the contract interface. Encodes and executes appropriate blockchain
@@ -21,7 +27,7 @@ public class ContractProxy implements InvocationHandler {
 
     private static final ContractExecutor executor = new ContractExecutor();
 
-    private final Class<? extends Contract> type;
+    private final Class<? extends Web3Contract> type;
     private final Web3Client client;
     private final EthAddress address;
 
@@ -62,7 +68,12 @@ public class ContractProxy implements InvocationHandler {
             case "getClient":
                 return client;
             default:
-                return executor.execute(this, method, args);
+                val view = method.isAnnotationPresent(View.class);
+                if (!view) {
+                    throw new Web3Error("Only @View functions are supported, unsupported function: {}", method);
+                }
+
+                return executor.execute(this, method, arrayCast(args, EthType.class));
         }
     }
 
@@ -89,7 +100,7 @@ public class ContractProxy implements InvocationHandler {
             return false;
         }
 
-        if (!(object instanceof Contract contract)) {
+        if (!(object instanceof Web3Contract contract)) {
             return false;
         }
 
