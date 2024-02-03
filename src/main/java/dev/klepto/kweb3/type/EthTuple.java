@@ -26,4 +26,8 @@ public record EthTuple(@Delegate ImmutableList<EthType> values) implements EthTy
         return new EthTuple(ImmutableList.copyOf(values));
     }
 
+    public static EthTuple tuple(Iterable<EthType> values) {
+        return new EthTuple(ImmutableList.copyOf(values));
+    }
+
 }
