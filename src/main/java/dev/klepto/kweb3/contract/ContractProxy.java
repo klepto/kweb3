@@ -2,15 +2,13 @@ package dev.klepto.kweb3.contract;
 
 import dev.klepto.kweb3.Web3Client;
 import dev.klepto.kweb3.type.EthAddress;
-import dev.klepto.kweb3.type.EthType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Objects;
-
-import static dev.klepto.kweb3.util.Collections.arrayCast;
 
 /**
  * Intercepts calls on un-implemented methods in the contract interface. Encodes and executes appropriate blockchain
@@ -22,8 +20,7 @@ import static dev.klepto.kweb3.util.Collections.arrayCast;
 @RequiredArgsConstructor
 public class ContractProxy implements InvocationHandler {
 
-    private static final ContractExecutor executor = new ContractExecutor();
-
+    private final ContractProxies contracts;
     private final Class<? extends Web3Contract> type;
     private final Web3Client client;
     private final EthAddress address;
@@ -65,7 +62,9 @@ public class ContractProxy implements InvocationHandler {
             case "getClient":
                 return client;
             default:
-                return executor.execute(this, method, arrayCast(args, EthType.class));
+                val function = contracts.getFunctions().get(method);
+                val call = new ContractCall(this, function, args);
+                return contracts.getExecutor().execute(call);
         }
     }
 
