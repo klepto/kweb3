@@ -1,8 +1,7 @@
 package dev.klepto.kweb3.util;
 
+import com.google.common.collect.ObjectArrays;
 import lombok.val;
-
-import java.lang.reflect.Array;
 
 /**
  * Various collection utilities.
@@ -23,9 +22,28 @@ public final class Collections {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] arrayCast(Object[] array, Class<T> componentType) {
-        val newArray = Array.newInstance(componentType, array.length);
+        val newArray = ObjectArrays.newArray(componentType, array.length);
         System.arraycopy(array, 0, newArray, 0, array.length);
-        return (T[]) newArray;
+        return newArray;
+    }
+
+    /**
+     * Returns a copy of a given array without element at specified index. Successful use of this method always shrinks
+     * array length by 1.
+     *
+     * @param array the object array
+     * @param index the index to be removed, any non-positive value will return original array
+     * @return a new array not containing the element at specified index
+     */
+    public static <T> T[] arrayRemove(T[] array, int index) {
+        if (index < 0) {
+            return array;
+        }
+
+        val newArray = ObjectArrays.newArray(array, array.length - 1);
+        System.arraycopy(array, 0, newArray, 0, index);
+        System.arraycopy(array, index + 1, newArray, index, newArray.length - index);
+        return newArray;
     }
 
 }
