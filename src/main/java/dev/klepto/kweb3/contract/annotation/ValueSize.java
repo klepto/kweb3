@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * @see dev.klepto.kweb3.type.EthBytes
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.METHOD})
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
 public @interface ValueSize {
 
     /**
