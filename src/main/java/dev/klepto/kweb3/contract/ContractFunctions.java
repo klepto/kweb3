@@ -3,7 +3,9 @@ package dev.klepto.kweb3.contract;
 import com.google.common.collect.ImmutableList;
 import dev.klepto.kweb3.contract.annotation.Cost;
 import dev.klepto.kweb3.contract.annotation.Transaction;
+import dev.klepto.kweb3.contract.annotation.Tuple;
 import dev.klepto.kweb3.contract.annotation.View;
+import dev.klepto.kweb3.type.EthType;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.ParameterAccess;
 import lombok.val;
@@ -78,6 +80,7 @@ public class ContractFunctions {
     private ImmutableList<ParameterAccess> getFunctionParameters(MethodAccess methodAccess) {
         return methodAccess.parameters()
                 .filter(parameter -> !parameter.containsAnnotation(Cost.class))
+                .filter(parameter -> parameter.type().matches(EthType.class) || parameter.containsAnnotation(Tuple.class))
                 .collect(toImmutableList());
     }
 
