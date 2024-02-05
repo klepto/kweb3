@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    id("java-library")
 }
 
 group = "dev.klepto.kweb3"
@@ -10,11 +10,12 @@ repositories {
 }
 
 dependencies {
+    api(libs.unreflect)
+    api(libs.google.guava)
+
     implementation(libs.jetbrains.annotations)
-    implementation(libs.google.guava)
     implementation(libs.google.gson)
     implementation(libs.headlong)
-    implementation(libs.unreflect)
     implementation(libs.java.websocket)
     implementation(libs.bundles.slf4j)
     testImplementation(platform(libs.junit.bom))
