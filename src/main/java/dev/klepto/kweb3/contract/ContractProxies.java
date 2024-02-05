@@ -23,7 +23,7 @@ public class ContractProxies {
     private final Map<Class<?>, Map<EthAddress, Web3Contract>> cache = new ConcurrentHashMap<>();
 
     private AtomicReference<ContractExecutor> executor = new AtomicReference<>(new DefaultContractExecutor());
-    private AtomicReference<ContractFunctions> functions = new AtomicReference<>(new ContractFunctions());
+    private AtomicReference<ContractParser> parser = new AtomicReference<>(new DefaultContractParser());
 
     /**
      * Creates a blockchain contract proxy that binds java interface functions directly to blockchain transactions.
@@ -67,17 +67,17 @@ public class ContractProxies {
      *
      * @param functions the contract function parser implementation
      */
-    public void setFunctions(ContractFunctions functions) {
-        this.functions.set(functions);
+    public void setParser(ContractParser functions) {
+        this.parser.set(functions);
     }
 
     /**
      * Gets the current contract function parser implementation used by all contract calls.
      *
-     * @return the current executor implementation
+     * @return the contract function parser implementation
      */
-    public ContractFunctions getFunctions() {
-        return functions.get();
+    public ContractParser getParser() {
+        return parser.get();
     }
 
 }
