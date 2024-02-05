@@ -20,6 +20,10 @@ public class Web3Client {
     private final ContractProxies contracts;
     private final EthAddress address;
 
+    public Web3Client(String rpcUrl, long chainId) {
+        this(new Web3Network.Basic(rpcUrl, chainId));
+    }
+
     public Web3Client(Web3Network network) {
         this.network = network;
         this.rpc = new WebsocketApiClient(network);
