@@ -90,7 +90,7 @@ public class DefaultContractExecutor implements ContractExecutor {
      * @param result the result string of the RPC call
      * @return the decoded contract result
      */
-    private EthTuple decodeResult(ContractCall call, String result) {
+    public EthTuple decodeResult(ContractCall call, String result) {
         return codec.decode(result, call.function().returnDescriptor());
     }
 

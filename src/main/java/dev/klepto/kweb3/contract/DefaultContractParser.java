@@ -80,7 +80,7 @@ public class DefaultContractParser implements ContractParser {
      * @param methodAccess the method access
      * @return the string containing contract function name
      */
-    private String parseFunctionName(MethodAccess methodAccess) {
+    public String parseFunctionName(MethodAccess methodAccess) {
         val viewAnnotation = methodAccess.annotation(View.class);
         val transactionAnnotation = methodAccess.annotation(Transaction.class);
         var name = viewAnnotation != null ? viewAnnotation.value()
