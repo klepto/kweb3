@@ -65,9 +65,17 @@ public class HeadlongCodec implements AbiCodec {
         } else if (descriptor.type().matchesExact(EthBytes.class)) {
             return bytes((byte[]) value).withSize(valueSize);
         } else if (descriptor.type().matchesExact(EthInt.class)) {
-            return int256((BigInteger) value).withSize(valueSize);
+            if (value instanceof Integer integer) {
+                return int256(integer).withSize(valueSize);
+            } else {
+                return int256((BigInteger) value).withSize(valueSize);
+            }
         } else if (descriptor.type().matchesExact(EthUint.class)) {
-            return uint256((BigInteger) value).withSize(valueSize);
+            if (value instanceof Integer integer) {
+                return uint256(integer).withSize(valueSize);
+            } else {
+                return uint256((BigInteger) value).withSize(valueSize);
+            }
         } else if (descriptor.type().matchesExact(EthString.class)) {
             return string((String) value);
         } else if (descriptor.type().matchesExact(EthBool.class)) {
