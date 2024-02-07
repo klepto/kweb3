@@ -8,6 +8,7 @@ import dev.klepto.kweb3.contract.annotation.View;
 import dev.klepto.kweb3.type.EthType;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.Unreflect;
+import dev.klepto.unreflect.UnreflectType;
 import lombok.val;
 
 import java.lang.reflect.Method;
@@ -36,11 +37,23 @@ public class DefaultContractParser implements ContractParser {
         cache.computeIfAbsent(method, key -> {
             val methodAccess = reflect(method);
             val name = parseFunctionName(methodAccess);
-            val parametersDescriptor = parseParametersType(method);
+            val parametersDescriptor = parseParametersTypeDescriptor(method);
             val signature = name + parametersDescriptor.toAbiDescriptor();
             val signatureHash = "0x" + keccak256(signature).substring(0, 8).toLowerCase();
-            val returnDescriptor = parseReturnType(method);
-            return new ContractFunction(methodAccess, name, signatureHash, parametersDescriptor, returnDescriptor, -1);
+            val returnDescriptor = parseReturnTypeDescriptor(method);
+            val returnType = parseReturnType(method);
+            val returnTuple = returnType.reflect().containsAnnotation(Tuple.class);
+
+            return new ContractFunction(
+                    methodAccess,
+                    name,
+                    signatureHash,
+                    parametersDescriptor,
+                    returnDescriptor,
+                    returnType,
+                    returnTuple,
+                    -1
+            );
         });
 
         return cache.get(method);
@@ -53,7 +66,7 @@ public class DefaultContractParser implements ContractParser {
      * @return the contract parameters type description
      */
     @Override
-    public TypeDescriptor parseParametersType(Method method) {
+    public TypeDescriptor parseParametersTypeDescriptor(Method method) {
         val methodAccess = reflect(method);
         val parameters = methodAccess.parameters()
                 .filter(parameter -> !parameter.containsAnnotation(Cost.class))
@@ -69,9 +82,20 @@ public class DefaultContractParser implements ContractParser {
      * @return the contract return type description
      */
     @Override
-    public TypeDescriptor parseReturnType(Method method) {
-        val methodAccess = reflect(method);
-        return ContractCodec.parseDescriptor(methodAccess);
+    public TypeDescriptor parseReturnTypeDescriptor(Method method) {
+        val type = parseReturnType(method);
+        return ContractCodec.parseDescriptor(type.reflect());
+    }
+
+    /**
+     * Parses contract JVM return type.
+     *
+     * @param method the contract interface method
+     * @return the contract JVM return type
+     */
+    @Override
+    public UnreflectType parseReturnType(Method method) {
+        return UnreflectType.of(method);
     }
 
     /**

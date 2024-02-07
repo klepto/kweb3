@@ -11,6 +11,7 @@ import one.util.streamex.StreamEx;
 
 import static dev.klepto.kweb3.type.EthTuple.tuple;
 import static dev.klepto.kweb3.util.Collections.arrayRemove;
+import static dev.klepto.kweb3.util.Conditions.require;
 
 /**
  * Default implementation of {@link ContractExecutor}. Encodes and executes appropriate blockchain views and/or
@@ -76,11 +77,11 @@ public class DefaultContractExecutor implements ContractExecutor {
     public Object decode(ContractCall call, Web3Result<String> result) {
         // For asynchronous signature, map future web3 result for decoding.
         if (call.function().method().type().matchesExact(Web3Result.class)) {
-            return result.map(value -> decodeResult(call, value).get(0)).error(Throwable::printStackTrace);
+            return result.map(value -> decodeResult(call, value)).error(Throwable::printStackTrace);
         }
 
         // For blocking signature, wait for result and decode.
-        return decodeResult(call, result.get()).get(0);
+        return decodeResult(call, result.get());
     }
 
     /**
@@ -90,8 +91,24 @@ public class DefaultContractExecutor implements ContractExecutor {
      * @param result the result string of the RPC call
      * @return the decoded contract result
      */
-    public EthTuple decodeResult(ContractCall call, String result) {
-        return codec.decode(result, call.function().returnDescriptor());
+    public Object decodeResult(ContractCall call, String result) {
+        val function = call.function();
+        val type = function.returnType();
+        val descriptor = function.returnTuple()
+                ? function.returnDescriptor()
+                : function.returnDescriptor().wrap();
+        val resultTuple = codec.decode(result, descriptor);
+        if (type.matches(EthType.class)) {
+            return resultTuple.get(0);
+        }
+
+        if (!function.returnTuple()) {
+            val value = resultTuple.get(0);
+            require(value instanceof EthTuple, "Incorrect response type, expected EthTuple, got: {}", value.getClass());
+        }
+
+        val containerTuple = function.returnTuple() ? resultTuple : (EthTuple) resultTuple.get(0);
+        return ContractCodec.decodeTupleContainer(type, containerTuple);
     }
 
 }

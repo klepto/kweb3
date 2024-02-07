@@ -19,6 +19,7 @@ import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static dev.klepto.kweb3.util.Conditions.require;
+import static dev.klepto.unreflect.Unreflect.reflect;
 
 /**
  * Handles encoding/decoding of {@link EthType} JVM types for use with {@link ContractExecutor}.
@@ -54,7 +55,7 @@ public class ContractCodec {
         val valueSizeAnnotation = reflectable.annotation(ValueSize.class);
         val arraySize = arraySizeAnnotation != null ? arraySizeAnnotation.value() : -1;
         val valueSize = valueSizeAnnotation != null ? valueSizeAnnotation.value() : -1;
-        return parseDescriptor(reflectable.type(), arraySize, valueSize);
+        return parseDescriptor(reflectable.type(), valueSize, arraySize);
     }
 
     /**
@@ -120,5 +121,29 @@ public class ContractCodec {
         return parseTupleDescriptor(type.reflect().fields().toList());
     }
 
+    /**
+     * Decodes tuple values into specified JVM container {@link UnreflectType}. Used for struct and multiple value
+     * return decoding.
+     *
+     * @param type  the JVM container
+     * @param tuple the tuple values
+     * @return the decoded JVM container containing tuple values
+     */
+    public static Object decodeTupleContainer(UnreflectType type, EthTuple tuple) {
+        val container = type.allocate();
+        val fields = reflect(container).fields().toList();
+        require(fields.size() == tuple.size(), "Tuple container size mismatch: {}", type);
+
+        for (var i = 0; i < tuple.size(); i++) {
+            val field = fields.get(i);
+            val value = tuple.get(i);
+            val decodedValue = value instanceof EthTuple valueTuple
+                    ? decodeTupleContainer(field.type(), valueTuple)
+                    : value;
+            field.set(decodedValue);
+        }
+
+        return container;
+    }
 
 }
