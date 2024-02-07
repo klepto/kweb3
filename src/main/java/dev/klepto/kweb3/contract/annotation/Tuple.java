@@ -1,17 +1,20 @@
 package dev.klepto.kweb3.contract.annotation;
 
+import dev.klepto.kweb3.contract.ContractExecutor;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotates a tuple parameter, field or result. This indicates to contract executor that even though, the type isn't
- * recognized by the API, it contains fields that will hold values for encoding or decoding of the contract call.
+ * Annotates a contract function return type as a tuple type. This tells {@link ContractExecutor} to not attempt to
+ * decode it as struct, but rather as a multiple return values.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.TYPE})
 public @interface Tuple {
+
 }
