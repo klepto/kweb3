@@ -10,6 +10,8 @@ import dev.klepto.kweb3.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.type.*;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -33,8 +35,17 @@ import static dev.klepto.kweb3.util.Hex.toByteArray;
  */
 public class HeadlongCodec implements AbiCodec {
 
+    /**
+     * Decodes given ABI string into ethereum values contained within {@link EthTuple} using
+     * {@link com.esaulpaugh.headlong} codec. Returns <code>null</code> if given ABI string contains no data.
+     *
+     * @param abi        the ABI data string
+     * @param descriptor the type description of given string
+     * @return a tuple containing decoded values or <code>null</code> if ABI string contained no data
+     */
     @Override
-    public EthTuple decode(String abi, TypeDescriptor descriptor) {
+    @Nullable
+    public EthTuple decode(@NotNull String abi, @NotNull TypeDescriptor descriptor) {
         descriptor = descriptor instanceof EthTupleTypeDescriptor
                 ? descriptor
                 : descriptor.wrap();
@@ -46,59 +57,139 @@ public class HeadlongCodec implements AbiCodec {
         }
 
         val result = tuple.decode(data);
-        return (EthTuple) decodeHeadlongValue(result, descriptor);
+        return (EthTuple) decodeValue(result, descriptor);
     }
 
-    private Object decodeHeadlongValue(Object value, TypeDescriptor descriptor) {
-        val valueSize = descriptor instanceof EthSizedTypeDescriptor sized ? sized.valueSize() : -1;
-        if (value.getClass().isArray() && descriptor instanceof EthArrayTypeDescriptor arrayDescriptor) {
-            val array = (Object[]) value;
-            val result = arrayCast(
-                    Arrays.stream(array)
-                            .map(element -> decodeHeadlongValue(element, arrayDescriptor.descriptor()))
-                            .toArray(),
-                    (Class<? extends EthType>) arrayDescriptor.type().toClass()
-            );
-            return array(arrayDescriptor.arraySize(), result);
-        } else if (descriptor.type().matchesExact(EthAddress.class)) {
-            return address(((Address) value).toString());
-        } else if (descriptor.type().matchesExact(EthBytes.class)) {
-            return bytes((byte[]) value).withSize(valueSize);
-        } else if (descriptor.type().matchesExact(EthInt.class)) {
-            if (value instanceof Integer integer) {
-                return int256(integer).withSize(valueSize);
-            } else {
-                return int256((BigInteger) value).withSize(valueSize);
-            }
-        } else if (descriptor.type().matchesExact(EthUint.class)) {
-            if (value instanceof Integer integer) {
-                return uint256(integer).withSize(valueSize);
-            } else {
-                return uint256((BigInteger) value).withSize(valueSize);
-            }
-        } else if (descriptor.type().matchesExact(EthString.class)) {
-            return string((String) value);
-        } else if (descriptor.type().matchesExact(EthBool.class)) {
-            return bool((boolean) value);
-        } else if (descriptor instanceof EthTupleTypeDescriptor tupleDescriptor) {
-            val tuple = (Tuple) value;
-            val values = new ArrayList<>();
-            for (var i = 0; i < tuple.size(); i++) {
-                values.add(decodeHeadlongValue(tuple.get(i), tupleDescriptor.children().get(i)));
-            }
-            return tuple(values.stream().map(EthType.class::cast).toArray(EthType[]::new));
+    /**
+     * Converts any given headlong value into appropriate {@link EthType} value.
+     *
+     * @param value      the headlong value
+     * @param descriptor the ethereum type descriptor
+     * @return the decoded ethereum data value
+     * @throws IllegalArgumentException if decoder for a given value was not found
+     */
+    private EthType decodeValue(Object value, TypeDescriptor descriptor) throws IllegalArgumentException {
+        if (value instanceof Address address) {
+            return decodeAddress(address, descriptor);
+        } else if (value instanceof byte[] bytes && descriptor instanceof EthSizedTypeDescriptor) {
+            return decodeBytes(bytes, (EthSizedTypeDescriptor) descriptor);
+        } else if (value instanceof Number number && descriptor instanceof EthSizedTypeDescriptor) {
+            return decodeNumeric(number, (EthSizedTypeDescriptor) descriptor);
+        } else if (value instanceof String string) {
+            return decodeString(string, descriptor);
+        } else if (value instanceof Boolean bool) {
+            return decodeBool(bool, descriptor);
+        } else if (value instanceof Object[] && descriptor instanceof EthArrayTypeDescriptor) {
+            return decodeArray((Object[]) value, (EthArrayTypeDescriptor) descriptor);
+        } else if (value instanceof Tuple tuple && descriptor instanceof EthTupleTypeDescriptor) {
+            return decodeTuple(tuple, (EthTupleTypeDescriptor) descriptor);
         }
 
         throw new IllegalArgumentException("Couldn't decode headlong type: " + value);
     }
 
-    @Override
-    public String encode(EthType value) {
-        return encode(value, TypeDescriptor.parse(value));
+    /**
+     * Converts headlong <code>Address</code> value into {@link EthAddress} value.
+     *
+     * @param value      the address value
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum address value
+     */
+    private EthAddress decodeAddress(Address value, TypeDescriptor descriptor) {
+        return address(value.toString());
     }
 
+    /**
+     * Converts <code>byte</code> array value into {@link EthBool} value.
+     *
+     * @param value      the byte array value
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum bytes value
+     */
+    private EthBytes decodeBytes(byte[] value, EthSizedTypeDescriptor descriptor) {
+        return bytes(value).withSize(descriptor.valueSize());
+    }
+
+    /**
+     * Converts <code>Number</code> value into {@link EthNumericType} value.
+     *
+     * @param value      the number value
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum numeric value
+     */
+    private EthNumericType decodeNumeric(Number value, EthSizedTypeDescriptor descriptor) {
+        val integer = value instanceof BigInteger
+                ? (BigInteger) value
+                : BigInteger.valueOf(value.longValue());
+
+        return descriptor.type().matchesExact(EthInt.class)
+                ? int256(integer).withSize(descriptor.valueSize())
+                : uint256(integer).withSize(descriptor.valueSize());
+    }
+
+    /**
+     * Converts <code>String</code> value into {@link EthString} value.
+     *
+     * @param value      the string value
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum string value
+     */
+    private EthString decodeString(String value, TypeDescriptor descriptor) {
+        return string(value);
+    }
+
+    /**
+     * Converts <code>boolean</code> value into {@link EthBool} value.
+     *
+     * @param value      the boolean value
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum bool value
+     */
+    private EthBool decodeBool(boolean value, TypeDescriptor descriptor) {
+        return bool(value);
+    }
+
+    /**
+     * Recursively converts array of values into {@link EthArray} value.
+     *
+     * @param value      the array of values
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum array value
+     */
+    @SuppressWarnings("unchecked")
+    private EthArray<?> decodeArray(Object[] value, EthArrayTypeDescriptor descriptor) {
+        val values = Arrays.stream(value)
+                .map(element -> decodeValue(element, descriptor.descriptor()))
+                .toArray();
+        val result = arrayCast(values, (Class<? extends EthType>) descriptor.type().toClass());
+        return array(descriptor.arraySize(), result);
+    }
+
+    /**
+     * Recursively converts headlong {@link Tuple} value into {@link EthTuple} value.
+     *
+     * @param value      the headlong tuple value
+     * @param descriptor the type descriptor
+     * @return the decoded ethereum tuple value
+     */
+    private EthTuple decodeTuple(Tuple value, EthTupleTypeDescriptor descriptor) {
+        val values = new ArrayList<>();
+        for (var i = 0; i < value.size(); i++) {
+            values.add(decodeValue(value.get(i), descriptor.children().get(i)));
+        }
+        return tuple(values.stream().map(EthType.class::cast).toArray(EthType[]::new));
+    }
+
+    /**
+     * Encodes given {@link EthType} value into an ABI string using {@link com.esaulpaugh.headlong} codec.
+     *
+     * @param value      the ethereum type value
+     * @param descriptor the type description
+     * @return the ABI encoded string containing the ethereum value
+     */
     @Override
-    public String encode(EthType value, TypeDescriptor descriptor) {
+    @NotNull
+    public String encode(@NotNull EthType value, @NotNull TypeDescriptor descriptor) {
         if (value instanceof EthTuple) {
             return encode((EthTuple) value, descriptor);
         } else {
@@ -106,45 +197,133 @@ public class HeadlongCodec implements AbiCodec {
         }
     }
 
+    /**
+     * Encodes given {@link EthTuple} value into an ABI string using {@link com.esaulpaugh.headlong} codec.
+     *
+     * @param value      the ethereum tuple value
+     * @param descriptor the type description
+     * @return the ABI encoded string containing the ethereum value
+     */
     private String encode(EthTuple value, TypeDescriptor descriptor) {
         val tupleType = TupleType.parse(descriptor.toAbiDescriptor());
-        val result = tupleType.encode((Tuple) encodeHeadlongValue(value)).array();
+        val result = tupleType.encode((Tuple) encodeValue(value)).array();
         return FastHex.encodeToString(result, 0, result.length);
     }
 
-    private Object encodeHeadlongValue(Object value) {
+    /**
+     * Converts any given {@link EthType} value into equivalent {@link com.esaulpaugh.headlong} value.
+     *
+     * @param value the ethereum value
+     * @return the headlong-compatible representation of the value
+     * @throws IllegalArgumentException if encoder for a given value was not found
+     */
+    private Object encodeValue(EthType value) throws IllegalArgumentException {
         if (value instanceof EthArray<?> array) {
-            val result = array.stream()
-                    .map(this::encodeHeadlongValue)
-                    .toArray();
-            return arrayCast(result, result[0].getClass());
+            return encodeArray(array);
         } else if (value instanceof EthAddress address) {
-            return Address.wrap(address.toChecksumHex());
+            return encodeAddress(address);
         } else if (value instanceof EthBytes bytes) {
-            return bytes.toByteArray();
-        } else if (value instanceof EthNumericType numeric
-                && value instanceof EthSizedType sized) {
-            val bigInteger = (BigInteger) numeric.value();
-            if (sized.size() <= 32) {
-                return bigInteger.intValue();
-            } else if (sized.size() <= 64) {
-                return bigInteger.longValue();
-            }
-            return bigInteger;
+            return encodeBytes(bytes);
+        } else if (value instanceof EthNumericType numeric) {
+            return encodeNumeric(numeric);
         } else if (value instanceof EthString string) {
-            return string.value();
+            return encodeString(string);
         } else if (value instanceof EthBool bool) {
-            return bool.value();
+            return encodeBool(bool);
         } else if (value instanceof EthTuple tuple) {
-            val values = new Object[tuple.size()];
-            for (var i = 0; i < values.length; i++) {
-                values[i] = encodeHeadlongValue(tuple.get(i));
-            }
-            return Tuple.of(values);
+            return encodeTuple(tuple);
         }
 
         throw new IllegalArgumentException("Couldn't encode ethereum type: " + value);
     }
 
+    /**
+     * Recursively converts {@link EthArray} value into regular JVM array value.
+     *
+     * @param value the ethereum array value
+     * @return the headlong-compatible JVM array
+     */
+    private Object encodeArray(EthArray<?> value) {
+        val result = value.stream()
+                .map(this::encodeValue)
+                .toArray();
+        return arrayCast(result, result[0].getClass());
+    }
+
+    /**
+     * Converts {@link EthAddress} value into {@link Address} value.
+     *
+     * @param value the ethereum address value
+     * @return the headlong-compatible address value
+     */
+    private Address encodeAddress(EthAddress value) {
+        return Address.wrap(value.toChecksumHex());
+    }
+
+    /**
+     * Converts {@link EthBytes} value into <code>byte</code> array value.
+     *
+     * @param value the ethereum bytes value
+     * @return the headlong-compatible byte array value
+     */
+    private byte[] encodeBytes(EthBytes value) {
+        return value.toByteArray();
+    }
+
+    /**
+     * Converts {@link EthNumericType} value into {@link Number} value.
+     *
+     * @param value the ethereum numeric value
+     * @return the headlong-compatible number value
+     */
+    private Number encodeNumeric(EthNumericType value) {
+        val integer = (BigInteger) value.value();
+        if (value instanceof EthSizedType sized) {
+            if (sized.size() <= 8) {
+                return integer.byteValue();
+            } else if (sized.size() <= 16) {
+                return integer.shortValue();
+            } else if (sized.size() <= 32) {
+                return integer.intValue();
+            } else if (sized.size() <= 64) {
+                return integer.longValue();
+            }
+        }
+        return integer;
+    }
+
+    /**
+     * Converts {@link EthString} value into {@link String} value.
+     *
+     * @param value the ethereum numeric value
+     * @return the headlong-compatible string value
+     */
+    private String encodeString(EthString value) {
+        return value.value();
+    }
+
+    /**
+     * Converts {@link EthBool} value into <code>boolean</code> value.
+     *
+     * @param value the ethereum numeric value
+     * @return the headlong-compatible boolean value
+     */
+    private boolean encodeBool(EthBool value) {
+        return value.value();
+    }
+
+    /**
+     * Converts {@link EthTuple} value into {@link Tuple} value.
+     *
+     * @param value the ethereum address value
+     * @return the headlong-compatible tuple value
+     */
+    private Tuple encodeTuple(EthTuple value) {
+        val values = new Object[value.size()];
+        for (var i = 0; i < values.length; i++) {
+            values[i] = encodeValue(value.get(i));
+        }
+        return Tuple.of(values);
+    }
 
 }

@@ -2,6 +2,8 @@ package dev.klepto.kweb3.abi;
 
 import dev.klepto.kweb3.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.type.EthTuple;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents ABI decoder for converting between string and ethereum data types.
@@ -11,12 +13,14 @@ import dev.klepto.kweb3.type.EthTuple;
 public interface AbiDecoder {
 
     /**
-     * Decodes given ABI string into ethereum values contained within {@link EthTuple}.
+     * Decodes given ABI string into ethereum values contained within {@link EthTuple}. Returns <code>null</code> if
+     * given ABI string contains no data.
      *
-     * @param abi            the ABI data string
-     * @param typeDescriptor the type description of given string
-     * @return a tuple containing decoded values
+     * @param abi        the ABI data string
+     * @param descriptor the type description of given string
+     * @return a tuple containing decoded values or <code>null</code> if ABI string contained no data
      */
-    EthTuple decode(String abi, TypeDescriptor typeDescriptor);
+    @Nullable
+    EthTuple decode(@NotNull String abi, @NotNull TypeDescriptor descriptor);
 
 }
