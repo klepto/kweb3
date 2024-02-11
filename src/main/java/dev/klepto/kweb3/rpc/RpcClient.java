@@ -3,6 +3,7 @@ package dev.klepto.kweb3.rpc;
 import dev.klepto.kweb3.Web3Error;
 import dev.klepto.kweb3.Web3Result;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +39,7 @@ public abstract class RpcClient implements RpcApi {
      * @param request the rpc request object
      * @return a {@link Web3Result} containing rpc response object that will be completed asynchronously
      */
-    public abstract Web3Result<RpcResponse> request(RpcRequest request);
+    public abstract @NotNull Web3Result<RpcResponse> request(@NotNull RpcRequest request);
 
     /**
      * Called when new RPC response is received.

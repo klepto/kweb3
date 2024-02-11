@@ -1,6 +1,8 @@
 package dev.klepto.kweb3.util;
 
 import dev.klepto.kweb3.Web3Error;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility methods for runtime argument and state checking.
@@ -32,7 +34,7 @@ public final class Conditions {
      * @param args       the message arguments to include with runtime exception
      * @throws Web3Error if {@code expression} is false
      */
-    public static void require(boolean expression, String message, Object... args) {
+    public static void require(boolean expression, @NotNull String message, @Nullable Object... args) {
         if (!expression) {
             throw new Web3Error(message, args);
         }

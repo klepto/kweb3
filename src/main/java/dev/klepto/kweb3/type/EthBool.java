@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.type;
 
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import static dev.klepto.kweb3.util.Conditions.require;
 
@@ -39,7 +40,8 @@ public record EthBool(boolean value) implements EthType {
     /**
      * Converts ethereum {@link EthUint} type to ethereum bool type.
      */
-    public static EthBool bool(EthUint value) {
+    @NotNull
+    public static EthBool bool(@NotNull EthUint value) {
         val intValue = value.value().intValue();
         require(intValue == 1 || intValue == 0, "Not a boolean value");
         return new EthBool(intValue == 1);
@@ -48,7 +50,8 @@ public record EthBool(boolean value) implements EthType {
     /**
      * Converts ethereum {@link EthInt} type to ethereum bool type.
      */
-    public static EthBool bool(EthInt value) {
+    @NotNull
+    public static EthBool bool(@NotNull EthInt value) {
         val intValue = value.value().intValue();
         require(intValue == 1 || intValue == 0, "Not a boolean value");
         return new EthBool(intValue == 1);

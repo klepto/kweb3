@@ -1,5 +1,7 @@
 package dev.klepto.kweb3.type;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents ethereum <code>string</code> data type.
  *
@@ -19,7 +21,8 @@ public record EthString(String value) implements EthType {
     }
 
     /* Solidity style string initializers */
-    public static EthString string(String value) {
+    @NotNull
+    public static EthString string(@NotNull String value) {
         return new EthString(value);
     }
 

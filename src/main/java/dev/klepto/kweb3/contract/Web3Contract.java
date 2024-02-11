@@ -2,6 +2,7 @@ package dev.klepto.kweb3.contract;
 
 import dev.klepto.kweb3.Web3Client;
 import dev.klepto.kweb3.type.EthAddress;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Default interface for all blockchain contracts. Contains utility methods that apply to all contracts.
@@ -15,6 +16,7 @@ public interface Web3Contract {
      *
      * @return the client that that is responsible for this contract
      */
+    @NotNull
     Web3Client getClient();
 
     /**
@@ -22,6 +24,7 @@ public interface Web3Contract {
      *
      * @return the blockchain address
      */
+    @NotNull
     EthAddress getAddress();
 
     /**
@@ -31,6 +34,7 @@ public interface Web3Contract {
      *
      * @return the actual contract class
      */
+    @NotNull
     Class<? extends Web3Contract> getContractClass();
 
 }

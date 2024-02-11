@@ -2,6 +2,7 @@ package dev.klepto.kweb3.util;
 
 import com.google.common.collect.ObjectArrays;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Various collection utilities.
@@ -21,7 +22,8 @@ public final class Collections {
      * @return the array of given component type
      */
     @SuppressWarnings("unchecked")
-    public static <T> T[] arrayCast(Object[] array, Class<T> componentType) {
+    @NotNull
+    public static <T> T[] arrayCast(@NotNull Object[] array, @NotNull Class<T> componentType) {
         val newArray = ObjectArrays.newArray(componentType, array.length);
         System.arraycopy(array, 0, newArray, 0, array.length);
         return newArray;
@@ -35,7 +37,8 @@ public final class Collections {
      * @param index the index to be removed, any non-positive value will return original array
      * @return a new array not containing the element at specified index
      */
-    public static <T> T[] arrayRemove(T[] array, int index) {
+    @NotNull
+    public static <T> T[] arrayRemove(@NotNull T[] array, int index) {
         if (index < 0) {
             return array;
         }

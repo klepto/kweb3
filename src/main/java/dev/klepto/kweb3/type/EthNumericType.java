@@ -1,5 +1,7 @@
 package dev.klepto.kweb3.type;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigInteger;
 
 import static dev.klepto.kweb3.util.hash.Keccak256.keccak256Checksum;
@@ -16,6 +18,7 @@ public interface EthNumericType extends EthType {
      *
      * @return the numeric value as big integer
      */
+    @NotNull
     BigInteger value();
 
     /**
@@ -23,6 +26,7 @@ public interface EthNumericType extends EthType {
      *
      * @return a hexadecimal string value
      */
+    @NotNull
     default String toHex() {
         var hex = value().toString(16);
         if (hex.length() % 2 != 0) {
@@ -36,6 +40,7 @@ public interface EthNumericType extends EthType {
      *
      * @return a checksum hexadecimal string value
      */
+    @NotNull
     default String toChecksumHex() {
         return keccak256Checksum(toHex());
     }

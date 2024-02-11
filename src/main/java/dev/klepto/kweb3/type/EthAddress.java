@@ -2,6 +2,7 @@ package dev.klepto.kweb3.type;
 
 import dev.klepto.kweb3.util.Hex;
 import dev.klepto.kweb3.util.hash.Keccak256;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
@@ -37,14 +38,16 @@ public record EthAddress(BigInteger value) implements EthNumericType {
     /**
      * Converts {@link BigInteger} to ethereum address type.
      */
-    public static EthAddress address(BigInteger value) {
+    @NotNull
+    public static EthAddress address(@NotNull BigInteger value) {
         return new EthAddress(value);
     }
 
     /**
      * Converts hexadecimal string to ethereum address type.
      */
-    public static EthAddress address(String hex) {
+    @NotNull
+    public static EthAddress address(@NotNull String hex) {
         hex = stripPrefix(Keccak256.keccak256Checksum(hex));
         return address(toBigInteger(hex));
     }
@@ -52,7 +55,8 @@ public record EthAddress(BigInteger value) implements EthNumericType {
     /**
      * Converts ethereum {@link EthUint} to ethereum address type.
      */
-    public static EthAddress address(EthUint value) {
+    @NotNull
+    public static EthAddress address(@NotNull EthUint value) {
         checkArgument(value.size() == 160, "Only uint160 can be converted to address");
         return address(value.value());
     }

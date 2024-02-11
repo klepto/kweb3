@@ -2,6 +2,7 @@ package dev.klepto.kweb3.contract;
 
 import dev.klepto.kweb3.abi.descriptor.TypeDescriptor;
 import dev.klepto.unreflect.UnreflectType;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 
@@ -19,7 +20,8 @@ public interface ContractParser {
      * @param method the contract interface method
      * @return the contract function description
      */
-    ContractFunction parseFunction(Method method);
+    @NotNull
+    ContractFunction parseFunction(@NotNull Method method);
 
     /**
      * Parses contract parameters type description for a given contract interface method.
@@ -27,7 +29,8 @@ public interface ContractParser {
      * @param method the contract interface method
      * @return the contract parameters type description
      */
-    TypeDescriptor parseParametersTypeDescriptor(Method method);
+    @NotNull
+    TypeDescriptor parseParametersTypeDescriptor(@NotNull Method method);
 
     /**
      * Parses contract return type description for a given contract interface method.
@@ -35,7 +38,8 @@ public interface ContractParser {
      * @param method the contract interface method
      * @return the contract return type description
      */
-    TypeDescriptor parseReturnTypeDescriptor(Method method);
+    @NotNull
+    TypeDescriptor parseReturnTypeDescriptor(@NotNull Method method);
 
     /**
      * Parses contract JVM return type for a given contract interface method.
@@ -43,6 +47,7 @@ public interface ContractParser {
      * @param method the contract interface method
      * @return the contract JVM return type, could be ethereum data type or a container for struct or tuple
      */
-    UnreflectType parseReturnType(Method method);
+    @NotNull
+    UnreflectType parseReturnType(@NotNull Method method);
 
 }

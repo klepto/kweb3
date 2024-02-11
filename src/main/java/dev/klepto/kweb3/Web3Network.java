@@ -1,5 +1,7 @@
 package dev.klepto.kweb3;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a web3 network/chain.
  */
@@ -10,6 +12,7 @@ public interface Web3Network {
      *
      * @return a string containing RPC url
      */
+    @NotNull
     String rpcUrl();
 
     /**
@@ -22,7 +25,7 @@ public interface Web3Network {
     /**
      * Basic {@link Web3Network} implementation that takes network variables as constructor parameters.
      */
-    record Basic(String rpcUrl, long chainId) implements Web3Network {
+    record Basic(@NotNull String rpcUrl, long chainId) implements Web3Network {
     }
 
 }

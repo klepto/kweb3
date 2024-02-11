@@ -5,6 +5,7 @@ import dev.klepto.kweb3.rpc.RpcMethod;
 import dev.klepto.kweb3.rpc.RpcRequest;
 import dev.klepto.kweb3.rpc.RpcResponse;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation of Ethereum RPC API <code>eth_gasPrice</code> method.
@@ -18,6 +19,7 @@ public interface EthGasPrice extends RpcMethod {
      *
      * @return the hexadecimal value of the current gas price in wei
      */
+    @NotNull
     default Web3Result<String> ethGasPrice() {
         val request = new RpcRequest()
                 .withMethod("eth_gasPrice");

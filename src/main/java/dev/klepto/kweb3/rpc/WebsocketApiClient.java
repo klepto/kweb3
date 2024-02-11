@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -60,7 +61,7 @@ public class WebsocketApiClient extends RpcClient {
      * @return a {@link Web3Result} containing rpc response object that will be completed asynchronously
      */
     @Override
-    public Web3Result<RpcResponse> request(RpcRequest request) {
+    public @NotNull Web3Result<RpcResponse> request(@NotNull RpcRequest request) {
         try {
             val result = new Web3Result<RpcResponse>();
             request = beforeRequest(request, result);

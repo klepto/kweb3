@@ -2,6 +2,7 @@ package dev.klepto.kweb3.contract;
 
 import dev.klepto.kweb3.Web3Result;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a contract executor. This interface is used to enable different implementations of contract proxy
@@ -19,7 +20,8 @@ public interface ContractExecutor {
      * @param call the contract interface method call
      * @return the contract function execution result, the type must match return type of the interface method
      */
-    default Object execute(ContractCall call) {
+    @NotNull
+    default Object execute(@NotNull ContractCall call) {
         val data = encode(call);
         val result = request(call, data);
         return decode(call, result);
@@ -32,7 +34,8 @@ public interface ContractExecutor {
      * @param call the contract interface method call
      * @return the ABI-compatible string containing request data
      */
-    String encode(ContractCall call);
+    @NotNull
+    String encode(@NotNull ContractCall call);
 
     /**
      * Creates an RPC request with given data for this contract call. Must be called by
@@ -42,7 +45,8 @@ public interface ContractExecutor {
      * @param data the ABI-compatible call data
      * @return the result of the RPC call
      */
-    Web3Result<String> request(ContractCall call, String data);
+    @NotNull
+    Web3Result<String> request(@NotNull ContractCall call, @NotNull String data);
 
     /**
      * Decodes an RPC response to interface method return type.  Must be returned by
@@ -52,6 +56,7 @@ public interface ContractExecutor {
      * @param result the result of the RPC call
      * @return the decoded object that matches the contract interface method
      */
-    Object decode(ContractCall call, Web3Result<String> result);
+    @NotNull
+    Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result);
 
 }

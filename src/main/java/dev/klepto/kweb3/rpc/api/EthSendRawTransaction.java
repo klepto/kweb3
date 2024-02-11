@@ -5,6 +5,7 @@ import dev.klepto.kweb3.rpc.RpcMethod;
 import dev.klepto.kweb3.rpc.RpcRequest;
 import dev.klepto.kweb3.rpc.RpcResponse;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation of Ethereum RPC API <code>eth_sendRawTransaction</code> method.
@@ -19,7 +20,8 @@ public interface EthSendRawTransaction extends RpcMethod {
      * @param data the signed transaction data (typically signed with a library, using your private key)
      * @return the transaction hash, or the zero hash if the transaction is not yet available
      */
-    default Web3Result<String> ethSendRawTransaction(String data) {
+    @NotNull
+    default Web3Result<String> ethSendRawTransaction(@NotNull String data) {
         val request = new RpcRequest()
                 .withMethod("eth_sendRawTransaction")
                 .withParams(new Request(data));
@@ -33,7 +35,7 @@ public interface EthSendRawTransaction extends RpcMethod {
      *
      * @param data the signed transaction data (typically signed with a library, using your private key)
      */
-    record Request(String data) {
+    record Request(@NotNull String data) {
     }
 
 }

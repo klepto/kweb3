@@ -3,6 +3,7 @@ package dev.klepto.kweb3.util;
 import com.google.common.base.CharMatcher;
 import com.google.common.io.BaseEncoding;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
@@ -24,7 +25,7 @@ public final class Hex {
      * @param value the string value to check
      * @return true if given string value is a hexadecimal string
      */
-    public static boolean isValid(String value) {
+    public static boolean isValid(@NotNull String value) {
         value = stripPrefix(value);
         return value.chars().allMatch(character -> VALID_HEX.indexOf(character) != 0);
     }
@@ -35,7 +36,8 @@ public final class Hex {
      * @param hex a hexadecimal string that may or may not contain <code>0x</code> prefix
      * @return a hexadecimal string without the default prefix
      */
-    public static String stripPrefix(String hex) {
+    @NotNull
+    public static String stripPrefix(@NotNull String hex) {
         return hex.toLowerCase().replace("0x", "");
     }
 
@@ -45,7 +47,8 @@ public final class Hex {
      * @param value the integer value
      * @return a hexadecimal representation of integer
      */
-    public static String toHex(byte[] value) {
+    @NotNull
+    public static String toHex(byte @NotNull [] value) {
         return toHex(value, true, true);
     }
 
@@ -57,7 +60,8 @@ public final class Hex {
      * @param leadingZero if true, ensures that result length is divisible by 2
      * @return a hexadecimal representation of integer
      */
-    public static String toHex(byte[] value, boolean prefix, boolean leadingZero) {
+    @NotNull
+    public static String toHex(byte @NotNull [] value, boolean prefix, boolean leadingZero) {
         var hex = BaseEncoding.base16().encode(value).toLowerCase();
         if (!leadingZero) {
             hex = CharMatcher.is('0').trimLeadingFrom(hex);
@@ -77,7 +81,8 @@ public final class Hex {
      * @param value the integer value
      * @return a hexadecimal representation of integer
      */
-    public static String toHex(BigInteger value) {
+    @NotNull
+    public static String toHex(@NotNull BigInteger value) {
         return toHex(value, true, true);
     }
 
@@ -89,7 +94,8 @@ public final class Hex {
      * @param leadingZero if true, ensures that result length is divisible by 2
      * @return a hexadecimal representation of integer
      */
-    public static String toHex(BigInteger value, boolean prefix, boolean leadingZero) {
+    @NotNull
+    public static String toHex(@NotNull BigInteger value, boolean prefix, boolean leadingZero) {
         var hex = value.toString(16).toLowerCase();
         if (leadingZero && hex.length() % 2 != 0) {
             hex = "0" + hex;
@@ -103,7 +109,8 @@ public final class Hex {
      * @param hex the hexadecimal string
      * @return a big integer value of hexadecimal string
      */
-    public static BigInteger toBigInteger(String hex) {
+    @NotNull
+    public static BigInteger toBigInteger(@NotNull String hex) {
         return new BigInteger(stripPrefix(hex), 16);
     }
 
@@ -113,7 +120,7 @@ public final class Hex {
      * @param hex the hexadecimal string
      * @return a byte array containing hexadecimal string value
      */
-    public static byte[] toByteArray(String hex) {
+    public static byte @NotNull [] toByteArray(@NotNull String hex) {
         val encoding = BaseEncoding.base16().omitPadding();
         return encoding.decode(stripPrefix(hex).toUpperCase());
     }

@@ -2,6 +2,7 @@ package dev.klepto.kweb3.type;
 
 import dev.klepto.kweb3.util.Hex;
 import lombok.With;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
@@ -32,1009 +33,1260 @@ public record EthUint(int size, BigInteger value) implements EthNumericType, Eth
     }
 
     /* Solidity style uint initializers */
-    public static EthUint uint256(BigInteger value) {
+    @NotNull
+    public static EthUint uint256(@NotNull BigInteger value) {
         return new EthUint(256, value);
     }
 
+    @NotNull
     public static EthUint uint256(long value) {
         return uint256(BigInteger.valueOf(value));
     }
 
-    public static EthUint uint256(String hex) {
+    @NotNull
+    public static EthUint uint256(@NotNull String hex) {
         require(Hex.isValid(hex), "Malformed hex string: {}", hex);
         return uint256(Hex.toBigInteger(hex));
     }
 
     /* Smaller size solidity int initializers */
+    @NotNull
     public static EthUint uint8(long value) {
         return uint256(value).withSize(8);
     }
 
+    @NotNull
     public static EthUint uint10(long value) {
         return uint256(value).withSize(10);
     }
 
+    @NotNull
     public static EthUint uint12(long value) {
         return uint256(value).withSize(12);
     }
 
+    @NotNull
     public static EthUint uint14(long value) {
         return uint256(value).withSize(14);
     }
 
+    @NotNull
     public static EthUint uint16(long value) {
         return uint256(value).withSize(16);
     }
 
+    @NotNull
     public static EthUint uint18(long value) {
         return uint256(value).withSize(18);
     }
 
+    @NotNull
     public static EthUint uint20(long value) {
         return uint256(value).withSize(20);
     }
 
+    @NotNull
     public static EthUint uint22(long value) {
         return uint256(value).withSize(22);
     }
 
+    @NotNull
     public static EthUint uint24(long value) {
         return uint256(value).withSize(24);
     }
 
+    @NotNull
     public static EthUint uint26(long value) {
         return uint256(value).withSize(26);
     }
 
+    @NotNull
     public static EthUint uint28(long value) {
         return uint256(value).withSize(28);
     }
 
+    @NotNull
     public static EthUint uint30(long value) {
         return uint256(value).withSize(30);
     }
 
+    @NotNull
     public static EthUint uint32(long value) {
         return uint256(value).withSize(32);
     }
 
+    @NotNull
     public static EthUint uint34(long value) {
         return uint256(value).withSize(34);
     }
 
+    @NotNull
     public static EthUint uint36(long value) {
         return uint256(value).withSize(36);
     }
 
+    @NotNull
     public static EthUint uint38(long value) {
         return uint256(value).withSize(38);
     }
 
+    @NotNull
     public static EthUint uint40(long value) {
         return uint256(value).withSize(40);
     }
 
+    @NotNull
     public static EthUint uint42(long value) {
         return uint256(value).withSize(42);
     }
 
+    @NotNull
     public static EthUint uint44(long value) {
         return uint256(value).withSize(44);
     }
 
+    @NotNull
     public static EthUint uint46(long value) {
         return uint256(value).withSize(46);
     }
 
+    @NotNull
     public static EthUint uint48(long value) {
         return uint256(value).withSize(48);
     }
 
+    @NotNull
     public static EthUint uint50(long value) {
         return uint256(value).withSize(50);
     }
 
+    @NotNull
     public static EthUint uint52(long value) {
         return uint256(value).withSize(52);
     }
 
+    @NotNull
     public static EthUint uint54(long value) {
         return uint256(value).withSize(54);
     }
 
+    @NotNull
     public static EthUint uint56(long value) {
         return uint256(value).withSize(56);
     }
 
+    @NotNull
     public static EthUint uint58(long value) {
         return uint256(value).withSize(58);
     }
 
+    @NotNull
     public static EthUint uint60(long value) {
         return uint256(value).withSize(60);
     }
 
+    @NotNull
     public static EthUint uint62(long value) {
         return uint256(value).withSize(62);
     }
 
+    @NotNull
     public static EthUint uint64(long value) {
         return uint256(value).withSize(64);
     }
 
+    @NotNull
     public static EthUint uint66(long value) {
         return uint256(value).withSize(66);
     }
 
+    @NotNull
     public static EthUint uint68(long value) {
         return uint256(value).withSize(68);
     }
 
+    @NotNull
     public static EthUint uint70(long value) {
         return uint256(value).withSize(70);
     }
 
+    @NotNull
     public static EthUint uint72(long value) {
         return uint256(value).withSize(72);
     }
 
+    @NotNull
     public static EthUint uint74(long value) {
         return uint256(value).withSize(74);
     }
 
+    @NotNull
     public static EthUint uint76(long value) {
         return uint256(value).withSize(76);
     }
 
+    @NotNull
     public static EthUint uint78(long value) {
         return uint256(value).withSize(78);
     }
 
+    @NotNull
     public static EthUint uint80(long value) {
         return uint256(value).withSize(80);
     }
 
+    @NotNull
     public static EthUint uint82(long value) {
         return uint256(value).withSize(82);
     }
 
+    @NotNull
     public static EthUint uint84(long value) {
         return uint256(value).withSize(84);
     }
 
+    @NotNull
     public static EthUint uint86(long value) {
         return uint256(value).withSize(86);
     }
 
+    @NotNull
     public static EthUint uint88(long value) {
         return uint256(value).withSize(88);
     }
 
+    @NotNull
     public static EthUint uint90(long value) {
         return uint256(value).withSize(90);
     }
 
+    @NotNull
     public static EthUint uint92(long value) {
         return uint256(value).withSize(92);
     }
 
+    @NotNull
     public static EthUint uint94(long value) {
         return uint256(value).withSize(94);
     }
 
+    @NotNull
     public static EthUint uint96(long value) {
         return uint256(value).withSize(96);
     }
 
+    @NotNull
     public static EthUint uint98(long value) {
         return uint256(value).withSize(98);
     }
 
+    @NotNull
     public static EthUint uint100(long value) {
         return uint256(value).withSize(100);
     }
 
+    @NotNull
     public static EthUint uint102(long value) {
         return uint256(value).withSize(102);
     }
 
+    @NotNull
     public static EthUint uint104(long value) {
         return uint256(value).withSize(104);
     }
 
+    @NotNull
     public static EthUint uint106(long value) {
         return uint256(value).withSize(106);
     }
 
+    @NotNull
     public static EthUint uint108(long value) {
         return uint256(value).withSize(108);
     }
 
+    @NotNull
     public static EthUint uint110(long value) {
         return uint256(value).withSize(110);
     }
 
+    @NotNull
     public static EthUint uint112(long value) {
         return uint256(value).withSize(112);
     }
 
+    @NotNull
     public static EthUint uint114(long value) {
         return uint256(value).withSize(114);
     }
 
+    @NotNull
     public static EthUint uint116(long value) {
         return uint256(value).withSize(116);
     }
 
+    @NotNull
     public static EthUint uint118(long value) {
         return uint256(value).withSize(118);
     }
 
+    @NotNull
     public static EthUint uint120(long value) {
         return uint256(value).withSize(120);
     }
 
+    @NotNull
     public static EthUint uint122(long value) {
         return uint256(value).withSize(122);
     }
 
+    @NotNull
     public static EthUint uint124(long value) {
         return uint256(value).withSize(124);
     }
 
+    @NotNull
     public static EthUint uint126(long value) {
         return uint256(value).withSize(126);
     }
 
+    @NotNull
     public static EthUint uint128(long value) {
         return uint256(value).withSize(128);
     }
 
+    @NotNull
     public static EthUint uint130(long value) {
         return uint256(value).withSize(130);
     }
 
+    @NotNull
     public static EthUint uint132(long value) {
         return uint256(value).withSize(132);
     }
 
+    @NotNull
     public static EthUint uint134(long value) {
         return uint256(value).withSize(134);
     }
 
+    @NotNull
     public static EthUint uint136(long value) {
         return uint256(value).withSize(136);
     }
 
+    @NotNull
     public static EthUint uint138(long value) {
         return uint256(value).withSize(138);
     }
 
+    @NotNull
     public static EthUint uint140(long value) {
         return uint256(value).withSize(140);
     }
 
+    @NotNull
     public static EthUint uint142(long value) {
         return uint256(value).withSize(142);
     }
 
+    @NotNull
     public static EthUint uint144(long value) {
         return uint256(value).withSize(144);
     }
 
+    @NotNull
     public static EthUint uint146(long value) {
         return uint256(value).withSize(146);
     }
 
+    @NotNull
     public static EthUint uint148(long value) {
         return uint256(value).withSize(148);
     }
 
+    @NotNull
     public static EthUint uint150(long value) {
         return uint256(value).withSize(150);
     }
 
+    @NotNull
     public static EthUint uint152(long value) {
         return uint256(value).withSize(152);
     }
 
+    @NotNull
     public static EthUint uint154(long value) {
         return uint256(value).withSize(154);
     }
 
+    @NotNull
     public static EthUint uint156(long value) {
         return uint256(value).withSize(156);
     }
 
+    @NotNull
     public static EthUint uint158(long value) {
         return uint256(value).withSize(158);
     }
 
+    @NotNull
     public static EthUint uint160(long value) {
         return uint256(value).withSize(160);
     }
 
+    @NotNull
     public static EthUint uint162(long value) {
         return uint256(value).withSize(162);
     }
 
+    @NotNull
     public static EthUint uint164(long value) {
         return uint256(value).withSize(164);
     }
 
+    @NotNull
     public static EthUint uint166(long value) {
         return uint256(value).withSize(166);
     }
 
+    @NotNull
     public static EthUint uint168(long value) {
         return uint256(value).withSize(168);
     }
 
+    @NotNull
     public static EthUint uint170(long value) {
         return uint256(value).withSize(170);
     }
 
+    @NotNull
     public static EthUint uint172(long value) {
         return uint256(value).withSize(172);
     }
 
+    @NotNull
     public static EthUint uint174(long value) {
         return uint256(value).withSize(174);
     }
 
+    @NotNull
     public static EthUint uint176(long value) {
         return uint256(value).withSize(176);
     }
 
+    @NotNull
     public static EthUint uint178(long value) {
         return uint256(value).withSize(178);
     }
 
+    @NotNull
     public static EthUint uint180(long value) {
         return uint256(value).withSize(180);
     }
 
+    @NotNull
     public static EthUint uint182(long value) {
         return uint256(value).withSize(182);
     }
 
+    @NotNull
     public static EthUint uint184(long value) {
         return uint256(value).withSize(184);
     }
 
+    @NotNull
     public static EthUint uint186(long value) {
         return uint256(value).withSize(186);
     }
 
+    @NotNull
     public static EthUint uint188(long value) {
         return uint256(value).withSize(188);
     }
 
+    @NotNull
     public static EthUint uint190(long value) {
         return uint256(value).withSize(190);
     }
 
+    @NotNull
     public static EthUint uint192(long value) {
         return uint256(value).withSize(192);
     }
 
+    @NotNull
     public static EthUint uint194(long value) {
         return uint256(value).withSize(194);
     }
 
+    @NotNull
     public static EthUint uint196(long value) {
         return uint256(value).withSize(196);
     }
 
+    @NotNull
     public static EthUint uint198(long value) {
         return uint256(value).withSize(198);
     }
 
+    @NotNull
     public static EthUint uint200(long value) {
         return uint256(value).withSize(200);
     }
 
+    @NotNull
     public static EthUint uint202(long value) {
         return uint256(value).withSize(202);
     }
 
+    @NotNull
     public static EthUint uint204(long value) {
         return uint256(value).withSize(204);
     }
 
+    @NotNull
     public static EthUint uint206(long value) {
         return uint256(value).withSize(206);
     }
 
+    @NotNull
     public static EthUint uint208(long value) {
         return uint256(value).withSize(208);
     }
 
+    @NotNull
     public static EthUint uint210(long value) {
         return uint256(value).withSize(210);
     }
 
+    @NotNull
     public static EthUint uint212(long value) {
         return uint256(value).withSize(212);
     }
 
+    @NotNull
     public static EthUint uint214(long value) {
         return uint256(value).withSize(214);
     }
 
+    @NotNull
     public static EthUint uint216(long value) {
         return uint256(value).withSize(216);
     }
 
+    @NotNull
     public static EthUint uint218(long value) {
         return uint256(value).withSize(218);
     }
 
+    @NotNull
     public static EthUint uint220(long value) {
         return uint256(value).withSize(220);
     }
 
+    @NotNull
     public static EthUint uint222(long value) {
         return uint256(value).withSize(222);
     }
 
+    @NotNull
     public static EthUint uint224(long value) {
         return uint256(value).withSize(224);
     }
 
+    @NotNull
     public static EthUint uint226(long value) {
         return uint256(value).withSize(226);
     }
 
+    @NotNull
     public static EthUint uint228(long value) {
         return uint256(value).withSize(228);
     }
 
+    @NotNull
     public static EthUint uint230(long value) {
         return uint256(value).withSize(230);
     }
 
+    @NotNull
     public static EthUint uint232(long value) {
         return uint256(value).withSize(232);
     }
 
+    @NotNull
     public static EthUint uint234(long value) {
         return uint256(value).withSize(234);
     }
 
+    @NotNull
     public static EthUint uint236(long value) {
         return uint256(value).withSize(236);
     }
 
+    @NotNull
     public static EthUint uint238(long value) {
         return uint256(value).withSize(238);
     }
 
+    @NotNull
     public static EthUint uint240(long value) {
         return uint256(value).withSize(240);
     }
 
+    @NotNull
     public static EthUint uint242(long value) {
         return uint256(value).withSize(242);
     }
 
+    @NotNull
     public static EthUint uint244(long value) {
         return uint256(value).withSize(244);
     }
 
+    @NotNull
     public static EthUint uint246(long value) {
         return uint256(value).withSize(246);
     }
 
+    @NotNull
     public static EthUint uint248(long value) {
         return uint256(value).withSize(248);
     }
 
+    @NotNull
     public static EthUint uint250(long value) {
         return uint256(value).withSize(250);
     }
 
+    @NotNull
     public static EthUint uint252(long value) {
         return uint256(value).withSize(252);
     }
 
+    @NotNull
     public static EthUint uint254(long value) {
         return uint256(value).withSize(254);
     }
 
-    public static EthUint uint8(String hex) {
+    @NotNull
+    public static EthUint uint8(@NotNull String hex) {
         return uint256(hex).withSize(8);
     }
 
-    public static EthUint uint10(String hex) {
+    @NotNull
+    public static EthUint uint10(@NotNull String hex) {
         return uint256(hex).withSize(10);
     }
 
-    public static EthUint uint12(String hex) {
+    @NotNull
+    public static EthUint uint12(@NotNull String hex) {
         return uint256(hex).withSize(12);
     }
 
-    public static EthUint uint14(String hex) {
+    @NotNull
+    public static EthUint uint14(@NotNull String hex) {
         return uint256(hex).withSize(14);
     }
 
-    public static EthUint uint16(String hex) {
+    @NotNull
+    public static EthUint uint16(@NotNull String hex) {
         return uint256(hex).withSize(16);
     }
 
-    public static EthUint uint18(String hex) {
+    @NotNull
+    public static EthUint uint18(@NotNull String hex) {
         return uint256(hex).withSize(18);
     }
 
-    public static EthUint uint20(String hex) {
+    @NotNull
+    public static EthUint uint20(@NotNull String hex) {
         return uint256(hex).withSize(20);
     }
 
-    public static EthUint uint22(String hex) {
+    @NotNull
+    public static EthUint uint22(@NotNull String hex) {
         return uint256(hex).withSize(22);
     }
 
-    public static EthUint uint24(String hex) {
+    @NotNull
+    public static EthUint uint24(@NotNull String hex) {
         return uint256(hex).withSize(24);
     }
 
-    public static EthUint uint26(String hex) {
+    @NotNull
+    public static EthUint uint26(@NotNull String hex) {
         return uint256(hex).withSize(26);
     }
 
-    public static EthUint uint28(String hex) {
+    @NotNull
+    public static EthUint uint28(@NotNull String hex) {
         return uint256(hex).withSize(28);
     }
 
-    public static EthUint uint30(String hex) {
+    @NotNull
+    public static EthUint uint30(@NotNull String hex) {
         return uint256(hex).withSize(30);
     }
 
-    public static EthUint uint32(String hex) {
+    @NotNull
+    public static EthUint uint32(@NotNull String hex) {
         return uint256(hex).withSize(32);
     }
 
-    public static EthUint uint34(String hex) {
+    @NotNull
+    public static EthUint uint34(@NotNull String hex) {
         return uint256(hex).withSize(34);
     }
 
-    public static EthUint uint36(String hex) {
+    @NotNull
+    public static EthUint uint36(@NotNull String hex) {
         return uint256(hex).withSize(36);
     }
 
-    public static EthUint uint38(String hex) {
+    @NotNull
+    public static EthUint uint38(@NotNull String hex) {
         return uint256(hex).withSize(38);
     }
 
-    public static EthUint uint40(String hex) {
+    @NotNull
+    public static EthUint uint40(@NotNull String hex) {
         return uint256(hex).withSize(40);
     }
 
-    public static EthUint uint42(String hex) {
+    @NotNull
+    public static EthUint uint42(@NotNull String hex) {
         return uint256(hex).withSize(42);
     }
 
-    public static EthUint uint44(String hex) {
+    @NotNull
+    public static EthUint uint44(@NotNull String hex) {
         return uint256(hex).withSize(44);
     }
 
-    public static EthUint uint46(String hex) {
+    @NotNull
+    public static EthUint uint46(@NotNull String hex) {
         return uint256(hex).withSize(46);
     }
 
-    public static EthUint uint48(String hex) {
+    @NotNull
+    public static EthUint uint48(@NotNull String hex) {
         return uint256(hex).withSize(48);
     }
 
-    public static EthUint uint50(String hex) {
+    @NotNull
+    public static EthUint uint50(@NotNull String hex) {
         return uint256(hex).withSize(50);
     }
 
-    public static EthUint uint52(String hex) {
+    @NotNull
+    public static EthUint uint52(@NotNull String hex) {
         return uint256(hex).withSize(52);
     }
 
-    public static EthUint uint54(String hex) {
+    @NotNull
+    public static EthUint uint54(@NotNull String hex) {
         return uint256(hex).withSize(54);
     }
 
-    public static EthUint uint56(String hex) {
+    @NotNull
+    public static EthUint uint56(@NotNull String hex) {
         return uint256(hex).withSize(56);
     }
 
-    public static EthUint uint58(String hex) {
+    @NotNull
+    public static EthUint uint58(@NotNull String hex) {
         return uint256(hex).withSize(58);
     }
 
-    public static EthUint uint60(String hex) {
+    @NotNull
+    public static EthUint uint60(@NotNull String hex) {
         return uint256(hex).withSize(60);
     }
 
-    public static EthUint uint62(String hex) {
+    @NotNull
+    public static EthUint uint62(@NotNull String hex) {
         return uint256(hex).withSize(62);
     }
 
-    public static EthUint uint64(String hex) {
+    @NotNull
+    public static EthUint uint64(@NotNull String hex) {
         return uint256(hex).withSize(64);
     }
 
-    public static EthUint uint66(String hex) {
+    @NotNull
+    public static EthUint uint66(@NotNull String hex) {
         return uint256(hex).withSize(66);
     }
 
-    public static EthUint uint68(String hex) {
+    @NotNull
+    public static EthUint uint68(@NotNull String hex) {
         return uint256(hex).withSize(68);
     }
 
-    public static EthUint uint70(String hex) {
+    @NotNull
+    public static EthUint uint70(@NotNull String hex) {
         return uint256(hex).withSize(70);
     }
 
-    public static EthUint uint72(String hex) {
+    @NotNull
+    public static EthUint uint72(@NotNull String hex) {
         return uint256(hex).withSize(72);
     }
 
-    public static EthUint uint74(String hex) {
+    @NotNull
+    public static EthUint uint74(@NotNull String hex) {
         return uint256(hex).withSize(74);
     }
 
-    public static EthUint uint76(String hex) {
+    @NotNull
+    public static EthUint uint76(@NotNull String hex) {
         return uint256(hex).withSize(76);
     }
 
-    public static EthUint uint78(String hex) {
+    @NotNull
+    public static EthUint uint78(@NotNull String hex) {
         return uint256(hex).withSize(78);
     }
 
-    public static EthUint uint80(String hex) {
+    @NotNull
+    public static EthUint uint80(@NotNull String hex) {
         return uint256(hex).withSize(80);
     }
 
-    public static EthUint uint82(String hex) {
+    @NotNull
+    public static EthUint uint82(@NotNull String hex) {
         return uint256(hex).withSize(82);
     }
 
-    public static EthUint uint84(String hex) {
+    @NotNull
+    public static EthUint uint84(@NotNull String hex) {
         return uint256(hex).withSize(84);
     }
 
-    public static EthUint uint86(String hex) {
+    @NotNull
+    public static EthUint uint86(@NotNull String hex) {
         return uint256(hex).withSize(86);
     }
 
-    public static EthUint uint88(String hex) {
+    @NotNull
+    public static EthUint uint88(@NotNull String hex) {
         return uint256(hex).withSize(88);
     }
 
-    public static EthUint uint90(String hex) {
+    @NotNull
+    public static EthUint uint90(@NotNull String hex) {
         return uint256(hex).withSize(90);
     }
 
-    public static EthUint uint92(String hex) {
+    @NotNull
+    public static EthUint uint92(@NotNull String hex) {
         return uint256(hex).withSize(92);
     }
 
-    public static EthUint uint94(String hex) {
+    @NotNull
+    public static EthUint uint94(@NotNull String hex) {
         return uint256(hex).withSize(94);
     }
 
-    public static EthUint uint96(String hex) {
+    @NotNull
+    public static EthUint uint96(@NotNull String hex) {
         return uint256(hex).withSize(96);
     }
 
-    public static EthUint uint98(String hex) {
+    @NotNull
+    public static EthUint uint98(@NotNull String hex) {
         return uint256(hex).withSize(98);
     }
 
-    public static EthUint uint100(String hex) {
+    @NotNull
+    public static EthUint uint100(@NotNull String hex) {
         return uint256(hex).withSize(100);
     }
 
-    public static EthUint uint102(String hex) {
+    @NotNull
+    public static EthUint uint102(@NotNull String hex) {
         return uint256(hex).withSize(102);
     }
 
-    public static EthUint uint104(String hex) {
+    @NotNull
+    public static EthUint uint104(@NotNull String hex) {
         return uint256(hex).withSize(104);
     }
 
-    public static EthUint uint106(String hex) {
+    @NotNull
+    public static EthUint uint106(@NotNull String hex) {
         return uint256(hex).withSize(106);
     }
 
-    public static EthUint uint108(String hex) {
+    @NotNull
+    public static EthUint uint108(@NotNull String hex) {
         return uint256(hex).withSize(108);
     }
 
-    public static EthUint uint110(String hex) {
+    @NotNull
+    public static EthUint uint110(@NotNull String hex) {
         return uint256(hex).withSize(110);
     }
 
-    public static EthUint uint112(String hex) {
+    @NotNull
+    public static EthUint uint112(@NotNull String hex) {
         return uint256(hex).withSize(112);
     }
 
-    public static EthUint uint114(String hex) {
+    @NotNull
+    public static EthUint uint114(@NotNull String hex) {
         return uint256(hex).withSize(114);
     }
 
-    public static EthUint uint116(String hex) {
+    @NotNull
+    public static EthUint uint116(@NotNull String hex) {
         return uint256(hex).withSize(116);
     }
 
-    public static EthUint uint118(String hex) {
+    @NotNull
+    public static EthUint uint118(@NotNull String hex) {
         return uint256(hex).withSize(118);
     }
 
-    public static EthUint uint120(String hex) {
+    @NotNull
+    public static EthUint uint120(@NotNull String hex) {
         return uint256(hex).withSize(120);
     }
 
-    public static EthUint uint122(String hex) {
+    @NotNull
+    public static EthUint uint122(@NotNull String hex) {
         return uint256(hex).withSize(122);
     }
 
-    public static EthUint uint124(String hex) {
+    @NotNull
+    public static EthUint uint124(@NotNull String hex) {
         return uint256(hex).withSize(124);
     }
 
-    public static EthUint uint126(String hex) {
+    @NotNull
+    public static EthUint uint126(@NotNull String hex) {
         return uint256(hex).withSize(126);
     }
 
-    public static EthUint uint128(String hex) {
+    @NotNull
+    public static EthUint uint128(@NotNull String hex) {
         return uint256(hex).withSize(128);
     }
 
-    public static EthUint uint130(String hex) {
+    @NotNull
+    public static EthUint uint130(@NotNull String hex) {
         return uint256(hex).withSize(130);
     }
 
-    public static EthUint uint132(String hex) {
+    @NotNull
+    public static EthUint uint132(@NotNull String hex) {
         return uint256(hex).withSize(132);
     }
 
-    public static EthUint uint134(String hex) {
+    @NotNull
+    public static EthUint uint134(@NotNull String hex) {
         return uint256(hex).withSize(134);
     }
 
-    public static EthUint uint136(String hex) {
+    @NotNull
+    public static EthUint uint136(@NotNull String hex) {
         return uint256(hex).withSize(136);
     }
 
-    public static EthUint uint138(String hex) {
+    @NotNull
+    public static EthUint uint138(@NotNull String hex) {
         return uint256(hex).withSize(138);
     }
 
-    public static EthUint uint140(String hex) {
+    @NotNull
+    public static EthUint uint140(@NotNull String hex) {
         return uint256(hex).withSize(140);
     }
 
-    public static EthUint uint142(String hex) {
+    @NotNull
+    public static EthUint uint142(@NotNull String hex) {
         return uint256(hex).withSize(142);
     }
 
-    public static EthUint uint144(String hex) {
+    @NotNull
+    public static EthUint uint144(@NotNull String hex) {
         return uint256(hex).withSize(144);
     }
 
-    public static EthUint uint146(String hex) {
+    @NotNull
+    public static EthUint uint146(@NotNull String hex) {
         return uint256(hex).withSize(146);
     }
 
-    public static EthUint uint148(String hex) {
+    @NotNull
+    public static EthUint uint148(@NotNull String hex) {
         return uint256(hex).withSize(148);
     }
 
-    public static EthUint uint150(String hex) {
+    @NotNull
+    public static EthUint uint150(@NotNull String hex) {
         return uint256(hex).withSize(150);
     }
 
-    public static EthUint uint152(String hex) {
+    @NotNull
+    public static EthUint uint152(@NotNull String hex) {
         return uint256(hex).withSize(152);
     }
 
-    public static EthUint uint154(String hex) {
+    @NotNull
+    public static EthUint uint154(@NotNull String hex) {
         return uint256(hex).withSize(154);
     }
 
-    public static EthUint uint156(String hex) {
+    @NotNull
+    public static EthUint uint156(@NotNull String hex) {
         return uint256(hex).withSize(156);
     }
 
-    public static EthUint uint158(String hex) {
+    @NotNull
+    public static EthUint uint158(@NotNull String hex) {
         return uint256(hex).withSize(158);
     }
 
-    public static EthUint uint160(String hex) {
+    @NotNull
+    public static EthUint uint160(@NotNull String hex) {
         return uint256(hex).withSize(160);
     }
 
-    public static EthUint uint162(String hex) {
+    @NotNull
+    public static EthUint uint162(@NotNull String hex) {
         return uint256(hex).withSize(162);
     }
 
-    public static EthUint uint164(String hex) {
+    @NotNull
+    public static EthUint uint164(@NotNull String hex) {
         return uint256(hex).withSize(164);
     }
 
-    public static EthUint uint166(String hex) {
+    @NotNull
+    public static EthUint uint166(@NotNull String hex) {
         return uint256(hex).withSize(166);
     }
 
-    public static EthUint uint168(String hex) {
+    @NotNull
+    public static EthUint uint168(@NotNull String hex) {
         return uint256(hex).withSize(168);
     }
 
-    public static EthUint uint170(String hex) {
+    @NotNull
+    public static EthUint uint170(@NotNull String hex) {
         return uint256(hex).withSize(170);
     }
 
-    public static EthUint uint172(String hex) {
+    @NotNull
+    public static EthUint uint172(@NotNull String hex) {
         return uint256(hex).withSize(172);
     }
 
-    public static EthUint uint174(String hex) {
+    @NotNull
+    public static EthUint uint174(@NotNull String hex) {
         return uint256(hex).withSize(174);
     }
 
-    public static EthUint uint176(String hex) {
+    @NotNull
+    public static EthUint uint176(@NotNull String hex) {
         return uint256(hex).withSize(176);
     }
 
-    public static EthUint uint178(String hex) {
+    @NotNull
+    public static EthUint uint178(@NotNull String hex) {
         return uint256(hex).withSize(178);
     }
 
-    public static EthUint uint180(String hex) {
+    @NotNull
+    public static EthUint uint180(@NotNull String hex) {
         return uint256(hex).withSize(180);
     }
 
-    public static EthUint uint182(String hex) {
+    @NotNull
+    public static EthUint uint182(@NotNull String hex) {
         return uint256(hex).withSize(182);
     }
 
-    public static EthUint uint184(String hex) {
+    @NotNull
+    public static EthUint uint184(@NotNull String hex) {
         return uint256(hex).withSize(184);
     }
 
-    public static EthUint uint186(String hex) {
+    @NotNull
+    public static EthUint uint186(@NotNull String hex) {
         return uint256(hex).withSize(186);
     }
 
-    public static EthUint uint188(String hex) {
+    @NotNull
+    public static EthUint uint188(@NotNull String hex) {
         return uint256(hex).withSize(188);
     }
 
-    public static EthUint uint190(String hex) {
+    @NotNull
+    public static EthUint uint190(@NotNull String hex) {
         return uint256(hex).withSize(190);
     }
 
-    public static EthUint uint192(String hex) {
+    @NotNull
+    public static EthUint uint192(@NotNull String hex) {
         return uint256(hex).withSize(192);
     }
 
-    public static EthUint uint194(String hex) {
+    @NotNull
+    public static EthUint uint194(@NotNull String hex) {
         return uint256(hex).withSize(194);
     }
 
-    public static EthUint uint196(String hex) {
+    @NotNull
+    public static EthUint uint196(@NotNull String hex) {
         return uint256(hex).withSize(196);
     }
 
-    public static EthUint uint198(String hex) {
+    @NotNull
+    public static EthUint uint198(@NotNull String hex) {
         return uint256(hex).withSize(198);
     }
 
-    public static EthUint uint200(String hex) {
+    @NotNull
+    public static EthUint uint200(@NotNull String hex) {
         return uint256(hex).withSize(200);
     }
 
-    public static EthUint uint202(String hex) {
+    @NotNull
+    public static EthUint uint202(@NotNull String hex) {
         return uint256(hex).withSize(202);
     }
 
-    public static EthUint uint204(String hex) {
+    @NotNull
+    public static EthUint uint204(@NotNull String hex) {
         return uint256(hex).withSize(204);
     }
 
-    public static EthUint uint206(String hex) {
+    @NotNull
+    public static EthUint uint206(@NotNull String hex) {
         return uint256(hex).withSize(206);
     }
 
-    public static EthUint uint208(String hex) {
+    @NotNull
+    public static EthUint uint208(@NotNull String hex) {
         return uint256(hex).withSize(208);
     }
 
-    public static EthUint uint210(String hex) {
+    @NotNull
+    public static EthUint uint210(@NotNull String hex) {
         return uint256(hex).withSize(210);
     }
 
-    public static EthUint uint212(String hex) {
+    @NotNull
+    public static EthUint uint212(@NotNull String hex) {
         return uint256(hex).withSize(212);
     }
 
-    public static EthUint uint214(String hex) {
+    @NotNull
+    public static EthUint uint214(@NotNull String hex) {
         return uint256(hex).withSize(214);
     }
 
-    public static EthUint uint216(String hex) {
+    @NotNull
+    public static EthUint uint216(@NotNull String hex) {
         return uint256(hex).withSize(216);
     }
 
-    public static EthUint uint218(String hex) {
+    @NotNull
+    public static EthUint uint218(@NotNull String hex) {
         return uint256(hex).withSize(218);
     }
 
-    public static EthUint uint220(String hex) {
+    @NotNull
+    public static EthUint uint220(@NotNull String hex) {
         return uint256(hex).withSize(220);
     }
 
-    public static EthUint uint222(String hex) {
+    @NotNull
+    public static EthUint uint222(@NotNull String hex) {
         return uint256(hex).withSize(222);
     }
 
-    public static EthUint uint224(String hex) {
+    @NotNull
+    public static EthUint uint224(@NotNull String hex) {
         return uint256(hex).withSize(224);
     }
 
-    public static EthUint uint226(String hex) {
+    @NotNull
+    public static EthUint uint226(@NotNull String hex) {
         return uint256(hex).withSize(226);
     }
 
-    public static EthUint uint228(String hex) {
+    @NotNull
+    public static EthUint uint228(@NotNull String hex) {
         return uint256(hex).withSize(228);
     }
 
-    public static EthUint uint230(String hex) {
+    @NotNull
+    public static EthUint uint230(@NotNull String hex) {
         return uint256(hex).withSize(230);
     }
 
-    public static EthUint uint232(String hex) {
+    @NotNull
+    public static EthUint uint232(@NotNull String hex) {
         return uint256(hex).withSize(232);
     }
 
-    public static EthUint uint234(String hex) {
+    @NotNull
+    public static EthUint uint234(@NotNull String hex) {
         return uint256(hex).withSize(234);
     }
 
-    public static EthUint uint236(String hex) {
+    @NotNull
+    public static EthUint uint236(@NotNull String hex) {
         return uint256(hex).withSize(236);
     }
 
-    public static EthUint uint238(String hex) {
+    @NotNull
+    public static EthUint uint238(@NotNull String hex) {
         return uint256(hex).withSize(238);
     }
 
-    public static EthUint uint240(String hex) {
+    @NotNull
+    public static EthUint uint240(@NotNull String hex) {
         return uint256(hex).withSize(240);
     }
 
-    public static EthUint uint242(String hex) {
+    @NotNull
+    public static EthUint uint242(@NotNull String hex) {
         return uint256(hex).withSize(242);
     }
 
-    public static EthUint uint244(String hex) {
+    @NotNull
+    public static EthUint uint244(@NotNull String hex) {
         return uint256(hex).withSize(244);
     }
 
-    public static EthUint uint246(String hex) {
+    @NotNull
+    public static EthUint uint246(@NotNull String hex) {
         return uint256(hex).withSize(246);
     }
 
-    public static EthUint uint248(String hex) {
+    @NotNull
+    public static EthUint uint248(@NotNull String hex) {
         return uint256(hex).withSize(248);
     }
 
-    public static EthUint uint250(String hex) {
+    @NotNull
+    public static EthUint uint250(@NotNull String hex) {
         return uint256(hex).withSize(250);
     }
 
-    public static EthUint uint252(String hex) {
+    @NotNull
+    public static EthUint uint252(@NotNull String hex) {
         return uint256(hex).withSize(252);
     }
 
-    public static EthUint uint254(String hex) {
+    @NotNull
+    public static EthUint uint254(@NotNull String hex) {
         return uint256(hex).withSize(254);
     }
 

@@ -1,6 +1,8 @@
 package dev.klepto.kweb3;
 
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.util.Arrays;
@@ -17,11 +19,11 @@ public class Web3Error extends RuntimeException {
         super();
     }
 
-    public Web3Error(Throwable cause) {
+    public Web3Error(@NotNull Throwable cause) {
         super(cause);
     }
 
-    public Web3Error(String message, Object... args) {
+    public Web3Error(@NotNull String message, @Nullable Object... args) {
         super(MessageFormatter.arrayFormat(message, args).getMessage());
     }
 
@@ -31,7 +33,8 @@ public class Web3Error extends RuntimeException {
      * @param depth the target depth
      * @return this exception instance
      */
-    public Web3Error replaceStackClass(int depth, Class<?> newClass) {
+    @NotNull
+    public Web3Error replaceStackClass(int depth, @NotNull Class<?> newClass) {
         val stackTrace = getStackTrace();
         if (depth >= stackTrace.length) {
             return this;
@@ -56,6 +59,7 @@ public class Web3Error extends RuntimeException {
      * @param depth the target depth
      * @return this exception instance
      */
+    @NotNull
     public Web3Error discardStack(int depth) {
         val stackTrace = getStackTrace();
         if (depth >= stackTrace.length) {

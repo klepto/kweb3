@@ -3,6 +3,7 @@ package dev.klepto.kweb3.type;
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.Delegate;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Collectors;
 
@@ -22,11 +23,13 @@ public record EthTuple(@Delegate ImmutableList<EthType> values) implements EthTy
     }
 
     /* Solidity style tuple initializers */
-    public static EthTuple tuple(EthType... values) {
+    @NotNull
+    public static EthTuple tuple(@NotNull EthType... values) {
         return new EthTuple(ImmutableList.copyOf(values));
     }
 
-    public static EthTuple tuple(Iterable<EthType> values) {
+    @NotNull
+    public static EthTuple tuple(@NotNull Iterable<EthType> values) {
         return new EthTuple(ImmutableList.copyOf(values));
     }
 

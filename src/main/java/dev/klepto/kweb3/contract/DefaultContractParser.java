@@ -10,6 +10,7 @@ import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.Unreflect;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class DefaultContractParser implements ContractParser {
      * @return the contract function description
      */
     @Override
-    public ContractFunction parseFunction(Method method) {
+    public @NotNull ContractFunction parseFunction(@NotNull Method method) {
         cache.computeIfAbsent(method, key -> {
             val methodAccess = reflect(method);
             val name = parseFunctionName(methodAccess);
@@ -66,7 +67,7 @@ public class DefaultContractParser implements ContractParser {
      * @return the contract parameters type description
      */
     @Override
-    public TypeDescriptor parseParametersTypeDescriptor(Method method) {
+    public @NotNull TypeDescriptor parseParametersTypeDescriptor(@NotNull Method method) {
         val methodAccess = reflect(method);
         val parameters = methodAccess.parameters()
                 .filter(parameter -> !parameter.containsAnnotation(Cost.class))
@@ -82,7 +83,7 @@ public class DefaultContractParser implements ContractParser {
      * @return the contract return type description
      */
     @Override
-    public TypeDescriptor parseReturnTypeDescriptor(Method method) {
+    public @NotNull TypeDescriptor parseReturnTypeDescriptor(@NotNull Method method) {
         val type = parseReturnType(method);
         return ContractCodec.parseDescriptor(type.reflect());
     }
@@ -94,7 +95,7 @@ public class DefaultContractParser implements ContractParser {
      * @return the contract JVM return type
      */
     @Override
-    public UnreflectType parseReturnType(Method method) {
+    public @NotNull UnreflectType parseReturnType(@NotNull Method method) {
         return UnreflectType.of(method);
     }
 

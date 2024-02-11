@@ -1,6 +1,8 @@
 package dev.klepto.kweb3;
 
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -32,7 +34,7 @@ public class Web3Result<T> {
      *
      * @param value the result completion value
      */
-    public void complete(T value) {
+    public void complete(@Nullable T value) {
         stage.toCompletableFuture().complete(value);
     }
 
@@ -41,7 +43,7 @@ public class Web3Result<T> {
      *
      * @param cause the cause of the error
      */
-    public void completeExceptionally(Throwable cause) {
+    public void completeExceptionally(@NotNull Throwable cause) {
         stage.toCompletableFuture().completeExceptionally(cause);
     }
 
@@ -57,6 +59,7 @@ public class Web3Result<T> {
      *
      * @return the result
      */
+    @Nullable
     public T get() {
         try {
             return stage.toCompletableFuture().get();
@@ -70,7 +73,8 @@ public class Web3Result<T> {
      *
      * @param consumer the result consumer
      */
-    public Web3Result<T> get(Consumer<T> consumer) {
+    @NotNull
+    public Web3Result<T> get(@NotNull Consumer<T> consumer) {
         val newStage = stage.whenComplete((result, error) -> {
             if (result != null) {
                 consumer.accept(result);
@@ -84,7 +88,8 @@ public class Web3Result<T> {
      *
      * @param consumer the result consumer
      */
-    public Web3Result<T> error(Consumer<Throwable> consumer) {
+    @NotNull
+    public Web3Result<T> error(@NotNull Consumer<Throwable> consumer) {
         val newStage = stage.whenComplete((result, error) -> {
             if (error != null) {
                 consumer.accept(error);
@@ -99,7 +104,8 @@ public class Web3Result<T> {
      * @param mapper the mapping function
      * @return new Web3Result that will produce remapped result
      */
-    public <R> Web3Result<R> map(Function<T, R> mapper) {
+    @NotNull
+    public <R> Web3Result<R> map(@NotNull Function<T, R> mapper) {
         val newStage = stage.thenApply(mapper);
         return new Web3Result<>(newStage);
     }

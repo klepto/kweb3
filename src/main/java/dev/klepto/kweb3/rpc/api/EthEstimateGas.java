@@ -5,6 +5,7 @@ import dev.klepto.kweb3.rpc.RpcMethod;
 import dev.klepto.kweb3.rpc.RpcRequest;
 import dev.klepto.kweb3.rpc.RpcResponse;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -28,12 +29,13 @@ public interface EthEstimateGas extends RpcMethod {
      *                    <code>latest</code>
      * @return the return value of the executed contract method
      */
+    @NotNull
     default Web3Result<String> ethEstimateGas(@Nullable String from,
-                                              String to,
+                                              @NotNull String to,
                                               @Nullable Integer gas,
                                               @Nullable String gasPrice,
                                               @Nullable String value,
-                                              String data,
+                                              @NotNull String data,
                                               @Nullable String blockNumber) {
         blockNumber = blockNumber == null ? "latest" : blockNumber;
         val transaction = new Transaction(from, to, gas, gasPrice, value, data);
@@ -56,11 +58,11 @@ public interface EthEstimateGas extends RpcMethod {
      * @param data     the hash of the method signature and encoded parameters
      */
     record Transaction(@Nullable String from,
-                       String to,
+                       @NotNull String to,
                        @Nullable Integer gas,
                        @Nullable String gasPrice,
                        @Nullable String value,
-                       String data) {
+                       @NotNull String data) {
     }
 
 }

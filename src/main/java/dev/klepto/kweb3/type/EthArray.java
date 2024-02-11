@@ -3,6 +3,7 @@ package dev.klepto.kweb3.type;
 import com.google.common.collect.ImmutableList;
 import lombok.experimental.Delegate;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<
      * @return the class representing the type of elements contained in this array
      */
     @SuppressWarnings("unchecked")
+    @NotNull
     public Class<T> getComponentType() {
         if (isEmpty()) {
             // Unable to infer types on empty generic arrays.
@@ -61,7 +63,8 @@ public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<
      * @param values the array element values
      * @return a fixed-sized ethereum array representation
      */
-    public static <T extends EthType> EthArray<T> array(int size, T... values) {
+    @NotNull
+    public static <T extends EthType> EthArray<T> array(int size, @NotNull T... values) {
         return new EthArray<>(size, ImmutableList.copyOf(values));
     }
 
@@ -71,7 +74,8 @@ public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<
      * @param values the array element values
      * @return a dynamic-size ethereum array representation
      */
-    public static <T extends EthType> EthArray<T> array(T... values) {
+    @NotNull
+    public static <T extends EthType> EthArray<T> array(@NotNull T... values) {
         return array(-1, values);
     }
 

@@ -5,6 +5,7 @@ import com.google.common.primitives.Bytes;
 import dev.klepto.kweb3.util.Hex;
 import lombok.With;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import static dev.klepto.kweb3.util.Conditions.require;
 
@@ -31,6 +32,7 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
         );
     }
 
+    @NotNull
     public EthBytes withSize(int size) {
         if (value.size() < size) {
             val currentBytes = toByteArray();
@@ -53,273 +55,339 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
      *
      * @return a mutable array of bytes
      */
-    public byte[] toByteArray() {
+    public byte @NotNull [] toByteArray() {
         return Bytes.toArray(value);
     }
 
     /* Solidity style bytes initializers */
-    public static EthBytes bytes(byte[] value) {
+    @NotNull
+    public static EthBytes bytes(byte @NotNull [] value) {
         return new EthBytes(-1, ImmutableList.copyOf(Bytes.asList(value)));
     }
 
-    public static EthBytes bytes1(byte[] value) {
+    @NotNull
+    public static EthBytes bytes1(byte @NotNull [] value) {
         return bytes(value).withSize(1);
     }
 
-    public static EthBytes bytes2(byte[] value) {
+    @NotNull
+    public static EthBytes bytes2(byte @NotNull [] value) {
         return bytes(value).withSize(2);
     }
 
-    public static EthBytes bytes3(byte[] value) {
+    @NotNull
+    public static EthBytes bytes3(byte @NotNull [] value) {
         return bytes(value).withSize(3);
     }
 
-    public static EthBytes bytes4(byte[] value) {
+    @NotNull
+    public static EthBytes bytes4(byte @NotNull [] value) {
         return bytes(value).withSize(4);
     }
 
-    public static EthBytes bytes5(byte[] value) {
+    @NotNull
+    public static EthBytes bytes5(byte @NotNull [] value) {
         return bytes(value).withSize(5);
     }
 
-    public static EthBytes bytes6(byte[] value) {
+    @NotNull
+    public static EthBytes bytes6(byte @NotNull [] value) {
         return bytes(value).withSize(6);
     }
 
-    public static EthBytes bytes7(byte[] value) {
+    @NotNull
+    public static EthBytes bytes7(byte @NotNull [] value) {
         return bytes(value).withSize(7);
     }
 
-    public static EthBytes bytes8(byte[] value) {
+    @NotNull
+    public static EthBytes bytes8(byte @NotNull [] value) {
         return bytes(value).withSize(8);
     }
 
-    public static EthBytes bytes9(byte[] value) {
+    @NotNull
+    public static EthBytes bytes9(byte @NotNull [] value) {
         return bytes(value).withSize(9);
     }
 
-    public static EthBytes bytes10(byte[] value) {
+    @NotNull
+    public static EthBytes bytes10(byte @NotNull [] value) {
         return bytes(value).withSize(10);
     }
 
-    public static EthBytes bytes11(byte[] value) {
+    @NotNull
+    public static EthBytes bytes11(byte @NotNull [] value) {
         return bytes(value).withSize(11);
     }
 
-    public static EthBytes bytes12(byte[] value) {
+    @NotNull
+    public static EthBytes bytes12(byte @NotNull [] value) {
         return bytes(value).withSize(12);
     }
 
-    public static EthBytes bytes13(byte[] value) {
+    @NotNull
+    public static EthBytes bytes13(byte @NotNull [] value) {
         return bytes(value).withSize(13);
     }
 
-    public static EthBytes bytes14(byte[] value) {
+    @NotNull
+    public static EthBytes bytes14(byte @NotNull [] value) {
         return bytes(value).withSize(14);
     }
 
-    public static EthBytes bytes15(byte[] value) {
+    @NotNull
+    public static EthBytes bytes15(byte @NotNull [] value) {
         return bytes(value).withSize(15);
     }
 
-    public static EthBytes bytes16(byte[] value) {
+    @NotNull
+    public static EthBytes bytes16(byte @NotNull [] value) {
         return bytes(value).withSize(16);
     }
 
-    public static EthBytes bytes17(byte[] value) {
+    @NotNull
+    public static EthBytes bytes17(byte @NotNull [] value) {
         return bytes(value).withSize(17);
     }
 
-    public static EthBytes bytes18(byte[] value) {
+    @NotNull
+    public static EthBytes bytes18(byte @NotNull [] value) {
         return bytes(value).withSize(18);
     }
 
-    public static EthBytes bytes19(byte[] value) {
+    @NotNull
+    public static EthBytes bytes19(byte @NotNull [] value) {
         return bytes(value).withSize(19);
     }
 
-    public static EthBytes bytes20(byte[] value) {
+    @NotNull
+    public static EthBytes bytes20(byte @NotNull [] value) {
         return bytes(value).withSize(20);
     }
 
-    public static EthBytes bytes21(byte[] value) {
+    @NotNull
+    public static EthBytes bytes21(byte @NotNull [] value) {
         return bytes(value).withSize(21);
     }
 
-    public static EthBytes bytes22(byte[] value) {
+    @NotNull
+    public static EthBytes bytes22(byte @NotNull [] value) {
         return bytes(value).withSize(22);
     }
 
-    public static EthBytes bytes23(byte[] value) {
+    @NotNull
+    public static EthBytes bytes23(byte @NotNull [] value) {
         return bytes(value).withSize(23);
     }
 
-    public static EthBytes bytes24(byte[] value) {
+    @NotNull
+    public static EthBytes bytes24(byte @NotNull [] value) {
         return bytes(value).withSize(24);
     }
 
-    public static EthBytes bytes25(byte[] value) {
+    @NotNull
+    public static EthBytes bytes25(byte @NotNull [] value) {
         return bytes(value).withSize(25);
     }
 
-    public static EthBytes bytes26(byte[] value) {
+    @NotNull
+    public static EthBytes bytes26(byte @NotNull [] value) {
         return bytes(value).withSize(26);
     }
 
-    public static EthBytes bytes27(byte[] value) {
+    @NotNull
+    public static EthBytes bytes27(byte @NotNull [] value) {
         return bytes(value).withSize(27);
     }
 
-    public static EthBytes bytes28(byte[] value) {
+    @NotNull
+    public static EthBytes bytes28(byte @NotNull [] value) {
         return bytes(value).withSize(28);
     }
 
-    public static EthBytes bytes29(byte[] value) {
+    @NotNull
+    public static EthBytes bytes29(byte @NotNull [] value) {
         return bytes(value).withSize(29);
     }
 
-    public static EthBytes bytes30(byte[] value) {
+    @NotNull
+    public static EthBytes bytes30(byte @NotNull [] value) {
         return bytes(value).withSize(30);
     }
 
-    public static EthBytes bytes31(byte[] value) {
+    @NotNull
+    public static EthBytes bytes31(byte @NotNull [] value) {
         return bytes(value).withSize(31);
     }
 
-    public static EthBytes bytes32(byte[] value) {
+    @NotNull
+    public static EthBytes bytes32(byte @NotNull [] value) {
         return bytes(value).withSize(32);
     }
 
-    public static EthBytes bytes(String hex) {
+    @NotNull
+    public static EthBytes bytes(@NotNull String hex) {
         require(Hex.isValid(hex), "Malformed hex string: {}", hex);
         return bytes(Hex.toByteArray(hex));
     }
 
-    public static EthBytes bytes1(String hex) {
+    @NotNull
+    public static EthBytes bytes1(@NotNull String hex) {
         return bytes(hex).withSize(1);
     }
 
-    public static EthBytes bytes2(String hex) {
+    @NotNull
+    public static EthBytes bytes2(@NotNull String hex) {
         return bytes(hex).withSize(2);
     }
 
-    public static EthBytes bytes3(String hex) {
+    @NotNull
+    public static EthBytes bytes3(@NotNull String hex) {
         return bytes(hex).withSize(3);
     }
 
-    public static EthBytes bytes4(String hex) {
+    @NotNull
+    public static EthBytes bytes4(@NotNull String hex) {
         return bytes(hex).withSize(4);
     }
 
-    public static EthBytes bytes5(String hex) {
+    @NotNull
+    public static EthBytes bytes5(@NotNull String hex) {
         return bytes(hex).withSize(5);
     }
 
-    public static EthBytes bytes6(String hex) {
+    @NotNull
+    public static EthBytes bytes6(@NotNull String hex) {
         return bytes(hex).withSize(6);
     }
 
-    public static EthBytes bytes7(String hex) {
+    @NotNull
+    public static EthBytes bytes7(@NotNull String hex) {
         return bytes(hex).withSize(7);
     }
 
-    public static EthBytes bytes8(String hex) {
+    @NotNull
+    public static EthBytes bytes8(@NotNull String hex) {
         return bytes(hex).withSize(8);
     }
 
-    public static EthBytes bytes9(String hex) {
+    @NotNull
+    public static EthBytes bytes9(@NotNull String hex) {
         return bytes(hex).withSize(9);
     }
 
-    public static EthBytes bytes10(String hex) {
+    @NotNull
+    public static EthBytes bytes10(@NotNull String hex) {
         return bytes(hex).withSize(10);
     }
 
-    public static EthBytes bytes11(String hex) {
+    @NotNull
+    public static EthBytes bytes11(@NotNull String hex) {
         return bytes(hex).withSize(11);
     }
 
-    public static EthBytes bytes12(String hex) {
+    @NotNull
+    public static EthBytes bytes12(@NotNull String hex) {
         return bytes(hex).withSize(12);
     }
 
-    public static EthBytes bytes13(String hex) {
+    @NotNull
+    public static EthBytes bytes13(@NotNull String hex) {
         return bytes(hex).withSize(13);
     }
 
-    public static EthBytes bytes14(String hex) {
+    @NotNull
+    public static EthBytes bytes14(@NotNull String hex) {
         return bytes(hex).withSize(14);
     }
 
-    public static EthBytes bytes15(String hex) {
+    @NotNull
+    public static EthBytes bytes15(@NotNull String hex) {
         return bytes(hex).withSize(15);
     }
 
-    public static EthBytes bytes16(String hex) {
+    @NotNull
+    public static EthBytes bytes16(@NotNull String hex) {
         return bytes(hex).withSize(16);
     }
 
-    public static EthBytes bytes17(String hex) {
+    @NotNull
+    public static EthBytes bytes17(@NotNull String hex) {
         return bytes(hex).withSize(17);
     }
 
-    public static EthBytes bytes18(String hex) {
+    @NotNull
+    public static EthBytes bytes18(@NotNull String hex) {
         return bytes(hex).withSize(18);
     }
 
-    public static EthBytes bytes19(String hex) {
+    @NotNull
+    public static EthBytes bytes19(@NotNull String hex) {
         return bytes(hex).withSize(19);
     }
 
-    public static EthBytes bytes20(String hex) {
+    @NotNull
+    public static EthBytes bytes20(@NotNull String hex) {
         return bytes(hex).withSize(20);
     }
 
-    public static EthBytes bytes21(String hex) {
+    @NotNull
+    public static EthBytes bytes21(@NotNull String hex) {
         return bytes(hex).withSize(21);
     }
 
-    public static EthBytes bytes22(String hex) {
+    @NotNull
+    public static EthBytes bytes22(@NotNull String hex) {
         return bytes(hex).withSize(22);
     }
 
-    public static EthBytes bytes23(String hex) {
+    @NotNull
+    public static EthBytes bytes23(@NotNull String hex) {
         return bytes(hex).withSize(23);
     }
 
-    public static EthBytes bytes24(String hex) {
+    @NotNull
+    public static EthBytes bytes24(@NotNull String hex) {
         return bytes(hex).withSize(24);
     }
 
-    public static EthBytes bytes25(String hex) {
+    @NotNull
+    public static EthBytes bytes25(@NotNull String hex) {
         return bytes(hex).withSize(25);
     }
 
-    public static EthBytes bytes26(String hex) {
+    @NotNull
+    public static EthBytes bytes26(@NotNull String hex) {
         return bytes(hex).withSize(26);
     }
 
-    public static EthBytes bytes27(String hex) {
+    @NotNull
+    public static EthBytes bytes27(@NotNull String hex) {
         return bytes(hex).withSize(27);
     }
 
-    public static EthBytes bytes28(String hex) {
+    @NotNull
+    public static EthBytes bytes28(@NotNull String hex) {
         return bytes(hex).withSize(28);
     }
 
-    public static EthBytes bytes29(String hex) {
+    @NotNull
+    public static EthBytes bytes29(@NotNull String hex) {
         return bytes(hex).withSize(29);
     }
 
-    public static EthBytes bytes30(String hex) {
+    @NotNull
+    public static EthBytes bytes30(@NotNull String hex) {
         return bytes(hex).withSize(30);
     }
 
-    public static EthBytes bytes31(String hex) {
+    @NotNull
+    public static EthBytes bytes31(@NotNull String hex) {
         return bytes(hex).withSize(31);
     }
 
-    public static EthBytes bytes32(String hex) {
+    @NotNull
+    public static EthBytes bytes32(@NotNull String hex) {
         return bytes(hex).withSize(32);
     }
 

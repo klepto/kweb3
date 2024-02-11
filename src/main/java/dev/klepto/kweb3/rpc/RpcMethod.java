@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.rpc;
 
 import dev.klepto.kweb3.Web3Result;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Indicates that class contains an ethereum RPC method.
@@ -15,6 +16,6 @@ public interface RpcMethod {
      * @param request the rpc request object
      * @return a {@link Web3Result} containing rpc response object that will be completed asynchronously
      */
-    Web3Result<RpcResponse> request(RpcRequest request);
+    @NotNull Web3Result<RpcResponse> request(@NotNull RpcRequest request);
 
 }

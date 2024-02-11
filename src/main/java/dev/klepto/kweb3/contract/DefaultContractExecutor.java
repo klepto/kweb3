@@ -8,6 +8,7 @@ import dev.klepto.kweb3.type.EthTuple;
 import dev.klepto.kweb3.type.EthType;
 import lombok.val;
 import one.util.streamex.StreamEx;
+import org.jetbrains.annotations.NotNull;
 
 import static dev.klepto.kweb3.type.EthTuple.tuple;
 import static dev.klepto.kweb3.util.Collections.arrayRemove;
@@ -36,7 +37,7 @@ public class DefaultContractExecutor implements ContractExecutor {
      * @return the string containing argument call data
      */
     @Override
-    public String encode(ContractCall call) {
+    public @NotNull String encode(@NotNull ContractCall call) {
         // Remove cost argument as it's only used to send value with transactions and is not encoded in the call data.
         val argsWithoutCost = arrayRemove(call.args(), call.function().costParameterIndex());
 
@@ -58,7 +59,7 @@ public class DefaultContractExecutor implements ContractExecutor {
      * @return the RPC request result
      */
     @Override
-    public Web3Result<String> request(ContractCall call, String data) {
+    public @NotNull Web3Result<String> request(@NotNull ContractCall call, @NotNull String data) {
         val client = call.proxy().getClient();
         val clientAddress = client.getAddress() != null ? client.getAddress().toHex() : null;
         val contractAddress = call.proxy().getAddress().toHex();
@@ -74,7 +75,7 @@ public class DefaultContractExecutor implements ContractExecutor {
      * @return the already decoded, or to be decoded in the future contract result
      */
     @Override
-    public Object decode(ContractCall call, Web3Result<String> result) {
+    public @NotNull Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result) {
         // For asynchronous signature, map future web3 result for decoding.
         if (call.function().method().type().matchesExact(Web3Result.class)) {
             return result.map(value -> decodeResult(call, value)).error(Throwable::printStackTrace);

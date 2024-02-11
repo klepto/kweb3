@@ -6,6 +6,7 @@ import dev.klepto.kweb3.rpc.RpcApi;
 import dev.klepto.kweb3.rpc.WebsocketApiClient;
 import dev.klepto.kweb3.type.EthAddress;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import static dev.klepto.kweb3.type.EthAddress.address;
 
@@ -20,11 +21,11 @@ public class Web3Client {
     private final ContractProxies contracts;
     private final EthAddress address;
 
-    public Web3Client(String rpcUrl, long chainId) {
+    public Web3Client(@NotNull String rpcUrl, long chainId) {
         this(new Web3Network.Basic(rpcUrl, chainId));
     }
 
-    public Web3Client(Web3Network network) {
+    public Web3Client(@NotNull Web3Network network) {
         this.network = network;
         this.rpc = new WebsocketApiClient(network);
         this.contracts = new ContractProxies(this);
@@ -38,7 +39,8 @@ public class Web3Client {
      * @param address the blockchain address of the contract
      * @return the contract instance for direct blockchain transactions
      */
-    public <T extends Web3Contract> T contract(Class<T> type, EthAddress address) {
+    @NotNull
+    public <T extends Web3Contract> T contract(@NotNull Class<T> type, @NotNull EthAddress address) {
         return contracts.createProxy(type, address);
     }
 
@@ -49,7 +51,8 @@ public class Web3Client {
      * @param address the blockchain address string of the contract
      * @return the contract instance for direct blockchain transactions
      */
-    public <T extends Web3Contract> T contract(Class<T> type, String address) {
+    @NotNull
+    public <T extends Web3Contract> T contract(@NotNull Class<T> type, @NotNull String address) {
         return contract(type, address(address));
     }
 

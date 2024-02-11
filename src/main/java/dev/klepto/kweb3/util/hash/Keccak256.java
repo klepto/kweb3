@@ -2,6 +2,7 @@ package dev.klepto.kweb3.util.hash;
 
 import com.google.common.base.Strings;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -24,7 +25,8 @@ public final class Keccak256 {
      * @param hex the hexadecimal string
      * @return the checksum hash
      */
-    public static String keccak256Checksum(String hex) {
+    @NotNull
+    public static String keccak256Checksum(@NotNull String hex) {
         hex = hex.toLowerCase().replace("0x", "");
         val checksumHash = keccak256(hex);
 
@@ -45,7 +47,8 @@ public final class Keccak256 {
      * @param input the input string
      * @return the resulting hexadecimal string
      */
-    public static String keccak256(String input) {
+    @NotNull
+    public static String keccak256(@NotNull String input) {
         return keccak256(input, StandardCharsets.US_ASCII);
     }
 
@@ -56,7 +59,8 @@ public final class Keccak256 {
      * @param charset the input charset
      * @return the resulting hexadecimal string
      */
-    public static String keccak256(String input, Charset charset) {
+    @NotNull
+    public static String keccak256(String input, @NotNull Charset charset) {
         return String.format("%064x", new BigInteger(1, keccak256Bytes(input, charset)));
     }
 
@@ -66,7 +70,7 @@ public final class Keccak256 {
      * @param input the input string
      * @return the resulting byte array
      */
-    public static byte[] keccak256Bytes(String input) {
+    public static byte @NotNull [] keccak256Bytes(@NotNull String input) {
         return keccak256Bytes(input, StandardCharsets.US_ASCII);
     }
 
@@ -77,7 +81,7 @@ public final class Keccak256 {
      * @param charset the input charset
      * @return the resulting byte array
      */
-    public static byte[] keccak256Bytes(String input, Charset charset) {
+    public static byte @NotNull [] keccak256Bytes(@NotNull String input, @NotNull Charset charset) {
         val digest = new Keccak(256);
         val data = input.getBytes(charset);
         val hash = digest.digest(data);
