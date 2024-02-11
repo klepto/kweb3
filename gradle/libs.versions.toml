@@ -1,5 +1,6 @@
 [versions]
 slf4j = "2.0.5"
+kotlin = "1.9.22"
 
 [libraries]
 jetbrains-annotations = { module = "org.jetbrains:annotations", version = "24.0.0" }
@@ -13,6 +14,10 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 java-websocket = { module = "org.java-websocket:Java-WebSocket", version = "1.5.4" }
 unreflect = { module = "dev.klepto.unreflect:unreflect", version = "1.5" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
 [bundles]
 slf4j = ["slf4j-api", "slf4j-simple"]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
