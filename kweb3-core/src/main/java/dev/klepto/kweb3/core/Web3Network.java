@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a web3 network/chain.
+ *
+ * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface Web3Network {
 

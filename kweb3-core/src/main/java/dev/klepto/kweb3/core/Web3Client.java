@@ -12,6 +12,8 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
 
 /**
  * Web3Client implementation.
+ *
+ * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Getter
 public class Web3Client {
