@@ -12,6 +12,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
+ * A generic ABI type descriptor not tied to any {@link EthType}. Contains factory methods for constructing and/or
+ * parsing available type descriptors.
+ *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface TypeDescriptor {

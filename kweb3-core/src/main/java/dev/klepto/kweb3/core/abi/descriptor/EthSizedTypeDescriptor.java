@@ -6,7 +6,12 @@ import lombok.With;
 import lombok.val;
 
 /**
+ * An ABI type descriptor for a sized ethereum data type.
+ *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
+ * @see dev.klepto.kweb3.core.type.EthBytes
+ * @see dev.klepto.kweb3.core.type.EthInt
+ * @see dev.klepto.kweb3.core.type.EthUint
  */
 @With
 public record EthSizedTypeDescriptor(UnreflectType type, int valueSize) implements TypeDescriptor {
