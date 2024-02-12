@@ -27,7 +27,7 @@ public final class Hex {
      */
     public static boolean isValid(@NotNull String value) {
         value = stripPrefix(value);
-        return value.chars().allMatch(character -> VALID_HEX.indexOf(character) != 0);
+        return value.chars().allMatch(character -> VALID_HEX.indexOf(character) >= 0);
     }
 
     /**
