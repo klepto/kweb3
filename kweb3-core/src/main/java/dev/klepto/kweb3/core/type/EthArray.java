@@ -69,6 +69,18 @@ public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<
     }
 
     /**
+     * Creates a fixed-size ethereum array by copying elements from given iterable.
+     *
+     * @param size   the fixed array size
+     * @param values the iterable containing elements values
+     * @return a fixed-sized ethereum array representation
+     */
+    @NotNull
+    public static <T extends EthType> EthArray<T> array(int size, @NotNull Iterable<T> values) {
+        return new EthArray<>(size, ImmutableList.copyOf(values));
+    }
+
+    /**
      * Creates a dynamic-size ethereum array with given elements.
      *
      * @param values the array element values
@@ -79,4 +91,15 @@ public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<
         return array(-1, values);
     }
 
+    /**
+     * Creates a dynamic-size ethereum array by copying elements from given iterable.
+     *
+     * @param values the array element values
+     * @return a dynamic-size ethereum array representation
+     */
+    @NotNull
+    public static <T extends EthType> EthArray<T> array(@NotNull Iterable<T> values) {
+        return array(-1, values);
+    }
+    
 }
