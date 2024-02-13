@@ -22,7 +22,7 @@ public final class Conditions {
      */
     public static void require(boolean expression) {
         if (!expression) {
-            throw new Web3Error();
+            throw new Web3Error().discardStack(1);
         }
     }
 
@@ -36,7 +36,7 @@ public final class Conditions {
      */
     public static void require(boolean expression, @NotNull String message, @Nullable Object... args) {
         if (!expression) {
-            throw new Web3Error(message, args);
+            throw new Web3Error(message, args).discardStack(1);
         }
     }
 
