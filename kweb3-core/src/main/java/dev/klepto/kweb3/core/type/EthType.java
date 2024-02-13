@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.type;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -25,11 +25,11 @@ public interface EthType {
      * Returns solidity name equivalent of given ethereum data type.
      *
      * @param type the type class
-     * @return the solidity name of given ethereum data type or <code>null</code> if type does not have a name
+     * @return the solidity name of given ethereum data type or empty <code>String</code> if type does not have a name
      */
-    @Nullable
+    @NotNull
     static String getSolidityName(Class<?> type) {
-        return SOLIDITY_NAMES.get(type);
+        return SOLIDITY_NAMES.getOrDefault(type, "");
     }
 
 }
