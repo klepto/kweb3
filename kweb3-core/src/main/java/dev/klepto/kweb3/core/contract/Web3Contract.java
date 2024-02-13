@@ -5,24 +5,24 @@ import dev.klepto.kweb3.core.type.EthAddress;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Default interface for all blockchain contracts. Contains utility methods that apply to all contracts.
+ * Main interface for all smart contracts.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface Web3Contract {
 
     /**
-     * Returns the client that initialized this contract and is responsible for this contract's execution.
+     * Returns the client that initialized this smart contract and is responsible for its execution.
      *
-     * @return the client that that is responsible for this contract
+     * @return the client that that is responsible for this smart contract
      */
     @NotNull
     Web3Client getClient();
 
     /**
-     * Returns contract's blockchain address.
+     * Returns smart contract's blockchain address.
      *
-     * @return the blockchain address
+     * @return the smart contract address
      */
     @NotNull
     EthAddress getAddress();

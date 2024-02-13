@@ -1,10 +1,12 @@
 package dev.klepto.kweb3.core.contract;
 
+import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
 import dev.klepto.kweb3.core.contract.annotation.Transaction;
-import dev.klepto.kweb3.core.contract.annotation.Tuple;
 import dev.klepto.kweb3.core.contract.annotation.View;
+import dev.klepto.kweb3.core.contract.type.EthStructContainer;
+import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
 import dev.klepto.kweb3.core.type.EthType;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.Unreflect;
@@ -17,10 +19,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static dev.klepto.kweb3.core.util.Conditions.require;
 import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256;
 import static dev.klepto.unreflect.Unreflect.reflect;
 
 /**
+ * Default implementation of {@link ContractParser}. Uses {@link Unreflect} to infer smart-contract function ABI types
+ * to be used with contract interface call encoding/decoding.
+ *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public class DefaultContractParser implements ContractParser {
@@ -43,7 +49,8 @@ public class DefaultContractParser implements ContractParser {
             val signatureHash = "0x" + keccak256(signature).substring(0, 8).toLowerCase();
             val returnDescriptor = parseReturnTypeDescriptor(method);
             val returnType = parseReturnType(method);
-            val returnTuple = returnType.reflect().containsAnnotation(Tuple.class);
+            val returnTuple = returnType.matches(EthTupleContainer.class)
+                    && !returnType.matches(EthStructContainer.class);
 
             return new ContractFunction(
                     methodAccess,
@@ -71,7 +78,7 @@ public class DefaultContractParser implements ContractParser {
         val methodAccess = reflect(method);
         val parameters = methodAccess.parameters()
                 .filter(parameter -> !parameter.containsAnnotation(Cost.class))
-                .filter(parameter -> parameter.type().matches(EthType.class) || parameter.containsAnnotation(Tuple.class))
+                .filter(parameter -> parameter.type().matches(EthType.class))
                 .collect(toImmutableList());
         return ContractCodec.parseTupleDescriptor(parameters);
     }
@@ -84,8 +91,7 @@ public class DefaultContractParser implements ContractParser {
      */
     @Override
     public @NotNull TypeDescriptor parseReturnTypeDescriptor(@NotNull Method method) {
-        val type = parseReturnType(method);
-        return ContractCodec.parseDescriptor(type.reflect());
+        return ContractCodec.parseDescriptor(reflect(method));
     }
 
     /**
@@ -96,7 +102,13 @@ public class DefaultContractParser implements ContractParser {
      */
     @Override
     public @NotNull UnreflectType parseReturnType(@NotNull Method method) {
-        return UnreflectType.of(method);
+        val type = UnreflectType.of(method);
+        if (type.matchesExact(Web3Result.class)) {
+            val genericType = type.genericType();
+            require(genericType != null, "Could not infer generic type of Web3Result.");
+            return genericType;
+        }
+        return type;
     }
 
     /**
@@ -105,7 +117,7 @@ public class DefaultContractParser implements ContractParser {
      * @param methodAccess the method access
      * @return the string containing contract function name
      */
-    public String parseFunctionName(MethodAccess methodAccess) {
+    public @NotNull String parseFunctionName(@NotNull MethodAccess methodAccess) {
         val viewAnnotation = methodAccess.annotation(View.class);
         val transactionAnnotation = methodAccess.annotation(Transaction.class);
         var name = viewAnnotation != null ? viewAnnotation.value()

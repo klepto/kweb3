@@ -3,20 +3,20 @@ package dev.klepto.kweb3.core.contract;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.abi.AbiCodec;
 import dev.klepto.kweb3.core.abi.HeadlongCodec;
+import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
-import dev.klepto.kweb3.core.type.EthTuple;
 import dev.klepto.kweb3.core.type.EthType;
 import lombok.val;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import static dev.klepto.kweb3.core.type.EthTuple.tuple;
 import static dev.klepto.kweb3.core.util.Collections.arrayRemove;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
- * Default implementation of {@link ContractExecutor}. Encodes and executes appropriate blockchain views and/or
- * transactions and returns the result for any given contract method.
+ * Default implementation of {@link ContractExecutor}. Encodes and executes appropriate smart-contract views and/or
+ * transactions and returns the result for any given contract interface method call.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
@@ -45,10 +45,12 @@ public class DefaultContractExecutor implements ContractExecutor {
         val dataArgs = StreamEx.of(argsWithoutCost)
                 .filter(EthType.class::isInstance)
                 .map(EthType.class::cast)
-                .toList();
+                .toArray(EthType[]::new);
 
-        val descriptor = call.function().parametersDescriptor();
-        return codec.encode(tuple(dataArgs), descriptor);
+
+        val descriptor = (EthTupleTypeDescriptor) call.function().parametersDescriptor();
+        val normalizedArgs = ContractCodec.encodeParameterValues(descriptor, dataArgs);
+        return codec.encode(normalizedArgs, descriptor);
     }
 
     /**
@@ -92,24 +94,20 @@ public class DefaultContractExecutor implements ContractExecutor {
      * @param result the result string of the RPC call
      * @return the decoded contract result
      */
-    public Object decodeResult(ContractCall call, String result) {
+    @NotNull
+    public Object decodeResult(@NotNull ContractCall call, @Nullable String result) {
+        require(result != null, "Received a null result for {}.", call);
         val function = call.function();
         val type = function.returnType();
         val descriptor = function.returnTuple()
                 ? function.returnDescriptor()
                 : function.returnDescriptor().wrap();
-        val resultTuple = codec.decode(result, descriptor);
-        if (type.matches(EthType.class)) {
-            return resultTuple.get(0);
-        }
+        val tuple = codec.decode(result, descriptor);
 
-        if (!function.returnTuple()) {
-            val value = resultTuple.get(0);
-            require(value instanceof EthTuple, "Incorrect response type, expected EthTuple, got: {}", value.getClass());
-        }
-
-        val containerTuple = function.returnTuple() ? resultTuple : (EthTuple) resultTuple.get(0);
-        return ContractCodec.decodeTupleContainer(type, containerTuple);
+        require(tuple != null, "Decoded a null result for {}.", call);
+        require(!tuple.isEmpty(), "Result tuple is empty.");
+        val value = (EthType) (function.returnTuple() ? tuple : tuple.get(0));
+        return ContractCodec.decodeReturnValue(type, value);
     }
 
 }
