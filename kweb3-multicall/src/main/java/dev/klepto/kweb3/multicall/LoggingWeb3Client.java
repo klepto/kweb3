@@ -5,7 +5,9 @@ import dev.klepto.kweb3.core.Web3Client;
 import dev.klepto.kweb3.core.Web3Network;
 import dev.klepto.kweb3.core.contract.ContractCall;
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor;
+import dev.klepto.kweb3.core.contract.Web3Contract;
 import dev.klepto.kweb3.core.type.EthAddress;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -27,6 +29,19 @@ public class LoggingWeb3Client extends Web3Client {
     }
 
     /**
+     * Binds contract of a given type to an empty {@link EthAddress}. Since this client is offline, in many use-cases
+     * underlying smart contract address does not need to be specified.
+     *
+     * @param type the contract type, must be an interface extending Contract
+     * @return the contract instance for logging blockchain transactions
+     */
+    @NotNull
+    public <T extends Web3Contract> T contract(@NotNull Class<T> type) {
+        return contract(type, EthAddress.ZERO);
+    }
+
+
+    /**
      * Returns copy of call-data logs recorded by this client.
      *
      * @return a list of call-data logs
@@ -36,12 +51,13 @@ public class LoggingWeb3Client extends Web3Client {
     }
 
     /**
-     * Contains information about ethereum contract call.
+     * Contains information about smart contract call.
      *
-     * @param contractAddress the ethereum contract address
-     * @param data            the contract call-data
+     * @param contractAddress the smart contract address
+     * @param call            the smart contract interface call
+     * @param data            the smart contract call data
      */
-    public record Log(EthAddress contractAddress, String data) {
+    public record Log(EthAddress contractAddress, ContractCall call, String data) {
     }
 
     /**
@@ -51,7 +67,9 @@ public class LoggingWeb3Client extends Web3Client {
 
         @Override
         public Object execute(@NotNull ContractCall call) {
-            logs.add(new Log(call.proxy().getAddress(), call.function().signature() + encode(call)));
+            val address = call.proxy().getAddress();
+            val data = call.function().signature() + encode(call);
+            logs.add(new Log(address, call, data));
             return null;
         }
 
