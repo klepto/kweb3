@@ -8,7 +8,9 @@ import lombok.val;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Intercepts calls on un-implemented methods in the contract interface. Encodes and executes appropriate blockchain
@@ -24,6 +26,7 @@ public class ContractProxy implements InvocationHandler {
     private final Class<? extends Web3Contract> type;
     private final Web3Client client;
     private final EthAddress address;
+    private final Map<Object, Object> attributes = new ConcurrentHashMap<>();
 
     /**
      * Intercepts contract interface method call. Called automatically by JVM {@link java.lang.reflect.Proxy} via
