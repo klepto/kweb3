@@ -37,4 +37,11 @@ public interface Web3Contract {
     @NotNull
     Class<? extends Web3Contract> getContractClass();
 
+    /**
+     * Returns instance of {@link ContractProxy} associated with this smart contract interface.
+     *
+     * @return the contract proxy associated with this smart contract
+     */
+    ContractProxy getProxy();
+
 }

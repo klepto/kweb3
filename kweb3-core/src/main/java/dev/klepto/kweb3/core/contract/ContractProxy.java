@@ -61,6 +61,8 @@ public class ContractProxy implements InvocationHandler {
                 return address;
             case "getClient":
                 return client;
+            case "getProxy":
+                return this;
             default:
                 val function = contracts.getParser().parseFunction(method);
                 val call = new ContractCall(this, function, args);
