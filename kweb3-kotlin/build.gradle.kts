@@ -4,7 +4,9 @@ plugins {
 
 dependencies {
     implementation(projects.kweb3Core)
+    implementation(projects.kweb3Multicall)
     implementation(libs.kotlin.reflect)
+    implementation(libs.kotlin.coroutines)
 }
 
 kotlin {
