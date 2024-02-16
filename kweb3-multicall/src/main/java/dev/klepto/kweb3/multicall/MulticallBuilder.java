@@ -97,7 +97,7 @@ public class MulticallBuilder {
         val result = new Web3Result<EthArray<EthBytes>>();
         val counter = new AtomicInteger(0);
         batchResults.forEach(batchResult -> {
-            if (counter.incrementAndGet() != batches.size()) {
+            if (counter.incrementAndGet() < batches.size()) {
                 return;
             }
 
