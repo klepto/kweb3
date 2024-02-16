@@ -1,7 +1,6 @@
 package dev.klepto.kweb3.core.type;
 
 import com.google.common.collect.ImmutableList;
-import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +16,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @param values   the elements of the array
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthArray<T extends EthType>(int capacity, @Delegate ImmutableList<T> values) implements EthType {
+public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values) implements EthType, EthCollection<T> {
 
     public EthArray {
         require(

@@ -1,7 +1,6 @@
 package dev.klepto.kweb3.core.type;
 
 import com.google.common.collect.ImmutableList;
-import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
  * @param values a list of values contained within this tuple
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthTuple(@Delegate ImmutableList<EthType> values) implements EthType {
+public record EthTuple(ImmutableList<EthType> values) implements EthType, EthCollection<EthType> {
 
     @Override
     public String toString() {
