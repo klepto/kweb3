@@ -94,8 +94,6 @@ public class MulticallBuilder {
         val batches = Lists.partition(calls, batchSize);
         val batchResults = batches.stream().map(this::executeBatch).toList();
 
-        System.out.println(batches.size());
-
         val result = new Web3Result<EthArray<EthBytes>>();
         val counter = new AtomicInteger(0);
         batchResults.forEach(batchResult -> {
