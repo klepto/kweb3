@@ -104,7 +104,7 @@ public class MulticallBuilder {
             val combined = new ArrayList<EthBytes>();
             batchResults.stream()
                     .map(Web3Result::get)
-                    .forEach(array -> combined.addAll(array.asList()));
+                    .forEach(combined::addAll);
             result.complete(EthArray.array(combined));
         });
         return result;
