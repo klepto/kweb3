@@ -5,6 +5,7 @@ import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.Web3Network
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.type.EthAddress
+import kotlinx.coroutines.sync.Mutex
 
 /**
  * [Web3Client] implementation that support suspend functions by use of
@@ -13,6 +14,13 @@ import dev.klepto.kweb3.core.type.EthAddress
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 class CoroutineWeb3Client(network: Web3Network) : Web3Client(network) {
+
+    /**
+     * Public [Mutex] associated with this client for customizable smart
+     * contract call synchronization. Every contract created by this
+     * client will respect the lock of this mutex during its execution.
+     */
+    val mutex = Mutex(false)
 
     init {
         contracts.executor = CoroutineContractExecutor()

@@ -3,10 +3,13 @@ package dev.klepto.kweb3.kotlin
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import dev.klepto.kweb3.kotlin.ContractCallExtensions.client
+import dev.klepto.kweb3.kotlin.ContractCallExtensions.continuation
+import dev.klepto.kweb3.kotlin.ContractCallExtensions.isSuspending
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Contract executor implementation supporting coroutine (suspend)
@@ -17,30 +20,51 @@ import kotlin.coroutines.resumeWithException
 class CoroutineContractExecutor : DefaultContractExecutor() {
 
     /**
-     * Decodes RPC result into contract return type. If contract function's
-     * last parameter is a [Continuation], this assumes that contract function
-     * contains `suspend` keyword and process it as a coroutine, otherwise
-     * defaults back to behavior implemented by [DefaultContractExecutor].
+     * Executes a contract function from start to finish with a lock provided
+     * by [CoroutineWeb3Client] mutex.
+     *
+     * @param call the contract interface method call
+     * @return the contract function execution result, the type must match
+     *     return type of the interface method
+     */
+    override fun execute(call: ContractCall): Any {
+        if (call.isSuspending()) {
+            return this::executeSuspending.call(call, call.continuation())
+        }
+
+        return super.execute(call)
+    }
+
+    /**
+     * Executes smart contract interface call from a suspending coroutine
+     * context.
+     *
+     * @param call the contract interface method call
+     * @return the decoded smart contract result
+     */
+    suspend fun executeSuspending(call: ContractCall): Any {
+        call.client().mutex.withLock {
+            val data = encode(call)
+            val result = request(call, data)
+            return decodeSuspending(call, result)
+        }
+    }
+
+    /**
+     * Suspend current coroutine until RPC result is received and decodes RPC
+     * result into contract return type.
      *
      * @param call the contract interface method call
      * @param result the result of the RPC call
-     * @return the already decoded, or to be decoded in the future contract
-     *     result
+     * @return the decoded smart contract result
      */
-    @Suppress("UNCHECKED_CAST")
-    override fun decode(call: ContractCall, result: Web3Result<String>): Any {
+    suspend fun decodeSuspending(call: ContractCall, result: Web3Result<String>): Any {
         val decoded = result.map { decodeResult(call, it) }
 
-        val lastArg = call.args.last()
-        if (lastArg is Continuation<*>) {
-            val continuation = lastArg as Continuation<Any>
-            decoded
-                    .get { continuation.resume(it) }
+        return suspendCoroutine { continuation ->
+            decoded.get { continuation.resume(it) }
                     .error { continuation.resumeWithException(it) }
-            return COROUTINE_SUSPENDED
         }
-
-        return super.decode(call, result)
     }
 
 }
