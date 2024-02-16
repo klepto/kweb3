@@ -32,4 +32,13 @@ public interface MulticallContract extends Web3Contract {
             EthArray<EthBytes> data
     );
 
+    /**
+     * Creates a new {@link MulticallBuilder} for this multicall smart contract implementation.
+     *
+     * @return a new instance of multicall builder
+     */
+    default MulticallBuilder builder() {
+        return new MulticallBuilder(this);
+    }
+
 }
