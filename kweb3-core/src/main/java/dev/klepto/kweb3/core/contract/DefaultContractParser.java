@@ -84,7 +84,7 @@ public class DefaultContractParser implements ContractParser {
     }
 
     /**
-     * Parses contract return type description {@link Unreflect} API.
+     * Parses contract return type description using {@link Unreflect} API.
      *
      * @param method the contract interface method
      * @return the contract return type description
