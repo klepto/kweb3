@@ -30,6 +30,17 @@ public class DefaultContractExecutor implements ContractExecutor {
     private final AbiCodec codec = new HeadlongCodec();
 
     /**
+     * Executes a contract function from start to finish using this executor implementation.
+     *
+     * @param call the contract interface method call
+     * @return the contract function execution result, the type must match return type of the interface method
+     */
+    @Override
+    public @NotNull Object execute(@NotNull ContractCall call) {
+        return ContractExecutor.super.execute(call);
+    }
+
+    /**
      * Encodes contract function call by ensuring to exclude {@link Cost} arguments and any non-ethereum related
      * arguments (which can be result of bytecode transformations, such as suspend functions).
      *
