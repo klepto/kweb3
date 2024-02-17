@@ -2,11 +2,13 @@ package dev.klepto.kweb3.kotlin
 
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
+import dev.klepto.kweb3.core.contract.ContractExecutor
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
-import dev.klepto.kweb3.kotlin.ContractCallExtensions.client
 import dev.klepto.kweb3.kotlin.ContractCallExtensions.continuation
 import dev.klepto.kweb3.kotlin.ContractCallExtensions.isSuspending
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -19,6 +21,9 @@ import kotlin.coroutines.suspendCoroutine
  */
 class CoroutineContractExecutor : DefaultContractExecutor() {
 
+    val mutex = Mutex(false)
+    val interceptor = AtomicReference<ContractExecutor>()
+
     /**
      * Executes a contract function from start to finish with a lock provided
      * by [CoroutineWeb3Client] mutex.
@@ -28,6 +33,11 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
      *     return type of the interface method
      */
     override fun execute(call: ContractCall): Any {
+        val interceptor = this.interceptor.get()
+        if (interceptor != null) {
+            return interceptor.execute(call)
+        }
+
         if (call.isSuspending()) {
             return this::executeSuspending.call(call, call.continuation())
         }
@@ -43,7 +53,7 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
      * @return the decoded smart contract result
      */
     suspend fun executeSuspending(call: ContractCall): Any {
-        call.client().mutex.withLock {
+        mutex.withLock {
             val data = encode(call)
             val result = request(call, data)
             return decodeSuspending(call, result)
@@ -65,6 +75,22 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
             decoded.get { continuation.resume(it) }
                     .error { continuation.resumeWithException(it) }
         }
+    }
+
+    /**
+     * Executes given code block by locking this contract executor to a given
+     * [ContractExecutor] interceptor.
+     *
+     * @param interceptor the interceptor to be used instead of this executor
+     * @param block the code block
+     */
+    suspend fun withInterceptor(interceptor: ContractExecutor, block: suspend () -> Unit) {
+        val current = this.interceptor.get()
+        mutex.withLock {
+            this.interceptor.set(interceptor)
+            block()
+        }
+        this.interceptor.set(current)
     }
 
 }
