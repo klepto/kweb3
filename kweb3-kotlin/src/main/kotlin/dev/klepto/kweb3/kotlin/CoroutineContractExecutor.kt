@@ -85,12 +85,12 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
      * @param block the code block
      */
     suspend fun withInterceptor(interceptor: ContractExecutor, block: suspend () -> Unit) {
-        val current = this.interceptor.get()
         mutex.withLock {
+            val current = this.interceptor.get()
             this.interceptor.set(interceptor)
             block()
+            this.interceptor.set(current)
         }
-        this.interceptor.set(current)
     }
 
 }
