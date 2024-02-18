@@ -1,12 +1,16 @@
 package dev.klepto.kweb3.kotlin.multicall
 
+import dev.klepto.kweb3.kotlin.contracts.Multicall3
+
 /**
- * A type-bound multicall builder managing a mutable list of calls.
+ * A type-bound [Multicall3] builder.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class MulticallBuilder<T>(private val contract: MulticallContract,
-                          private val calls: MutableList<suspend () -> T> = mutableListOf()) {
+class MulticallBuilder<T>(
+    private val contract: Multicall3,
+    private val calls: MutableList<suspend () -> T> = mutableListOf()
+) {
 
     /**
      * Appends a new call to the list of calls associated with builder.

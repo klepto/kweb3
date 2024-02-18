@@ -6,11 +6,12 @@ import dev.klepto.kweb3.core.contract.DefaultContractExecutor
 import dev.klepto.kweb3.core.contract.LoggingContractExecutor
 import dev.klepto.kweb3.core.type.EthArray
 import dev.klepto.kweb3.core.type.EthArray.array
+import dev.klepto.kweb3.core.type.EthBool.bool
 import dev.klepto.kweb3.core.type.EthBytes
-import dev.klepto.kweb3.core.type.EthUint
-import dev.klepto.kweb3.core.type.EthUint.uint256
+import dev.klepto.kweb3.core.type.EthBytes.bytes
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
+import dev.klepto.kweb3.kotlin.contracts.Multicall3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,35 +19,26 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /**
- * A suspending multicall executor that executes given [calls] through
- * provided multicall [contract] implementation.
+ * A suspending [Multicall3] executor.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class MulticallExecutor<T>(private val contract: MulticallContract,
-                           private val calls: List<suspend () -> T>) {
-
-    private val defaultBatchSize = 512
-    private val defaultGasLimit = uint256(1_000_000)
-    private val defaultSizeLimit = uint256(1_000_000)
+class MulticallExecutor<T>(
+    private val contract: Multicall3,
+    private val calls: List<suspend () -> T>
+) {
 
     /**
-     * Executes all [calls] through a multicall smart [contract] and returns
-     * an ordered list containing result of all calls. For calls that failed
-     * to execute due to gas limit, size limit or internal error, a `null` is
-     * preserved at a matching result index.
+     * Executes all [calls] through a [Multicall3] smart contract and returns
+     * an ordered list containing result of each call. For calls that failed
+     * to execute due to internal error, a `null` is preserved at a matching
+     * result index.
      *
-     * @param batchSize the maximum size of a multicall batch
-     * @param gasLimit the maximum amount of gas for a single multicall request
-     *     is allowed to use (ignored if not supported by underlying smart
-     *     contract)
-     * @param sizeLimit the maximum size of return value for a single multicall
-     *     request (ignored if not supported by underlying smart contract)
+     * @param batchSize the maximum size of a multicall batch, `1024` by
+     *     default
      * @return a list containing results of all successful and reverted calls
      */
-    suspend fun execute(batchSize: Int = defaultBatchSize,
-                        gasLimit: EthUint = defaultGasLimit,
-                        sizeLimit: EthUint = defaultSizeLimit): List<T?> {
+    suspend fun execute(batchSize: Int = 1024): List<T?> {
         require(batchSize > 0) { "Batch size must be positive." }
         val executor = contract.client.contracts.executor
         require(executor is CoroutineContractExecutor) {
@@ -56,32 +48,27 @@ class MulticallExecutor<T>(private val contract: MulticallContract,
 
         val batches = calls.chunked(batchSize)
         return batches.flatMap {
-            executeBatch(executor, it, gasLimit, sizeLimit)
+            executeBatch(executor, it)
         }
     }
 
     /**
-     * Executes a single multicall [batch] using underlying multicall
-     * [contract]. Every call in a given [batch] is first encoded into a single
-     * multicall request, then multicall executes the request and dispatches
-     * decoded values to back every call in the [batch].
+     * Executes a single multicall [batch] using provided [Multicall3]
+     * contract. Every call in a given [batch] is first encoded and aggregated
+     * into a single multicall request, then request is executed and multicall
+     * result gets decoded into individual values that get dispatched back to
+     * every call in the [batch].
      *
-     * @param executor the underlying coroutine executor to be used for this
-     *     request
+     * @param executor the coroutine executor to be used for this request
      * @param batch a list of smart contract calls
-     * @param gasLimit a gas limit parameter to pass to multicall smart
-     *     contract
-     * @param sizeLimit a size limit parameter to pass to multicall smart
-     *     contract
-     * @return an ordered list containing decoded multicall results or `null`
-     *     for failed calls
+     * @return an ordered list containing decoded multicall results
      */
-    private suspend fun executeBatch(executor: CoroutineContractExecutor,
-                                     batch: List<suspend () -> T>,
-                                     gasLimit: EthUint,
-                                     sizeLimit: EthUint): List<T?> {
+    private suspend fun executeBatch(
+        executor: CoroutineContractExecutor,
+        batch: List<suspend () -> T>
+    ): List<T?> {
         val encodedCalls = encodeCalls(executor, batch)
-        val results = contract.tryAggregate(gasLimit, sizeLimit, encodedCalls)
+        val results = array(contract.aggregate3(encodedCalls).map { it.returnData })
         return decodeResults(executor, batch, results)
     }
 
@@ -93,8 +80,10 @@ class MulticallExecutor<T>(private val contract: MulticallContract,
      * @param calls the list of calls
      * @return an ethereum array of multicall calls
      */
-    private suspend fun encodeCalls(executor: CoroutineContractExecutor,
-                                    calls: List<suspend () -> T>): EthArray<MulticallContract.Call> {
+    private suspend fun encodeCalls(
+        executor: CoroutineContractExecutor,
+        calls: List<suspend () -> T>
+    ): EthArray<Multicall3.Call> {
         val mutex = Mutex()
         val logger = MutexLoggingInterceptor(mutex)
         val scope = CoroutineScope(Dispatchers.IO)
@@ -110,7 +99,7 @@ class MulticallExecutor<T>(private val contract: MulticallContract,
         }
 
         val result = logger.logs.map {
-            MulticallContract.Call(it.contractAddress, EthBytes.bytes(it.data))
+            Multicall3.Call(it.contractAddress, bool(true), bytes(it.data))
         }
 
         return array(result)
@@ -125,9 +114,11 @@ class MulticallExecutor<T>(private val contract: MulticallContract,
      * @param results an ethereum array of results
      * @return the decoded list of multicall results
      */
-    private suspend fun decodeResults(executor: CoroutineContractExecutor,
-                                      calls: List<suspend () -> T>,
-                                      results: EthArray<EthBytes>): List<T?> {
+    private suspend fun decodeResults(
+        executor: CoroutineContractExecutor,
+        calls: List<suspend () -> T>,
+        results: EthArray<EthBytes>
+    ): List<T?> {
         require(calls.size == results.size) {
             "Results size does not match calls size."
         }
