@@ -109,6 +109,5 @@ public class Web3Result<T> {
         val newStage = stage.thenApply(mapper);
         return new Web3Result<>(newStage);
     }
-
-
+    
 }
