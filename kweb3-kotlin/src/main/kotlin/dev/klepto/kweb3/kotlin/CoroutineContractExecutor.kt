@@ -36,7 +36,7 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
         }
 
         if (call.isSuspending()) {
-            return this::executeSuspending.call(call, call.continuation())
+            return ::executeSuspending.call(call, call.continuation())
         }
 
         return super.execute(call)
