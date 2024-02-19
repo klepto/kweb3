@@ -14,9 +14,9 @@ import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 import dev.klepto.kweb3.kotlin.contract.Multicall3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
  * A suspending [Multicall3] executor.
@@ -73,8 +73,7 @@ class MulticallExecutor<T>(
     }
 
     /**
-     * Encodes given list of smart contract [calls] using
-     * [MutexLoggingInterceptor].
+     * Encodes given list of smart contract [calls] using [LoggingInterceptor].
      *
      * @param executor the coroutine contract executor
      * @param calls the list of calls
@@ -84,19 +83,14 @@ class MulticallExecutor<T>(
         executor: CoroutineContractExecutor,
         calls: List<suspend () -> T>
     ): EthArray<Multicall3.Call> {
-        val mutex = Mutex()
-        val logger = MutexLoggingInterceptor(mutex)
-        val scope = CoroutineScope(Dispatchers.IO)
-
+        val logger = LoggingInterceptor()
+        val scope = CoroutineScope(Dispatchers.Unconfined)
         executor.withInterceptor(logger) {
             calls.forEach { call ->
-                mutex.lock()
-                val job = scope.launch { call() }
-                mutex.withLock {
-                    job.cancel()
-                }
+                scope.launch { call() }
             }
         }
+        scope.cancel()
 
         val result = logger.logs.map {
             Multicall3.Call(it.contractAddress, bool(true), bytes(it.data))
@@ -142,16 +136,12 @@ class MulticallExecutor<T>(
     }
 
     /**
-     * A [CoroutineContractExecutor] interceptor that unlocks a given [mutex]
-     * after logging a request.
-     *
-     * @param mutex the mutex to be unlocked
+     * A [LoggingContractExecutor] interceptor that marks execution coroutine
+     * as suspended after logging a request.
      */
-    private class MutexLoggingInterceptor(private val mutex: Mutex) : LoggingContractExecutor() {
-        override fun request(call: ContractCall, data: String): Web3Result<String> {
-            val result = super.request(call, data)
-            mutex.unlock()
-            return result
+    private class LoggingInterceptor : LoggingContractExecutor() {
+        override fun decode(call: ContractCall, result: Web3Result<String>): Any {
+            return COROUTINE_SUSPENDED
         }
     }
 
