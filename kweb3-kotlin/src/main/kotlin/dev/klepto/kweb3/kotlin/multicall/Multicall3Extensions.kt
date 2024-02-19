@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.kotlin.multicall
 
 import dev.klepto.kweb3.core.type.EthType
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
+import dev.klepto.kweb3.kotlin.contract.Multicall3
 
 /**
  * Extensions for [Multicall3].
@@ -49,5 +49,5 @@ object Multicall3Extensions {
     fun <T> Multicall3.builder(block: (MulticallBuilder<T>.() -> MulticallBuilder<T>)): MulticallBuilder<T> {
         return MulticallBuilder<T>(this).apply { block.invoke(this) }
     }
-    
+
 }

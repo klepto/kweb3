@@ -6,7 +6,7 @@ import dev.klepto.kweb3.core.Web3Network
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.type.EthAddress
 import dev.klepto.kweb3.core.type.EthAddress.address
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
+import dev.klepto.kweb3.kotlin.contract.Multicall3
 
 /**
  * [Web3Client] implementation that support suspend functions by use of

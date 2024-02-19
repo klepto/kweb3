@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.kotlin.contracts
+package dev.klepto.kweb3.kotlin.contract
 
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.annotation.ValueSize
@@ -76,5 +76,5 @@ interface Erc20 : Web3Contract {
      */
     @View
     suspend fun allowance(owner: EthAddress, spender: EthAddress): EthUint
-    
+
 }

@@ -11,7 +11,7 @@ import dev.klepto.kweb3.core.type.EthBytes
 import dev.klepto.kweb3.core.type.EthBytes.bytes
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
+import dev.klepto.kweb3.kotlin.contract.Multicall3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
