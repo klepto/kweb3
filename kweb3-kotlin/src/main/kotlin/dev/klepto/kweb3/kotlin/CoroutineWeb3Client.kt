@@ -6,6 +6,7 @@ import dev.klepto.kweb3.core.Web3Network
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.type.EthAddress
 import dev.klepto.kweb3.core.type.EthAddress.address
+import dev.klepto.kweb3.kotlin.contracts.Multicall3
 
 /**
  * [Web3Client] implementation that support suspend functions by use of
@@ -54,6 +55,15 @@ class CoroutineWeb3Client(network: Web3Network) : Web3Client(network) {
      */
     inline fun <reified T : Web3Contract> contract(address: String): T {
         return contract<T>(address(address))
+    }
+
+    /**
+     * Returns an instance of [Multicall3] contract using default address.
+     *
+     * @return the multicall3 smart contract
+     */
+    fun multicall(): Multicall3 {
+        return contract<Multicall3>(Multicall3.ADDRESS)
     }
 
 }

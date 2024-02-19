@@ -9,12 +9,19 @@ import dev.klepto.kweb3.core.type.EthArray;
 import dev.klepto.kweb3.core.type.EthBool;
 import dev.klepto.kweb3.core.type.EthBytes;
 
+import static dev.klepto.kweb3.core.type.EthAddress.address;
+
 /**
  * Implementation of <a href="https://github.com/mds1/multicall">Multicall3</a> smart contract.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public interface Multicall3 extends Web3Contract {
+
+    /**
+     * The current address of the Multicall3 smart contract.
+     */
+    EthAddress ADDRESS = address("0xcA11bde05977b3631167028862bE2a173976CA11");
 
     /**
      * Aggregates all calls into a single request and returns an array containing {@link Result results} of each call.

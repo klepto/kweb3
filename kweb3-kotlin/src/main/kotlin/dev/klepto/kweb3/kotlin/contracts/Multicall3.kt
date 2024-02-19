@@ -4,6 +4,7 @@ import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.annotation.View
 import dev.klepto.kweb3.core.contract.type.EthStructContainer
 import dev.klepto.kweb3.core.type.EthAddress
+import dev.klepto.kweb3.core.type.EthAddress.address
 import dev.klepto.kweb3.core.type.EthArray
 import dev.klepto.kweb3.core.type.EthBool
 import dev.klepto.kweb3.core.type.EthBytes
@@ -15,6 +16,11 @@ import dev.klepto.kweb3.core.type.EthBytes
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 interface Multicall3 : Web3Contract {
+
+    companion object {
+        /** The current address of the Multicall3 smart contract. */
+        val ADDRESS = address("0xcA11bde05977b3631167028862bE2a173976CA11")
+    }
 
     /**
      * Aggregates all calls into a single request and returns an array
