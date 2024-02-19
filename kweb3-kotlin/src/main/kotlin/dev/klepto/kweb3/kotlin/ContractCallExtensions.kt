@@ -10,15 +10,6 @@ import kotlin.coroutines.Continuation
  */
 object ContractCallExtensions {
 
-
-    /**
-     * Retrieves [CoroutineWeb3Client] instance associated with this smart
-     * contract call.
-     */
-    fun ContractCall.client(): CoroutineWeb3Client {
-        return proxy.client as CoroutineWeb3Client
-    }
-
     /**
      * Returns `true` if contract call is a suspending function called from
      * coroutine context.
