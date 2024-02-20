@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.kotlin.contract
+package dev.klepto.kweb3.kotlin.contracts
 
 import dev.klepto.kweb3.core.contract.annotation.ValueSize
 import dev.klepto.kweb3.core.contract.annotation.View

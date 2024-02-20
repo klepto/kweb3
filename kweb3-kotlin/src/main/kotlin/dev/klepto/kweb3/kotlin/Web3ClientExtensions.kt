@@ -4,7 +4,7 @@ import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.type.EthAddress
 import dev.klepto.kweb3.core.type.EthAddress.address
-import dev.klepto.kweb3.kotlin.contract.Multicall3
+import dev.klepto.kweb3.kotlin.contracts.Multicall3
 
 /**
  * Extension functions for [Web3Client].

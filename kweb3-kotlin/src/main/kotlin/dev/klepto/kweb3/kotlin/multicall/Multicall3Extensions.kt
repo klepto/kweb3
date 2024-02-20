@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.kotlin.multicall
 
 import dev.klepto.kweb3.core.type.EthType
-import dev.klepto.kweb3.kotlin.contract.Multicall3
+import dev.klepto.kweb3.kotlin.contracts.Multicall3
 
 /**
  * Extensions for [Multicall3].
