@@ -11,6 +11,9 @@ import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
+
+import static dev.klepto.kweb3.core.Web3Error.message;
 import static dev.klepto.kweb3.core.util.Collections.arrayRemove;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
@@ -107,7 +110,14 @@ public class DefaultContractExecutor implements ContractExecutor {
      */
     @NotNull
     public Object decodeResult(@NotNull ContractCall call, @Nullable String result) {
-        require(result != null, "Received a null result for {}.", call);
+        val noResultMessage = (Supplier<String>) () ->
+                message(
+                        "No result for smart contract call. \nFunction: {}\nNetwork: {}",
+                        call,
+                        call.proxy().getClient().getNetwork()
+                );
+
+        require(result != null, noResultMessage);
         val function = call.function();
         val type = function.returnType();
         val descriptor = function.returnTuple()
@@ -115,8 +125,7 @@ public class DefaultContractExecutor implements ContractExecutor {
                 : function.returnDescriptor().wrap();
         val tuple = codec.decode(result, descriptor);
 
-        require(tuple != null, "Decoded a null result for {}.", call);
-        require(!tuple.isEmpty(), "Result tuple is empty.");
+        require(tuple != null && !tuple.isEmpty(), noResultMessage);
         val value = (EthType) (function.returnTuple() ? tuple : tuple.get(0));
         return ContractCodec.decodeReturnValue(type, value);
     }
