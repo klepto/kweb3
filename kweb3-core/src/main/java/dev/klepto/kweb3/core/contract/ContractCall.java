@@ -1,5 +1,10 @@
 package dev.klepto.kweb3.core.contract;
 
+import dev.klepto.kweb3.core.type.EthType;
+import lombok.val;
+
+import java.util.Arrays;
+
 /**
  * Represents a contract interface method call.
  *
@@ -10,4 +15,18 @@ package dev.klepto.kweb3.core.contract;
 public record ContractCall(ContractProxy proxy,
                            ContractFunction function,
                            Object[] args) {
+
+    @Override
+    public String toString() {
+        val contractAddress = proxy.getAddress().toChecksumHex();
+        val contractName = proxy.getType().getSimpleName();
+        val functionName = function.name();
+        val ethereumArgs = Arrays.stream(args)
+                .filter(EthType.class::isInstance)
+                .map(Object::toString)
+                .toList();
+        val argsString = String.join(", ", ethereumArgs);
+        return String.format("%s(%s).%s(%s)", contractName, contractAddress, functionName, argsString);
+    }
+
 }
