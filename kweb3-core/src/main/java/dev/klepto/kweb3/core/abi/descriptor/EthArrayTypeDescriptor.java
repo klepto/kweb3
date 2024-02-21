@@ -29,4 +29,9 @@ public record EthArrayTypeDescriptor(TypeDescriptor descriptor, int arraySize) i
         return descriptor.toAbiDescriptor() + arrayDescriptor;
     }
 
+    @Override
+    public String toString() {
+        return toAbiDescriptor();
+    }
+
 }

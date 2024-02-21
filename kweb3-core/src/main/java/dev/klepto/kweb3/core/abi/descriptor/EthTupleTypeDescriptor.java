@@ -34,4 +34,9 @@ public record EthTupleTypeDescriptor(ImmutableList<TypeDescriptor> children) imp
         return "(" + childrenDescriptor + ")";
     }
 
+    @Override
+    public String toString() {
+        return toAbiDescriptor();
+    }
+
 }

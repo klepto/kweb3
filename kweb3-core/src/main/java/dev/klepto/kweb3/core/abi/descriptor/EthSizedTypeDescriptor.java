@@ -26,4 +26,9 @@ public record EthSizedTypeDescriptor(UnreflectType type, int valueSize) implemen
         return TypeDescriptor.super.toAbiDescriptor() + valueDescriptor;
     }
 
+    @Override
+    public String toString() {
+        return toAbiDescriptor();
+    }
+
 }

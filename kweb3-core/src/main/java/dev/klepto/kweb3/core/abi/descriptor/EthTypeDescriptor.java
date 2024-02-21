@@ -19,4 +19,9 @@ public record EthTypeDescriptor(UnreflectType type) implements TypeDescriptor {
         this(UnreflectType.of(type));
     }
 
+    @Override
+    public String toString() {
+        return toAbiDescriptor();
+    }
+
 }
