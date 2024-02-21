@@ -46,6 +46,8 @@ public class ContractProxy implements InvocationHandler {
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        args = args == null ? new Object[0] : args;
+
         // Invoke interface default methods first. Allows for custom logic/helper methods in contract implementations.
         if (method.isDefault()) {
             return InvocationHandler.invokeDefault(proxy, method, args);
