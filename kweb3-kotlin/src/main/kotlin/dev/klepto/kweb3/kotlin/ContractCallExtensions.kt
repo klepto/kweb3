@@ -15,7 +15,7 @@ object ContractCallExtensions {
      * coroutine context.
      */
     fun ContractCall.isSuspending(): Boolean {
-        return args.last() is Continuation<*>
+        return args.isNotEmpty() && (args.last() is Continuation<*>)
     }
 
     /**
