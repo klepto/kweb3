@@ -15,16 +15,30 @@ import java.util.Arrays;
  */
 public class Web3Error extends RuntimeException {
 
+    /**
+     * Constructs a new runtime error.
+     */
     public Web3Error() {
         super();
     }
 
+    /**
+     * Constructs a new runtime error with a given cause
+     *
+     * @param cause the cause of the error
+     */
     public Web3Error(@NotNull Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new runtime error with a given message
+     *
+     * @param message the message of the error
+     * @param args    the message arguments
+     */
     public Web3Error(@NotNull String message, @Nullable Object... args) {
-        super(MessageFormatter.arrayFormat(message, args).getMessage());
+        super(message(message, args));
     }
 
     /**
@@ -68,6 +82,17 @@ public class Web3Error extends RuntimeException {
 
         setStackTrace(Arrays.copyOfRange(stackTrace, depth, stackTrace.length));
         return this;
+    }
+
+    /**
+     * Formats a message using SLF4J message formatter.
+     *
+     * @param message the message to format
+     * @param args    the message arguments
+     * @return the formatted message
+     */
+    public static String message(String message, Object... args) {
+        return MessageFormatter.arrayFormat(message, args).getMessage();
     }
 
 }
