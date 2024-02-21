@@ -39,6 +39,11 @@ public record EthUint(int size, BigInteger value) implements EthNumericType, Eth
     }
 
     @NotNull
+    public static EthUint uint256(int value) {
+        return uint256(BigInteger.valueOf(value));
+    }
+
+    @NotNull
     public static EthUint uint256(long value) {
         return uint256(BigInteger.valueOf(value));
     }
