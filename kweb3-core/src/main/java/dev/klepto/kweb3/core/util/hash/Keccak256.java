@@ -28,6 +28,7 @@ public final class Keccak256 {
     @NotNull
     public static String keccak256Checksum(@NotNull String hex) {
         hex = hex.toLowerCase().replace("0x", "");
+        hex = Strings.padStart(hex, 40, '0');
         val checksumHash = keccak256(hex);
 
         val result = new StringBuilder();
@@ -38,7 +39,7 @@ public final class Keccak256 {
             result.append(uppercase ? character.toUpperCase() : character);
         }
 
-        return "0x" + Strings.padStart(result.toString(), 40, '0');
+        return "0x" + result;
     }
 
     /**
