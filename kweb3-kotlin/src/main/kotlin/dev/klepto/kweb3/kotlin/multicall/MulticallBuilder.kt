@@ -8,8 +8,8 @@ import dev.klepto.kweb3.kotlin.contracts.Multicall3
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 class MulticallBuilder<T>(
-        private val contract: Multicall3,
-        private val calls: MutableList<suspend () -> T> = mutableListOf()
+    private val contract: Multicall3,
+    private val calls: MutableList<suspend () -> T> = mutableListOf()
 ) {
 
     /**
@@ -53,10 +53,12 @@ class MulticallBuilder<T>(
      * Creates a new [MulticallExecutor] for list of calls associated with this
      * builder and executes it.
      *
+     * @param batchSize the maximum size of a multicall batch, `1024` by
+     *     default
      * @return a list containing call results
      */
-    suspend fun execute(): List<T?> {
-        return build().execute()
+    suspend fun execute(batchSize: Int = 1024): List<T?> {
+        return build().execute(batchSize)
     }
 
 }
