@@ -2,7 +2,7 @@ package dev.klepto.kweb3.kotlin
 
 
 import dev.klepto.kweb3.core.Web3Client
-import dev.klepto.kweb3.core.Web3Network
+import dev.klepto.kweb3.core.config.Web3Network
 
 /**
  * [Web3Client] implementation that support suspend functions by use of

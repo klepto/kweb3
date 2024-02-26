@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core;
+package dev.klepto.kweb3.core.config;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -3,8 +3,8 @@ package dev.klepto.kweb3.core.rpc;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.klepto.kweb3.core.Web3Error;
-import dev.klepto.kweb3.core.Web3Network;
 import dev.klepto.kweb3.core.Web3Result;
+import dev.klepto.kweb3.core.config.Web3Endpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +28,10 @@ public class WebsocketApiClient extends RpcClient {
     private static final Gson GSON = new Gson();
 
     /**
-     * The web3 network that this client is connecting to.
+     * The endpoint that this client is connecting to.
      */
-    private final Web3Network network;
+    @NotNull
+    private final Web3Endpoint endpoint;
 
     /**
      * Thread-safe reference to current {@link WebsocketClient}.
@@ -49,7 +50,7 @@ public class WebsocketApiClient extends RpcClient {
             return current;
         }
 
-        val client = new WebsocketClient(network.rpcUrl(), this::onMessage, this::onClose);
+        val client = new WebsocketClient(endpoint.url(), this::onMessage, this::onClose);
         websocketClient.set(client);
         return client;
     }
