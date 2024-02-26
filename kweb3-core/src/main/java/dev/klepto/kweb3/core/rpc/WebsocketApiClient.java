@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.core.rpc;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.klepto.kweb3.core.Web3Error;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -39,6 +42,11 @@ public class WebsocketApiClient extends RpcClient {
     private final AtomicReference<WebsocketClient> websocketClient = new AtomicReference<>();
 
     /**
+     * The scheduler used to schedule reconnection attempts and request cooldown.
+     */
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    /**
      * Creates or gets currently active {@link WebsocketClient} in a thread-safe manner.
      *
      * @return the websocket client instance
@@ -65,8 +73,18 @@ public class WebsocketApiClient extends RpcClient {
     public @NotNull Web3Result<RpcResponse> request(@NotNull RpcRequest request) {
         try {
             val result = new Web3Result<RpcResponse>();
-            request = beforeRequest(request, result);
-            getWebsocketClient().send(GSON.toJson(request));
+            val processedRequest = beforeRequest(request, result);
+            scheduler.submit(() -> {
+                try {
+                    getWebsocketClient().send(GSON.toJson(processedRequest));
+                } catch (Exception cause) {
+                    result.completeExceptionally(new Web3Error(cause));
+                }
+
+                if (endpoint.requestCooldown() != null) {
+                    Uninterruptibles.sleepUninterruptibly(endpoint.requestCooldown());
+                }
+            });
             return result;
         } catch (Exception cause) {
             throw new Web3Error(cause);
