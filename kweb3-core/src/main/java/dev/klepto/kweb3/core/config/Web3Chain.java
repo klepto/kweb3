@@ -11,7 +11,7 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
 /**
  * Contains information about a {@link Web3Network}.
  *
- * @param name      the name of the network
+ * @param title     the name/title of the network
  * @param chainId   the chain id of the network
  * @param testnet   whether the network is a testnet
  * @param addresses the default addresses used within the network
@@ -20,18 +20,18 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record Web3Chain(@NotNull String name,
+public record Web3Chain(@NotNull String title,
                         long chainId,
                         boolean testnet,
                         @Nullable Addresses addresses,
                         @Nullable Currency currency,
                         @NotNull Web3Endpoint... endpoints) implements Web3Network {
 
-    public Web3Chain(String name,
+    public Web3Chain(String title,
                      long chainId,
                      boolean testnet,
                      Web3Endpoint... endpoints) {
-        this(name, chainId, testnet, null, null, endpoints);
+        this(title, chainId, testnet, null, null, endpoints);
     }
 
     /**
