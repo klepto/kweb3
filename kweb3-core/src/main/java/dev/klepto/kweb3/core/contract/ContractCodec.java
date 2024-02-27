@@ -260,7 +260,7 @@ public class ContractCodec {
             require(!tuple.isEmpty(), "Response returned empty tuple.");
         }
 
-        if (type.matches(EthStructContainer.class)) {
+        if (type.matches(EthTupleContainer.class)) {
             require(value instanceof EthTuple, "Cannot parse {} into tuple container {}.", value, type);
             return decodeTupleContainer(type, (EthTuple) value);
         }
