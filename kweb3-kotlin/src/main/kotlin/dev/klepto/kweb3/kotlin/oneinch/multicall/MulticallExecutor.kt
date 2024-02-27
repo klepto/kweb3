@@ -38,11 +38,11 @@ class MulticallExecutor<T>(
      *
      * @param batchSize the maximum size of a multicall batch, `1024` by
      *     default
-     * @param gasLimit the maximum amount of gas to be used for multicall
-     *     request, `150_000_000` by default
+     * @param gasBuffer the minimum amount of gas remaining to trigger an
+     *     execution return
      * @return a list containing results of all successful and reverted calls
      */
-    suspend fun execute(batchSize: Int = 1024, gasLimit: EthUint = uint256(150_000_000)): List<T?> {
+    suspend fun execute(batchSize: Int = 1024, gasBuffer: EthUint = uint256(10_000)): List<T?> {
         require(batchSize > 0) { "Batch size must be positive." }
         val executor = contract.client.contracts.executor
         require(executor is CoroutineContractExecutor) {
@@ -54,7 +54,7 @@ class MulticallExecutor<T>(
         val callQueue = LinkedList(calls)
         while (!callQueue.isEmpty()) {
             val batch = callQueue.subList(0, min(batchSize, callQueue.size))
-            val result = executeBatch(executor, batch, gasLimit)
+            val result = executeBatch(executor, batch, gasBuffer)
             for (i in result.indices) {
                 callQueue.pop()
             }
@@ -126,10 +126,6 @@ class MulticallExecutor<T>(
         calls: List<suspend () -> T>,
         results: List<EthBytes>
     ): List<T?> {
-        require(calls.size == results.size) {
-            "Results size does not match calls size."
-        }
-
         val result = mutableListOf<T?>()
         results.forEachIndexed { index, data ->
             val byteArray = data.toByteArray()
