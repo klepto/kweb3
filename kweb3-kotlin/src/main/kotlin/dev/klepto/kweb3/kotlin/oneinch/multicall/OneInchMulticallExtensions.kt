@@ -1,14 +1,13 @@
-package dev.klepto.kweb3.kotlin.multicall
+package dev.klepto.kweb3.kotlin.oneinch.multicall
 
 import dev.klepto.kweb3.core.type.EthType
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
 
 /**
- * Extensions for [Multicall3].
+ * Extensions for [OneInchMulticall].
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-object Multicall3Extensions {
+object OneInchMulticallExtensions {
 
     /**
      * Creates a [MulticallExecutor] with given [calls] and immediately
@@ -17,7 +16,7 @@ object Multicall3Extensions {
      * @param calls one or more calls to be executed by multicall executor
      * @return a list containing call results
      */
-    suspend fun <T> Multicall3.execute(vararg calls: suspend () -> T): List<T?> {
+    suspend fun <T> OneInchMulticall.execute(vararg calls: suspend () -> T): List<T?> {
         return build(*calls).execute()
     }
 
@@ -27,7 +26,7 @@ object Multicall3Extensions {
      * @param calls one or more calls to be executed by multicall executor
      * @return instance of multicall executor containing given calls
      */
-    suspend fun <T> Multicall3.build(vararg calls: suspend () -> T): MulticallExecutor<T> {
+    fun <T> OneInchMulticall.build(vararg calls: suspend () -> T): MulticallExecutor<T> {
         return MulticallExecutor(this, calls.asList())
     }
 
@@ -36,7 +35,7 @@ object Multicall3Extensions {
      *
      * @return new instance of multicall builder
      */
-    fun Multicall3.builder(): MulticallBuilder<EthType> {
+    fun OneInchMulticall.builder(): MulticallBuilder<EthType> {
         return MulticallBuilder(this)
     }
 
@@ -46,7 +45,7 @@ object Multicall3Extensions {
      *
      * @return a new instace of type-bound multicall builder
      */
-    fun <T> Multicall3.builder(block: (MulticallBuilder<T>.() -> MulticallBuilder<T>)): MulticallBuilder<T> {
+    fun <T> OneInchMulticall.builder(block: (MulticallBuilder<T>.() -> MulticallBuilder<T>)): MulticallBuilder<T> {
         return MulticallBuilder<T>(this).apply { block.invoke(this) }
     }
 

@@ -1,14 +1,14 @@
-package dev.klepto.kweb3.kotlin.multicall
+package dev.klepto.kweb3.kotlin.oneinch.multicall
 
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
+import dev.klepto.kweb3.core.type.EthUint
 
 /**
- * A type-bound [Multicall3] builder.
+ * A type-bound [OneInchMulticall] builder.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 class MulticallBuilder<T>(
-    private val contract: Multicall3,
+    private val contract: OneInchMulticall,
     private val calls: MutableList<suspend () -> T> = mutableListOf()
 ) {
 
@@ -55,9 +55,11 @@ class MulticallBuilder<T>(
      *
      * @param batchSize the maximum size of a multicall batch, `1024` by
      *     default
+     * @param gasLimit the maximum amount of gas to be used for multicall
+     *     request, `150_000_000` by default
      * @return a list containing call results
      */
-    suspend fun execute(batchSize: Int = 1024): List<T?> {
+    suspend fun execute(batchSize: Int = 1024, gasLimit: EthUint = EthUint.uint256(150_000_000)): List<T?> {
         return build().execute(batchSize)
     }
 

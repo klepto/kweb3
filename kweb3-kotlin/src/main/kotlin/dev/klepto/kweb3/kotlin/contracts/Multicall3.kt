@@ -18,7 +18,7 @@ import dev.klepto.kweb3.core.type.EthBytes
 interface Multicall3 : Web3Contract {
 
     companion object {
-        /** The current address of the Multicall3 smart contract. */
+        /** The current default address of the Multicall3 smart contract. */
         val ADDRESS = address("0xcA11bde05977b3631167028862bE2a173976CA11")
     }
 

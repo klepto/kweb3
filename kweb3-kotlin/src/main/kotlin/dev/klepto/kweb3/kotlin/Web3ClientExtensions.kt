@@ -4,7 +4,6 @@ import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.type.EthAddress
 import dev.klepto.kweb3.core.type.EthAddress.address
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
 
 /**
  * Extension functions for [Web3Client].
@@ -47,16 +46,6 @@ object Web3ClientExtensions {
      */
     inline fun <reified T : Web3Contract> Web3Client.contract(address: String): T {
         return contract<T>(address(address))
-    }
-
-    /**
-     * Returns an instance of [Multicall3] contract using default `multicall3`
-     * address.
-     *
-     * @return the multicall3 smart contract
-     */
-    fun Web3Client.multicall(): Multicall3 {
-        return contract<Multicall3>(Multicall3.ADDRESS)
     }
 
 }

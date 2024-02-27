@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.kotlin.multicall
+package dev.klepto.kweb3.kotlin.oneinch.multicall
 
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
@@ -6,25 +6,27 @@ import dev.klepto.kweb3.core.contract.DefaultContractExecutor
 import dev.klepto.kweb3.core.contract.LoggingContractExecutor
 import dev.klepto.kweb3.core.type.EthArray
 import dev.klepto.kweb3.core.type.EthArray.array
-import dev.klepto.kweb3.core.type.EthBool.bool
 import dev.klepto.kweb3.core.type.EthBytes
 import dev.klepto.kweb3.core.type.EthBytes.bytes
+import dev.klepto.kweb3.core.type.EthUint
+import dev.klepto.kweb3.core.type.EthUint.uint256
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
-import dev.klepto.kweb3.kotlin.contracts.Multicall3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.math.min
 
 /**
- * A suspending [Multicall3] executor.
+ * A suspending [OneInchMulticall] executor.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 class MulticallExecutor<T>(
-    private val contract: Multicall3,
+    private val contract: OneInchMulticall,
     private val calls: List<suspend () -> T>
 ) {
 
@@ -36,9 +38,11 @@ class MulticallExecutor<T>(
      *
      * @param batchSize the maximum size of a multicall batch, `1024` by
      *     default
+     * @param gasLimit the maximum amount of gas to be used for multicall
+     *     request, `150_000_000` by default
      * @return a list containing results of all successful and reverted calls
      */
-    suspend fun execute(batchSize: Int = 1024): List<T?> {
+    suspend fun execute(batchSize: Int = 1024, gasLimit: EthUint = uint256(150_000_000)): List<T?> {
         require(batchSize > 0) { "Batch size must be positive." }
         val executor = contract.client.contracts.executor
         require(executor is CoroutineContractExecutor) {
@@ -46,10 +50,17 @@ class MulticallExecutor<T>(
                     "be used from ${CoroutineContractExecutor::class.simpleName} context."
         }
 
-        val batches = calls.chunked(batchSize)
-        return batches.flatMap {
-            executeBatch(executor, it)
+        val results = mutableListOf<T?>()
+        val callQueue = LinkedList(calls)
+        while (!callQueue.isEmpty()) {
+            val batch = callQueue.subList(0, min(batchSize, callQueue.size))
+            val result = executeBatch(executor, batch, gasLimit)
+            for (i in result.indices) {
+                callQueue.pop()
+            }
+            results.addAll(result)
         }
+        return results
     }
 
     /**
@@ -65,10 +76,12 @@ class MulticallExecutor<T>(
      */
     private suspend fun executeBatch(
         executor: CoroutineContractExecutor,
-        batch: List<suspend () -> T>
+        batch: List<suspend () -> T>,
+        gasLimit: EthUint
     ): List<T?> {
         val encodedCalls = encodeCalls(executor, batch)
-        val results = array(contract.aggregate3(encodedCalls).map { it.returnData })
+        val response = contract.multicallWithGasLimitation(encodedCalls, gasLimit)
+        val results = response.results.subList(0, response.lastSuccessIndex.toInt() + 1)
         return decodeResults(executor, batch, results)
     }
 
@@ -82,7 +95,7 @@ class MulticallExecutor<T>(
     private suspend fun encodeCalls(
         executor: CoroutineContractExecutor,
         calls: List<suspend () -> T>
-    ): EthArray<Multicall3.Call> {
+    ): EthArray<OneInchMulticall.Call> {
         val logger = LoggingInterceptor()
         val scope = CoroutineScope(Dispatchers.Unconfined)
         executor.withInterceptor(logger) {
@@ -93,7 +106,7 @@ class MulticallExecutor<T>(
         scope.cancel()
 
         val result = logger.logs.map {
-            Multicall3.Call(it.contractAddress, bool(true), bytes(it.data))
+            OneInchMulticall.Call(it.contractAddress, bytes(it.data))
         }
 
         return array(result)
@@ -104,22 +117,22 @@ class MulticallExecutor<T>(
      * [ConstantResultInterceptor].
      *
      * @param executor the coroutine contract executor
-     * @param calls the list of calls
-     * @param results an ethereum array of results
+     * @param calls a list of calls
+     * @param results a list containing call results
      * @return the decoded list of multicall results
      */
     private suspend fun decodeResults(
         executor: CoroutineContractExecutor,
         calls: List<suspend () -> T>,
-        results: EthArray<EthBytes>
+        results: List<EthBytes>
     ): List<T?> {
         require(calls.size == results.size) {
             "Results size does not match calls size."
         }
 
         val result = mutableListOf<T?>()
-        calls.forEachIndexed { index, call ->
-            val byteArray = results[index].toByteArray()
+        results.forEachIndexed { index, data ->
+            val byteArray = data.toByteArray()
             if (byteArray.isEmpty()) {
                 result.add(null)
                 return@forEachIndexed
@@ -128,7 +141,7 @@ class MulticallExecutor<T>(
             val value = Hex.toHex(byteArray)
             val interceptor = ConstantResultInterceptor(value)
             executor.withInterceptor(interceptor) {
-                result.add(call())
+                result.add(calls[index]())
             }
         }
 
