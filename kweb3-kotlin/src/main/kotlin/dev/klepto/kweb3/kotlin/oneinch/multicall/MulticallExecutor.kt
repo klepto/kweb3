@@ -39,10 +39,10 @@ class MulticallExecutor<T>(
      * @param batchSize the maximum size of a multicall batch, `1024` by
      *     default
      * @param gasBuffer the minimum amount of gas remaining to trigger an
-     *     execution return
+     *     execution return, `3_000_000` by default
      * @return a list containing results of all successful and reverted calls
      */
-    suspend fun execute(batchSize: Int = 1024, gasBuffer: EthUint = uint256(10_000)): List<T?> {
+    suspend fun execute(batchSize: Int = 1024, gasBuffer: EthUint = uint256(3_000_000)): List<T?> {
         require(batchSize > 0) { "Batch size must be positive." }
         val executor = contract.client.contracts.executor
         require(executor is CoroutineContractExecutor) {

@@ -56,10 +56,10 @@ class MulticallBuilder<T>(
      * @param batchSize the maximum size of a multicall batch, `1024` by
      *     default
      * @param gasBuffer the minimum amount of gas remaining to trigger an
-     *     execution return
+     *     execution return, `3_000_000` by default
      * @return a list containing call results
      */
-    suspend fun execute(batchSize: Int = 1024, gasBuffer: EthUint = EthUint.uint256(10_000)): List<T?> {
+    suspend fun execute(batchSize: Int = 1024, gasBuffer: EthUint = EthUint.uint256(3_000_000)): List<T?> {
         return build().execute(batchSize, gasBuffer)
     }
 
