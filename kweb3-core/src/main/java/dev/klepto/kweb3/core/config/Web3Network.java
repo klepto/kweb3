@@ -13,11 +13,11 @@ import org.jetbrains.annotations.Nullable;
 public interface Web3Network {
 
     /**
-     * Returns the title of the network.
+     * Returns the name of the network.
      *
-     * @return title of the network
+     * @return name of the network
      */
-    String title();
+    String name();
 
     /**
      * Returns the chain id of the network.
