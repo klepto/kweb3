@@ -32,6 +32,11 @@ public record EthInt(int size, BigInteger value) implements EthNumericType, EthS
         return "int" + size + "(" + value + ")";
     }
 
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
     /* Solidity style int initializers */
     @NotNull
     public static EthInt int256(@NotNull BigInteger value) {

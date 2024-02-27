@@ -3,6 +3,8 @@ package dev.klepto.kweb3.core.type;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
@@ -35,6 +37,11 @@ public record EthBool(boolean value) implements EthType {
     @Override
     public String toString() {
         return "bool(" + value + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     /**

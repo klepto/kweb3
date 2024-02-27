@@ -33,6 +33,11 @@ public record EthAddress(BigInteger value) implements EthNumericType {
         return "address(" + toChecksumHex() + ")";
     }
 
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
     /* Solidity style address initializers */
 
     /**

@@ -20,6 +20,11 @@ public record EthString(String value) implements EthType {
         return "string(" + value + ")";
     }
 
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
     /* Solidity style string initializers */
     @NotNull
     public static EthString string(@NotNull String value) {

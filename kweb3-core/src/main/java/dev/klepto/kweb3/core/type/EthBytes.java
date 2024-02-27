@@ -49,6 +49,11 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
         return "bytes" + sizeString + "(" + Hex.toHex(toByteArray()) + ")";
     }
 
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
 
     /**
      * Converts this value to mutable <code>byte</code> array.

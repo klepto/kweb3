@@ -21,6 +21,11 @@ public record EthTuple(ImmutableList<EthType> values) implements EthType, EthCol
         return "tuple(" + children + ")";
     }
 
+    @Override
+    public int hashCode() {
+        return values.hashCode();
+    }
+
     /* Solidity style tuple initializers */
     @NotNull
     public static EthTuple tuple(@NotNull EthType... values) {
