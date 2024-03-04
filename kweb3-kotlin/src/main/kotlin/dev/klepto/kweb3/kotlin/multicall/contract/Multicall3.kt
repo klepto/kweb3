@@ -1,25 +1,30 @@
-package dev.klepto.kweb3.kotlin.contracts
+package dev.klepto.kweb3.kotlin.multicall.contract
 
-import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.annotation.View
 import dev.klepto.kweb3.core.contract.type.EthStructContainer
 import dev.klepto.kweb3.core.type.EthAddress
-import dev.klepto.kweb3.core.type.EthAddress.address
 import dev.klepto.kweb3.core.type.EthArray
+import dev.klepto.kweb3.core.type.EthArray.array
 import dev.klepto.kweb3.core.type.EthBool
+import dev.klepto.kweb3.core.type.EthBool.bool
 import dev.klepto.kweb3.core.type.EthBytes
+import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
 
 /**
  * Implementation of [Multicall3](https://github.com/mds1/multicall) smart
- * contract.
+ * contract executor.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-interface Multicall3 : Web3Contract {
+@JvmDefaultWithoutCompatibility
+interface Multicall3 : MulticallExecutor {
 
-    companion object {
-        /** The current default address of the Multicall3 smart contract. */
-        val ADDRESS = address("0xcA11bde05977b3631167028862bE2a173976CA11")
+    override suspend fun execute(allowFailure: Boolean, calls: List<MulticallExecutor.Call>): List<EthBytes?> {
+        val encodedCalls = array(calls.map { Call(it.address, bool(allowFailure), it.data) })
+        val response = aggregate3(encodedCalls)
+        return response.map {
+            if (it.success.value) it.returnData else null
+        }
     }
 
     /**
