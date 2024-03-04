@@ -58,10 +58,8 @@ public interface Web3Network {
      * Contains the default addresses used within the network.
      *
      * @param nativeToken the native token address
-     * @param multicall3  the multicall3 address
      */
-    record Addresses(@Nullable EthAddress nativeToken,
-                     @Nullable EthAddress multicall3) {
+    record Addresses(@Nullable EthAddress nativeToken) {
     }
 
     /**
