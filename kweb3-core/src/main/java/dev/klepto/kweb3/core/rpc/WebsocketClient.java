@@ -58,7 +58,7 @@ public class WebsocketClient extends WebSocketClient {
      */
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        log.info("WebSocket RPC connected: {}", url);
+        log.debug("WebSocket RPC connected: {}", url);
     }
 
     /**
@@ -83,7 +83,7 @@ public class WebsocketClient extends WebSocketClient {
      */
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        log.info("WebSocket RPC disconnected: {} - {}", reason, url);
+        log.debug("WebSocket RPC disconnected: {} - {}", reason, url);
         if (closeCallback != null) {
             closeCallback.run();
         }
