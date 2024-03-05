@@ -53,6 +53,7 @@ public class HeadlongCodecTest {
         val type = new EthTupleTypeDescriptor().withChildren(ImmutableList.of(innerType));
         val expected = tuple(array(tuple(uint256(1))));
         val result = codec.decode(abi, type);
+        assertNotNull(result);
         assertEquals(expected.size(), result.size());
         assertEquals(EthArray.class, result.get(0).getClass());
 
