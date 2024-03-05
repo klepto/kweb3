@@ -4,31 +4,37 @@ import com.google.common.collect.ImmutableList;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
- * Represents ethereum array data type. Used in place of JVM arrays in-order to enable immutability and support proper
- * type-safety for kweb3 API.
+ * Container for <code>ethereum array</code> value. Used in favor of JVM arrays in-order to enable immutability and API
+ * type-safety.
  *
- * @param capacity the size of the array, -1 indicates dynamic array, any other value indicates fixed size array
+ * @param capacity the size of the array, <code>-1</code> indicates dynamic array, any other positive value indicates a
+ *                 fixed size array
  * @param values   the elements of the array
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthArray<T extends EthType>(int capacity,
-                                          ImmutableList<T> values) implements EthType, EthCollection<T> {
+public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values) implements EthType, EthCollection<T> {
+
+    /**
+     * Constant indicating dynamic array size.
+     */
+    public static final int DYNAMIC_SIZE = -1;
 
     public EthArray {
         require(
-                capacity == -1 || capacity == values.size(),
+                capacity == DYNAMIC_SIZE || capacity == values.size(),
                 "Array of capacity {} cannot fit {} values",
                 capacity, values.size()
         );
     }
 
     /**
-     * Returns the ethereum data type of this array.
+     * Returns the {@link EthType} type of this array.
      *
      * @return the class representing the type of elements contained in this array
      */
@@ -42,6 +48,11 @@ public record EthArray<T extends EthType>(int capacity,
         return (Class<T>) values.get(0).getClass();
     }
 
+    /**
+     * Returns string representation of this <code>ethereum array</code>.
+     *
+     * @return the string representation of this <code>ethereum array</code>.
+     */
     @Override
     public String toString() {
         if (values.isEmpty()) {
@@ -54,14 +65,40 @@ public record EthArray<T extends EthType>(int capacity,
         return solidityName + size + "[" + children + "]";
     }
 
-    /* Solidity style array initializers */
+    /**
+     * Returns hash code of this <code>ethereum bool</code>.
+     *
+     * @return hash code of this <code>ethereum bool</code>
+     */
+    @Override
+    public int hashCode() {
+        return values.hashCode();
+    }
 
     /**
-     * Creates a fixed-size ethereum array with given elements.
+     * Compares this <code>ethereum bool</code> to the specified object.
+     *
+     * @param object the object to compare with
+     * @return true if the objects are the same; false otherwise
+     */
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof EthArray<?> other)) {
+            return false;
+        }
+        return values.equals(other.values);
+    }
+
+    /* Solidity style static initializers */
+
+    /**
+     * Creates a fixed-size  <code>ethereum array</code> with given elements.
      *
      * @param size   the fixed array size
-     * @param values the array element values
-     * @return a fixed-sized ethereum array representation
+     * @param values the array values
+     * @return a new fixed-sized <code>ethereum array</code> container
      */
     @NotNull
     @SafeVarargs
@@ -70,38 +107,38 @@ public record EthArray<T extends EthType>(int capacity,
     }
 
     /**
-     * Creates a fixed-size ethereum array by copying elements from given iterable.
+     * Creates a fixed-size  <code>ethereum array</code> with given {@link Collection} <code>values</code>.
      *
      * @param size   the fixed array size
-     * @param values the iterable containing elements values
-     * @return a fixed-sized ethereum array representation
+     * @param values the collection containing values
+     * @return a new fixed-sized <code>ethereum array</code> container
      */
     @NotNull
-    public static <T extends EthType> EthArray<T> array(int size, @NotNull Iterable<T> values) {
+    public static <T extends EthType> EthArray<T> array(int size, @NotNull Collection<T> values) {
         return new EthArray<>(size, ImmutableList.copyOf(values));
     }
 
     /**
-     * Creates a dynamic-size ethereum array with given elements.
+     * Creates a dynamic-size  <code>ethereum array</code> with given elements.
      *
-     * @param values the array element values
-     * @return a dynamic-size ethereum array representation
+     * @param values the array values
+     * @return a new dynamic-size <code>ethereum array</code> container
      */
     @NotNull
     @SafeVarargs
     public static <T extends EthType> EthArray<T> array(@NotNull T... values) {
-        return array(-1, values);
+        return array(DYNAMIC_SIZE, values);
     }
 
     /**
-     * Creates a dynamic-size ethereum array by copying elements from given iterable.
+     * Creates a dynamic-size  <code>ethereum array</code> with given {@link Collection} <code>values</code>.
      *
-     * @param values the array element values
-     * @return a dynamic-size ethereum array representation
+     * @param values the collection containing values
+     * @return a new dynamic-size <code>ethereum array</code> container
      */
     @NotNull
-    public static <T extends EthType> EthArray<T> array(@NotNull Iterable<T> values) {
-        return array(-1, values);
+    public static <T extends EthType> EthArray<T> array(@NotNull Collection<T> values) {
+        return array(DYNAMIC_SIZE, values);
     }
 
 }
