@@ -3,12 +3,13 @@ package dev.klepto.kweb3.core.type;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
- * Represents ethereum bool data type.
+ * Container for <code>ethereum bool</code> value.
  *
  * @param value true or false <code>boolean</code> value
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -25,43 +26,55 @@ public record EthBool(boolean value) implements EthType {
      */
     public static final EthBool FALSE = bool(false);
 
-    /* Solidity style bool initializers */
-
     /**
-     * Converts JVM {@link boolean} type to ethereum bool type.
+     * Returns string representation of this <code>ethereum bool</code>.
+     *
+     * @return the string representation of this <code>ethereum bool</code>.
      */
-    public static EthBool bool(boolean value) {
-        return new EthBool(value);
-    }
-
     @Override
     public String toString() {
         return "bool(" + value + ")";
     }
 
+    /**
+     * Returns hash code of this <code>ethereum bool</code>.
+     *
+     * @return hash code of this <code>ethereum bool</code>
+     */
     @Override
     public int hashCode() {
         return Objects.hash(value);
     }
 
     /**
-     * Converts ethereum {@link EthUint} type to ethereum bool type.
+     * Compares this <code>ethereum bool</code> to the specified object.
+     *
+     * @param object the object to compare with
+     * @return true if the objects are the same; false otherwise
      */
-    @NotNull
-    public static EthBool bool(@NotNull EthUint value) {
-        val intValue = value.value().intValue();
-        require(intValue == 1 || intValue == 0, "Not a boolean value");
-        return new EthBool(intValue == 1);
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof EthBool other)) {
+            return false;
+        }
+        return value == other.value;
     }
 
-    /**
-     * Converts ethereum {@link EthInt} type to ethereum bool type.
-     */
+    /* Solidity style static initializers */
     @NotNull
-    public static EthBool bool(@NotNull EthInt value) {
-        val intValue = value.value().intValue();
-        require(intValue == 1 || intValue == 0, "Not a boolean value");
-        return new EthBool(intValue == 1);
+    public static EthBool bool(boolean value) {
+        return new EthBool(value);
+    }
+
+    @NotNull
+    public static EthBool bool(@NotNull Number value) {
+        val intValue = EthNumericType.parseBigInteger(value);
+        val isTrue = intValue.equals(BigInteger.ONE);
+        val isFalse = intValue.equals(BigInteger.ZERO);
+        require(isTrue || isFalse, "Number {} is not a boolean value.", value);
+        return new EthBool(isTrue);
     }
 
 }
