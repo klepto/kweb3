@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.core.type;
 
+import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @param value true or false <code>boolean</code> value
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
+@With
 public record EthBool(boolean value) implements EthType {
 
     /**
