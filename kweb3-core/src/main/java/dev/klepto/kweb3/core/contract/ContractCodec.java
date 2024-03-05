@@ -25,7 +25,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
 import static dev.klepto.unreflect.Unreflect.reflect;
 
 /**
- * Handles encoding/decoding of {@link EthType} types for use with {@link ContractExecutor}.<br>
+ * Handles encoding/decoding of {@link EthValue} types for use with {@link ContractExecutor}.<br>
  * <p>
  * Kweb3 has two available pipelines for interacting with smart contracts.<br><br>
  * <p>
@@ -78,7 +78,7 @@ public class ContractCodec {
     }
 
     /**
-     * Parses a type descriptor of a given {@link EthType} represented by {@link UnreflectType} with a given value size
+     * Parses a type descriptor of a given {@link EthValue} represented by {@link UnreflectType} with a given value size
      * and array size. Used for annotation processing.
      *
      * @param type      the ethereum data type
@@ -93,7 +93,7 @@ public class ContractCodec {
             return parseDescriptor(genericType, valueSize, arraySize);
         }
 
-        if (type.matches(EthSizedType.class)) {
+        if (type.matches(EthSizedValue.class)) {
             // Hard-coded defaults, not a huge fan.
             if (valueSize == -1) {
                 if (type.matchesExact(EthUint.class) || type.matchesExact(EthInt.class)) {
@@ -153,16 +153,16 @@ public class ContractCodec {
     }
 
     /**
-     * Converts all given parameter values of a contract call to known {@link EthType} values. Simply returns for
+     * Converts all given parameter values of a contract call to known {@link EthValue} values. Simply returns for
      * already known ethereum values, for JVM tuple containers, recursively encodes each field value.
      *
      * @param descriptor the tuple descriptor of the parameters
      * @param values     the array of values
      * @return normalized parameter values contained in a tuple
      */
-    public static EthTuple encodeParameterValues(EthTupleTypeDescriptor descriptor, EthType[] values) {
+    public static EthTuple encodeParameterValues(EthTupleTypeDescriptor descriptor, EthValue[] values) {
         require(values.length == descriptor.children().size(), "Value size mismatch.");
-        val result = new ArrayList<EthType>();
+        val result = new ArrayList<EthValue>();
         for (var i = 0; i < values.length; i++) {
             result.add(encodeParameterValue(descriptor.children().get(i), values[i]));
         }
@@ -170,7 +170,7 @@ public class ContractCodec {
     }
 
     /**
-     * Converts given parameter value of a contract call to ABI-compatible {@link EthType} value. If a value is regular
+     * Converts given parameter value of a contract call to ABI-compatible {@link EthValue} value. If a value is regular
      * ethereum value, it simply returns it, if a value is a JVM tuple container or array of tuple containers, this
      * function will recursively encode every field in the container.
      *
@@ -178,7 +178,7 @@ public class ContractCodec {
      * @param value      the value
      * @return normalized parameter value ready to be used with ABI encoding
      */
-    public static EthType encodeParameterValue(TypeDescriptor descriptor, EthType value) {
+    public static EthValue encodeParameterValue(TypeDescriptor descriptor, EthValue value) {
         val isTupleDescriptor = descriptor instanceof EthTupleTypeDescriptor;
         val isArrayDescriptor = descriptor instanceof EthArrayTypeDescriptor;
 
@@ -202,7 +202,7 @@ public class ContractCodec {
     }
 
     /**
-     * Converts given parameter array value to ABI-compatible {@link EthType} value. If parameter value is already
+     * Converts given parameter array value to ABI-compatible {@link EthValue} value. If parameter value is already
      * ABI-compatible, function simply returns it. If parameter contains a {@link EthTupleContainer} or
      * {@link EthStructContainer}, it recursively encodes fields of each container to ABI-compatible values.
      *
@@ -218,14 +218,14 @@ public class ContractCodec {
 
         val result = value
                 .stream()
-                .map(element -> encodeParameterValue(componentDescriptor, (EthType) element))
+                .map(element -> encodeParameterValue(componentDescriptor, (EthValue) element))
                 .toList();
 
         return array(value.capacity(), result);
     }
 
     /**
-     * Converts given parameter {@link EthTupleContainer} value to ABI-compatible {@link EthType} value. Recursively
+     * Converts given parameter {@link EthTupleContainer} value to ABI-compatible {@link EthValue} value. Recursively
      * encodes all fields of the container to ABI-compatible values.
      *
      * @param descriptor the tuple type descriptor
@@ -238,7 +238,7 @@ public class ContractCodec {
                 .toList();
         require(fields.size() == descriptor.children().size(), "Tuple field size mismatch.");
 
-        val result = new ArrayList<EthType>();
+        val result = new ArrayList<EthValue>();
         for (var i = 0; i < fields.size(); i++) {
             result.add(encodeParameterValue(descriptor.children().get(i), fields.get(i).get()));
         }
@@ -247,7 +247,7 @@ public class ContractCodec {
     }
 
     /**
-     * Decodes value to given return <code>type</code>. If expected return type is simple {@link EthType} value, simply
+     * Decodes value to given return <code>type</code>. If expected return type is simple {@link EthValue} value, simply
      * unpacks it from the tuple and returns it. Otherwise, if expected return type is {@link EthTupleContainer} or
      * {@link EthArray array} of {@link EthTupleContainer}, recursively populates new instances of the containers.
      *
@@ -255,7 +255,7 @@ public class ContractCodec {
      * @param value the response value decoded from ABI response
      * @return decoded value matching given return type
      */
-    public static EthType decodeReturnValue(UnreflectType type, EthType value) {
+    public static EthValue decodeReturnValue(UnreflectType type, EthValue value) {
         if (value instanceof EthTuple tuple) {
             require(!tuple.isEmpty(), "Response returned empty tuple.");
         }
@@ -271,7 +271,7 @@ public class ContractCodec {
             require(genericType != null, "Could not infer EthArray type.");
 
             val array = (EthArray<?>) value;
-            val result = new ArrayList<EthType>();
+            val result = new ArrayList<EthValue>();
             for (var i = 0; i < array.size(); i++) {
                 result.add(decodeReturnValue(genericType, (EthTuple) array.get(i)));
             }
@@ -291,7 +291,7 @@ public class ContractCodec {
      * @param tuple the tuple values
      * @return the decoded JVM container containing tuple values
      */
-    public static EthType decodeTupleContainer(UnreflectType type, EthTuple tuple) {
+    public static EthValue decodeTupleContainer(UnreflectType type, EthTuple tuple) {
         require(
                 type.matches(EthTupleContainer.class),
                 "Given type {} is not a {} or {}",
@@ -315,7 +315,7 @@ public class ContractCodec {
             values.add(decodedValue);
         }
 
-        return (EthType) classAccess.create(values.toArray());
+        return (EthValue) classAccess.create(values.toArray());
     }
 
 }

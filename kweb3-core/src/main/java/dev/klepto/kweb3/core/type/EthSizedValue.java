@@ -6,7 +6,7 @@ package dev.klepto.kweb3.core.type;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthSizedType extends EthType {
+public interface EthSizedValue extends EthValue {
 
     /**
      * Size parameter of ethereum data type. For {@link EthUint} and {@link EthInt} it represents bit-size, for

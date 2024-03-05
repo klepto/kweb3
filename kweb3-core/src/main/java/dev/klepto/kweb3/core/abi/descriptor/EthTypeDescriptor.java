@@ -3,7 +3,7 @@ package dev.klepto.kweb3.core.abi.descriptor;
 import dev.klepto.kweb3.core.type.EthAddress;
 import dev.klepto.kweb3.core.type.EthBool;
 import dev.klepto.kweb3.core.type.EthString;
-import dev.klepto.kweb3.core.type.EthType;
+import dev.klepto.kweb3.core.type.EthValue;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
 import lombok.val;
@@ -28,7 +28,7 @@ public record EthTypeDescriptor(UnreflectType type) implements TypeDescriptor {
         require(isString || isBool || isAddress, "Unsupported simple descriptor type: " + type);
     }
 
-    public EthTypeDescriptor(Class<? extends EthType> type) {
+    public EthTypeDescriptor(Class<? extends EthValue> type) {
         this(UnreflectType.of(type));
     }
 

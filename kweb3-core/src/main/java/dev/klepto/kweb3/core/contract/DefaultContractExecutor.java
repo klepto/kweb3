@@ -5,7 +5,7 @@ import dev.klepto.kweb3.core.abi.AbiCodec;
 import dev.klepto.kweb3.core.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
-import dev.klepto.kweb3.core.type.EthType;
+import dev.klepto.kweb3.core.type.EthValue;
 import lombok.val;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
@@ -57,9 +57,9 @@ public class DefaultContractExecutor implements ContractExecutor {
 
         // Remove all non-ethereum type arguments, such as suspend method transformations.
         val dataArgs = StreamEx.of(argsWithoutCost)
-                .filter(EthType.class::isInstance)
-                .map(EthType.class::cast)
-                .toArray(EthType[]::new);
+                .filter(EthValue.class::isInstance)
+                .map(EthValue.class::cast)
+                .toArray(EthValue[]::new);
 
 
         val descriptor = (EthTupleTypeDescriptor) call.function().parametersDescriptor();
@@ -126,7 +126,7 @@ public class DefaultContractExecutor implements ContractExecutor {
         val tuple = codec.decode(result, descriptor);
 
         require(tuple != null && !tuple.isEmpty(), noResultMessage);
-        val value = (EthType) (function.returnTuple() ? tuple : tuple.get(0));
+        val value = (EthValue) (function.returnTuple() ? tuple : tuple.get(0));
         return ContractCodec.decodeReturnValue(type, value);
     }
 

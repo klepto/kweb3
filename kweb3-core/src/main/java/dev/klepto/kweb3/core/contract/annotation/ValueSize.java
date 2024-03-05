@@ -2,8 +2,8 @@ package dev.klepto.kweb3.core.contract.annotation;
 
 import dev.klepto.kweb3.core.type.EthBytes;
 import dev.klepto.kweb3.core.type.EthInt;
-import dev.klepto.kweb3.core.type.EthType;
 import dev.klepto.kweb3.core.type.EthUint;
+import dev.klepto.kweb3.core.type.EthValue;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotates value size of contract function parameter or result. This has to match sizing specified in the contract
- * function on the blockchain. For more information on sizing limits look at specific {@link EthType}.
+ * function on the blockchain. For more information on sizing limits look at specific {@link EthValue}.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  * @see EthInt

@@ -18,7 +18,7 @@ import static dev.klepto.kweb3.core.util.Hex.toBigInteger;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthAddress(BigInteger value) implements EthType, EthNumericType<EthAddress> {
+public record EthAddress(BigInteger value) implements EthValue, EthNumericValue<EthAddress> {
 
     /**
      * Zero address constant.
@@ -71,7 +71,7 @@ public record EthAddress(BigInteger value) implements EthType, EthNumericType<Et
     /* Solidity style static initializers */
     @NotNull
     public static EthAddress address(@NotNull Number value) {
-        return new EthAddress(EthNumericType.parseBigInteger(value));
+        return new EthAddress(EthNumericValue.parseBigInteger(value));
     }
 
     @NotNull

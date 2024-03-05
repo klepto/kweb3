@@ -7,7 +7,7 @@ import dev.klepto.kweb3.core.contract.annotation.Transaction;
 import dev.klepto.kweb3.core.contract.annotation.View;
 import dev.klepto.kweb3.core.contract.type.EthStructContainer;
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
-import dev.klepto.kweb3.core.type.EthType;
+import dev.klepto.kweb3.core.type.EthValue;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.Unreflect;
 import dev.klepto.unreflect.UnreflectType;
@@ -78,7 +78,7 @@ public class DefaultContractParser implements ContractParser {
         val methodAccess = reflect(method);
         val parameters = methodAccess.parameters()
                 .filter(parameter -> !parameter.containsAnnotation(Cost.class))
-                .filter(parameter -> parameter.type().matches(EthType.class))
+                .filter(parameter -> parameter.type().matches(EthValue.class))
                 .collect(toImmutableList());
         return ContractCodec.parseTupleDescriptor(parameters);
     }

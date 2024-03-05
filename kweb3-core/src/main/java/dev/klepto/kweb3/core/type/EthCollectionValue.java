@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  * @see EthArray
  * @see EthTuple
  */
-public interface EthCollection<T extends EthType> extends EthType, Iterable<T> {
+public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterable<T> {
 
     /**
      * Returns the values contained within this collection.

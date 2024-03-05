@@ -2,7 +2,7 @@ package dev.klepto.kweb3.core.abi.descriptor;
 
 import dev.klepto.kweb3.core.type.EthBytes;
 import dev.klepto.kweb3.core.type.EthInt;
-import dev.klepto.kweb3.core.type.EthSizedType;
+import dev.klepto.kweb3.core.type.EthSizedValue;
 import dev.klepto.kweb3.core.type.EthUint;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
@@ -28,7 +28,7 @@ public record EthSizedTypeDescriptor(UnreflectType type, int valueSize) implemen
         require(isInt || isUint || isBytes, "Unsupported sized descriptor type: {}", type);
     }
 
-    public EthSizedTypeDescriptor(Class<? extends EthSizedType> type, int valueSize) {
+    public EthSizedTypeDescriptor(Class<? extends EthSizedValue> type, int valueSize) {
         this(UnreflectType.of(type), valueSize);
     }
 

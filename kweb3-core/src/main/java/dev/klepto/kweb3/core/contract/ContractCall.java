@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.contract;
 
-import dev.klepto.kweb3.core.type.EthType;
+import dev.klepto.kweb3.core.type.EthValue;
 import lombok.val;
 
 import java.util.Arrays;
@@ -22,7 +22,7 @@ public record ContractCall(ContractProxy proxy,
         val contractName = proxy.getType().getSimpleName();
         val functionName = function.name();
         val ethereumArgs = Arrays.stream(args)
-                .filter(EthType.class::isInstance)
+                .filter(EthValue.class::isInstance)
                 .map(Object::toString)
                 .toList();
         val argsString = String.join(", ", ethereumArgs);

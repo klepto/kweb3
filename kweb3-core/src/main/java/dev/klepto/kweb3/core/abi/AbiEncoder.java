@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.core.abi;
 
 import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor;
-import dev.klepto.kweb3.core.type.EthType;
+import dev.klepto.kweb3.core.type.EthValue;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,27 +12,27 @@ import org.jetbrains.annotations.NotNull;
 public interface AbiEncoder {
 
     /**
-     * Attempts to encode given {@link EthType} value into an ABI string by automatically detecting type information.
+     * Attempts to encode given {@link EthValue} value into an ABI string by automatically detecting type information.
      * This will work most of the time except for cases where we are dealing with empty arrays or empty tuples where
      * inference isn't possible. Hence, why more delicate features of the API rely on
-     * {@link #encode(EthType, TypeDescriptor)}.
+     * {@link #encode(EthValue, TypeDescriptor)}.
      *
      * @param value the ethereum type value
      * @return the ABI encoded string containing the ethereum value
      */
     @NotNull
-    default String encode(@NotNull EthType value) {
+    default String encode(@NotNull EthValue value) {
         return encode(value, TypeDescriptor.parse(value));
     }
 
     /**
-     * Encodes given {@link EthType} value into an ABI string according to provided type description.
+     * Encodes given {@link EthValue} value into an ABI string according to provided type description.
      *
      * @param value      the ethereum type value
      * @param descriptor the type description
      * @return the ABI encoded string containing the ethereum value
      */
     @NotNull
-    String encode(@NotNull EthType value, @NotNull TypeDescriptor descriptor);
+    String encode(@NotNull EthValue value, @NotNull TypeDescriptor descriptor);
 
 }

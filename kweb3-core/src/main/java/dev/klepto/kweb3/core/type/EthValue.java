@@ -5,14 +5,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * Represents ethereum virtual machine data type. Acts as intermediary for encoding/decoding between java and blockchain
- * data-types.
+ * Represents <i>ethereum virtual machine</i> value. Acts as intermediary for encoding/decoding between java and
+ * blockchain data-types.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthType {
+public interface EthValue {
 
-    Map<Class<? extends EthType>, String> SOLIDITY_NAMES = Map.of(
+    Map<Class<? extends EthValue>, String> SOLIDITY_NAMES = Map.of(
             EthAddress.class, "address",
             EthBool.class, "bool",
             EthBytes.class, "bytes",
@@ -22,10 +22,11 @@ public interface EthType {
     );
 
     /**
-     * Returns solidity name equivalent of given ethereum data type.
+     * Returns solidity name equivalent of given <code>ethereum value</code> type.
      *
      * @param type the type class
-     * @return the solidity name of given ethereum data type or empty <code>String</code> if type does not have a name
+     * @return the solidity name of given <code>ethereum value</code> type or empty <code>String</code> if type does not
+     * have a name
      */
     @NotNull
     static String getSolidityName(Class<?> type) {

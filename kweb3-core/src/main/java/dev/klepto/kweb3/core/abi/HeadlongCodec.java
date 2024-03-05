@@ -61,14 +61,14 @@ public class HeadlongCodec implements AbiCodec {
     }
 
     /**
-     * Converts any given headlong value into appropriate {@link EthType} value.
+     * Converts any given headlong value into appropriate {@link EthValue} value.
      *
      * @param value      the headlong value
      * @param descriptor the ethereum type descriptor
      * @return the decoded ethereum data value
      * @throws IllegalArgumentException if decoder for a given value was not found
      */
-    private EthType decodeValue(Object value, TypeDescriptor descriptor) throws IllegalArgumentException {
+    private EthValue decodeValue(Object value, TypeDescriptor descriptor) throws IllegalArgumentException {
         if (value instanceof Address address) {
             return decodeAddress(address, descriptor);
         } else if (value instanceof byte[] bytes && descriptor instanceof EthSizedTypeDescriptor) {
@@ -111,13 +111,13 @@ public class HeadlongCodec implements AbiCodec {
     }
 
     /**
-     * Converts <code>Number</code> value into {@link EthNumericType} value.
+     * Converts <code>Number</code> value into {@link EthNumericValue} value.
      *
      * @param value      the number value
      * @param descriptor the type descriptor
      * @return the decoded ethereum numeric value
      */
-    private EthNumericType decodeNumeric(Number value, EthSizedTypeDescriptor descriptor) {
+    private EthNumericValue decodeNumeric(Number value, EthSizedTypeDescriptor descriptor) {
         val integer = value instanceof BigInteger
                 ? (BigInteger) value
                 : BigInteger.valueOf(value.longValue());
@@ -161,7 +161,7 @@ public class HeadlongCodec implements AbiCodec {
         val values = Arrays.stream(value)
                 .map(element -> decodeValue(element, descriptor.descriptor()))
                 .toArray();
-        val result = arrayCast(values, (Class<? extends EthType>) descriptor.type().toClass());
+        val result = arrayCast(values, (Class<? extends EthValue>) descriptor.type().toClass());
         return array(descriptor.arraySize(), result);
     }
 
@@ -177,11 +177,11 @@ public class HeadlongCodec implements AbiCodec {
         for (var i = 0; i < value.size(); i++) {
             values.add(decodeValue(value.get(i), descriptor.children().get(i)));
         }
-        return tuple(values.stream().map(EthType.class::cast).toArray(EthType[]::new));
+        return tuple(values.stream().map(EthValue.class::cast).toArray(EthValue[]::new));
     }
 
     /**
-     * Encodes given {@link EthType} value into an ABI string using {@link com.esaulpaugh.headlong} codec.
+     * Encodes given {@link EthValue} value into an ABI string using {@link com.esaulpaugh.headlong} codec.
      *
      * @param value      the ethereum type value
      * @param descriptor the type description
@@ -189,7 +189,7 @@ public class HeadlongCodec implements AbiCodec {
      */
     @Override
     @NotNull
-    public String encode(@NotNull EthType value, @NotNull TypeDescriptor descriptor) {
+    public String encode(@NotNull EthValue value, @NotNull TypeDescriptor descriptor) {
         if (value instanceof EthTuple) {
             return encode((EthTuple) value, descriptor);
         } else {
@@ -211,20 +211,20 @@ public class HeadlongCodec implements AbiCodec {
     }
 
     /**
-     * Converts any given {@link EthType} value into equivalent {@link com.esaulpaugh.headlong} value.
+     * Converts any given {@link EthValue} value into equivalent {@link com.esaulpaugh.headlong} value.
      *
      * @param value the ethereum value
      * @return the headlong-compatible representation of the value
      * @throws IllegalArgumentException if encoder for a given value was not found
      */
-    private Object encodeValue(EthType value) throws IllegalArgumentException {
+    private Object encodeValue(EthValue value) throws IllegalArgumentException {
         if (value instanceof EthArray<?> array) {
             return encodeArray(array);
         } else if (value instanceof EthAddress address) {
             return encodeAddress(address);
         } else if (value instanceof EthBytes bytes) {
             return encodeBytes(bytes);
-        } else if (value instanceof EthNumericType numeric) {
+        } else if (value instanceof EthNumericValue numeric) {
             return encodeNumeric(numeric);
         } else if (value instanceof EthString string) {
             return encodeString(string);
@@ -271,14 +271,14 @@ public class HeadlongCodec implements AbiCodec {
     }
 
     /**
-     * Converts {@link EthNumericType} value into {@link Number} value.
+     * Converts {@link EthNumericValue} value into {@link Number} value.
      *
      * @param value the ethereum numeric value
      * @return the headlong-compatible number value
      */
-    private Number encodeNumeric(EthNumericType value) {
+    private Number encodeNumeric(EthNumericValue value) {
         val integer = (BigInteger) value.value();
-        if (value instanceof EthSizedType sized) {
+        if (value instanceof EthSizedValue sized) {
             if (sized.size() <= 8) {
                 return integer.byteValue();
             } else if (sized.size() <= 16) {

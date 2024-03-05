@@ -17,7 +17,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthBytes(@With int size, ImmutableList<Byte> value) implements EthType, EthSizedType {
+public record EthBytes(@With int size, ImmutableList<Byte> value) implements EthValue, EthSizedValue {
 
     /**
      * Empty <code>ethereum bytes</code> constant.

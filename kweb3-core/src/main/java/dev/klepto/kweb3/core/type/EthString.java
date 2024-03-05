@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthString(String value) implements EthType {
+public record EthString(String value) implements EthValue {
 
     /**
      * Empty <code>ethereum string</code> constant.
@@ -71,7 +71,7 @@ public record EthString(String value) implements EthType {
             return new EthString(value.toString());
         }
 
-        val intValue = EthNumericType.parseBigInteger(value);
+        val intValue = EthNumericValue.parseBigInteger(value);
         return new EthString(intValue.toString());
     }
 

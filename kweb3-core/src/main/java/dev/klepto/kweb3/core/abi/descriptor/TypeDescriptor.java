@@ -2,9 +2,9 @@ package dev.klepto.kweb3.core.abi.descriptor;
 
 import com.google.common.collect.ImmutableList;
 import dev.klepto.kweb3.core.type.EthArray;
-import dev.klepto.kweb3.core.type.EthSizedType;
+import dev.klepto.kweb3.core.type.EthSizedValue;
 import dev.klepto.kweb3.core.type.EthTuple;
-import dev.klepto.kweb3.core.type.EthType;
+import dev.klepto.kweb3.core.type.EthValue;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.val;
 
@@ -12,7 +12,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
- * A generic ABI type descriptor not tied to any {@link EthType}. Contains factory methods for constructing and/or
+ * A generic ABI type descriptor not tied to any {@link EthValue}. Contains factory methods for constructing and/or
  * parsing available type descriptors.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -20,7 +20,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
 public interface TypeDescriptor {
 
     /**
-     * Returns {@link EthType} that this type descriptor represents.
+     * Returns {@link EthValue} that this type descriptor represents.
      *
      * @return the represented ethereum data type
      */
@@ -41,19 +41,19 @@ public interface TypeDescriptor {
      * @return the ABI compatible string that describes this type
      */
     default String toAbiDescriptor() {
-        return EthType.getSolidityName(type().toClass());
+        return EthValue.getSolidityName(type().toClass());
     }
 
     /**
-     * Generates ABI type descriptor by inferring types in a given {@link EthType} value.
+     * Generates ABI type descriptor by inferring types in a given {@link EthValue} value.
      *
      * @param value the ethereum data value
      * @return the ABI type descriptor
      */
-    static TypeDescriptor parse(EthType value) {
+    static TypeDescriptor parse(EthValue value) {
         if (value instanceof EthArray<?> array) {
             return parseArray(array);
-        } else if (value instanceof EthSizedType sized) {
+        } else if (value instanceof EthSizedValue sized) {
             return parseSized(sized);
         } else if (value instanceof EthTuple tuple) {
             return parseTuple(tuple);
@@ -63,12 +63,12 @@ public interface TypeDescriptor {
     }
 
     /**
-     * Generates ABI type descriptor by parsing information in a given {@link EthSizedType} value.
+     * Generates ABI type descriptor by parsing information in a given {@link EthSizedValue} value.
      *
      * @param value the ethereum sized value
      * @return the ABI type descriptor
      */
-    static TypeDescriptor parseSized(EthSizedType value) {
+    static TypeDescriptor parseSized(EthSizedValue value) {
         return new EthSizedTypeDescriptor(UnreflectType.of(value), value.size());
     }
 

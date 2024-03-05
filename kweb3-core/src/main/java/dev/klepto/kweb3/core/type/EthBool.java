@@ -16,7 +16,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthBool(boolean value) implements EthType {
+public record EthBool(boolean value) implements EthValue {
 
     /**
      * True bool constant.
@@ -75,7 +75,7 @@ public record EthBool(boolean value) implements EthType {
 
     @NotNull
     public static EthBool bool(@NotNull Number value) {
-        val intValue = EthNumericType.parseBigInteger(value);
+        val intValue = EthNumericValue.parseBigInteger(value);
         val isTrue = intValue.equals(BigInteger.ONE);
         val isFalse = intValue.equals(BigInteger.ZERO);
         require(isTrue || isFalse, "Number {} is not a boolean value.", value);

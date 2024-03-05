@@ -4,7 +4,7 @@ import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.type.EthStructContainer
 import dev.klepto.kweb3.core.type.EthAddress
 import dev.klepto.kweb3.core.type.EthBytes
-import dev.klepto.kweb3.core.type.EthType
+import dev.klepto.kweb3.core.type.EthValue
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 
 /**
@@ -56,7 +56,7 @@ interface MulticallExecutor : Web3Contract {
      *
      * @return a new multicall builder
      */
-    fun builder(): MulticallBuilder<EthType> {
+    fun builder(): MulticallBuilder<EthValue> {
         return MulticallBuilder(this)
     }
 

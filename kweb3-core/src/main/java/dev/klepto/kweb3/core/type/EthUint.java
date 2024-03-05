@@ -15,7 +15,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public class EthUint extends Number implements EthType, EthNumericType<EthUint>, EthSizedType {
+public class EthUint extends Number implements EthValue, EthNumericValue<EthUint>, EthSizedValue {
 
     /**
      * Zero <code>uint</code> constant.
@@ -83,7 +83,7 @@ public class EthUint extends Number implements EthType, EthNumericType<EthUint>,
      */
     @Override
     public int intValue() {
-        return ((EthNumericType<?>) this).intValue();
+        return value.intValue();
     }
 
     /**
@@ -93,7 +93,7 @@ public class EthUint extends Number implements EthType, EthNumericType<EthUint>,
      */
     @Override
     public long longValue() {
-        return ((EthNumericType<?>) this).longValue();
+        return value.longValue();
     }
 
     /**
@@ -103,7 +103,7 @@ public class EthUint extends Number implements EthType, EthNumericType<EthUint>,
      */
     @Override
     public float floatValue() {
-        return ((EthNumericType<?>) this).floatValue();
+        return decimalValue().floatValue();
     }
 
     /**
@@ -113,7 +113,7 @@ public class EthUint extends Number implements EthType, EthNumericType<EthUint>,
      */
     @Override
     public double doubleValue() {
-        return ((EthNumericType<?>) this).doubleValue();
+        return decimalValue().doubleValue();
     }
 
     /**
@@ -159,7 +159,7 @@ public class EthUint extends Number implements EthType, EthNumericType<EthUint>,
     /* Solidity style static initializers */
     @NotNull
     public static EthUint uint256(@NotNull Number value) {
-        return new EthUint(256, EthNumericType.parseBigInteger(value));
+        return new EthUint(256, EthNumericValue.parseBigInteger(value));
     }
 
     @NotNull

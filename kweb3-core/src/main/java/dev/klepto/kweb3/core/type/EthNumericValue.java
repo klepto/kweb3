@@ -14,7 +14,7 @@ import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256Checksum;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthNumericType<T extends EthType> extends EthType, Comparable<Number> {
+public interface EthNumericValue<T extends EthValue> extends EthValue, Comparable<Number> {
 
     /**
      * Returns numeric value as {@link BigInteger}.
@@ -118,70 +118,6 @@ public interface EthNumericType<T extends EthType> extends EthType, Comparable<N
     }
 
     /**
-     * Returns the value of the specified number as a {@code byte}.
-     *
-     * @return the numeric value represented by this object after conversion to type {@code byte}.
-     */
-    default byte byteValue() {
-        return value().byteValue();
-    }
-
-    /**
-     * Returns the value of the specified number as a {@code short}.
-     *
-     * @return the numeric value represented by this object after conversion to type {@code short}.
-     */
-    default short shortValue() {
-        return value().shortValue();
-    }
-
-    /**
-     * Returns the value of the specified number as an {@code int}.
-     *
-     * @return the numeric value represented by this object after conversion to type {@code int}.
-     */
-    default int intValue() {
-        return value().intValue();
-    }
-
-    /**
-     * Returns the value of the specified number as a {@code long}.
-     *
-     * @return the numeric value represented by this object after conversion to type {@code long}.
-     */
-    default long longValue() {
-        return value().longValue();
-    }
-
-    /**
-     * Returns the value of the specified number as a {@code float}.
-     *
-     * @return the numeric value represented by this object after conversion to type {@code float}.
-     */
-    default float floatValue() {
-        return value().floatValue();
-    }
-
-    /**
-     * Returns numeric value as <code>double</code> value with <code>18</code> decimals.
-     *
-     * @return the numeric value as double with 18 decimal places
-     */
-    default double doubleValue() {
-        return doubleValue(18);
-    }
-
-    /**
-     * Returns numeric value as <code>double</code> value.
-     *
-     * @param decimals the amount of decimal places
-     * @return the numeric value as double
-     */
-    default double doubleValue(int decimals) {
-        return decimalValue(decimals).doubleValue();
-    }
-
-    /**
      * Returns numeric value as {@link BigDecimal}> value with <code>18</code> decimals.
      *
      * @return the numeric value as big decimal with 18 decimal places
@@ -239,8 +175,8 @@ public interface EthNumericType<T extends EthType> extends EthType, Comparable<N
             return BigDecimal.valueOf(number.doubleValue()).toBigInteger();
         } else if (number instanceof BigDecimal) {
             return ((BigDecimal) number).toBigInteger();
-        } else if (number instanceof EthNumericType) {
-            return ((EthNumericType<?>) number).value();
+        } else if (number instanceof EthNumericValue) {
+            return ((EthNumericValue<?>) number).value();
         }
         return BigInteger.valueOf(number.longValue());
     }

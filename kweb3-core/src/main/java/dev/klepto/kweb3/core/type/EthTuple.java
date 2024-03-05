@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @param values a list of values contained within this tuple
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthTuple(ImmutableList<EthType> values) implements EthType, EthCollection<EthType> {
+public record EthTuple(ImmutableList<EthValue> values) implements EthValue, EthCollectionValue<EthValue> {
 
     /**
      * Returns string representation of this <code>ethereum tuple</code>.
@@ -60,12 +60,12 @@ public record EthTuple(ImmutableList<EthType> values) implements EthType, EthCol
 
     /* Solidity style static initializers */
     @NotNull
-    public static EthTuple tuple(@NotNull EthType... values) {
+    public static EthTuple tuple(@NotNull EthValue... values) {
         return new EthTuple(ImmutableList.copyOf(values));
     }
 
     @NotNull
-    public static EthTuple tuple(@NotNull Collection<EthType> values) {
+    public static EthTuple tuple(@NotNull Collection<EthValue> values) {
         return new EthTuple(ImmutableList.copyOf(values));
     }
 

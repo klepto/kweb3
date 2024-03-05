@@ -20,7 +20,8 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values) implements EthType, EthCollection<T> {
+public record EthArray<T extends EthValue>(int capacity,
+                                           ImmutableList<T> values) implements EthValue, EthCollectionValue<T> {
 
     /**
      * Constant indicating dynamic array size.
@@ -36,7 +37,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
     }
 
     /**
-     * Returns the {@link EthType} type of this array.
+     * Returns the {@link EthValue} type of this array.
      *
      * @return the class representing the type of elements contained in this array
      */
@@ -45,7 +46,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
     public Class<T> getComponentType() {
         if (values.isEmpty()) {
             // Unable to infer types on empty generic arrays.
-            return (Class<T>) EthType.class;
+            return (Class<T>) EthValue.class;
         }
         return (Class<T>) values.get(0).getClass();
     }
@@ -61,7 +62,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
             return "unknown[]";
         }
 
-        val solidityName = EthType.getSolidityName(values.get(0).getClass());
+        val solidityName = EthValue.getSolidityName(values.get(0).getClass());
         val size = capacity >= 0 ? "[" + capacity + "]" : "";
         val children = values().stream().map(Object::toString).collect(Collectors.joining(","));
         return solidityName + size + "[" + children + "]";
@@ -107,7 +108,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      */
     @NotNull
     @SafeVarargs
-    public static <T extends EthType> EthArray<T> array(int size, @NotNull T... values) {
+    public static <T extends EthValue> EthArray<T> array(int size, @NotNull T... values) {
         return new EthArray<>(size, ImmutableList.copyOf(values));
     }
 
@@ -119,7 +120,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      * @return a new fixed-sized <code>ethereum array</code> container
      */
     @NotNull
-    public static <T extends EthType> EthArray<T> array(int size, @NotNull Collection<T> values) {
+    public static <T extends EthValue> EthArray<T> array(int size, @NotNull Collection<T> values) {
         return new EthArray<>(size, ImmutableList.copyOf(values));
     }
 
@@ -131,7 +132,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      */
     @NotNull
     @SafeVarargs
-    public static <T extends EthType> EthArray<T> array(@NotNull T... values) {
+    public static <T extends EthValue> EthArray<T> array(@NotNull T... values) {
         return array(DYNAMIC_SIZE, values);
     }
 
@@ -142,7 +143,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      * @return a new dynamic-size <code>ethereum array</code> container
      */
     @NotNull
-    public static <T extends EthType> EthArray<T> array(@NotNull Collection<T> values) {
+    public static <T extends EthValue> EthArray<T> array(@NotNull Collection<T> values) {
         return array(DYNAMIC_SIZE, values);
     }
 
