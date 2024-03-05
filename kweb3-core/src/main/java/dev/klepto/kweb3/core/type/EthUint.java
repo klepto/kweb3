@@ -144,6 +144,9 @@ public class EthUint extends Number implements EthType, EthNumericType<EthUint>,
      */
     @Override
     public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
         if (this == object) {
             return true;
         }

@@ -56,6 +56,9 @@ public record EthAddress(BigInteger value) implements EthType, EthNumericType<Et
      * @return true if the objects are the same; false otherwise
      */
     public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
         if (this == object) {
             return true;
         }

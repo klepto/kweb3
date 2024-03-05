@@ -82,6 +82,9 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      * @return true if the objects are the same; false otherwise
      */
     public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
         if (this == object) {
             return true;
         }
