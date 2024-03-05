@@ -138,18 +138,18 @@ public class EthInt extends Number implements EthType, EthNumericType<EthInt>, E
     /**
      * Compares this <code>ethereum int</code> to the specified object.
      *
-     * @param other the object to compare with
+     * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
     @Override
-    public boolean equals(Object other) {
-        if (this == other) {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (!(other instanceof EthInt otherInt)) {
+        if (!(object instanceof EthInt other)) {
             return false;
         }
-        return size == otherInt.size && value.equals(otherInt.value);
+        return size == other.size && value.equals(other.value);
     }
 
     /* Solidity style static initializers */
