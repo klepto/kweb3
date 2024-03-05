@@ -34,7 +34,7 @@ public class HeadlongCodecTest {
 
     @Test
     public void testDecodeEmpty() {
-        assertNull(codec.decode("", new EthTypeDescriptor(EthUint.class)));
+        assertNull(codec.decode("", new EthTypeDescriptor(EthBool.class)));
     }
 
     @Test

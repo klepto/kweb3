@@ -16,7 +16,8 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @param values   the elements of the array
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values) implements EthType, EthCollection<T> {
+public record EthArray<T extends EthType>(int capacity,
+                                          ImmutableList<T> values) implements EthType, EthCollection<T> {
 
     public EthArray {
         require(
@@ -34,20 +35,20 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
     @SuppressWarnings("unchecked")
     @NotNull
     public Class<T> getComponentType() {
-        if (isEmpty()) {
+        if (values.isEmpty()) {
             // Unable to infer types on empty generic arrays.
             return (Class<T>) EthType.class;
         }
-        return (Class<T>) get(0).getClass();
+        return (Class<T>) values.get(0).getClass();
     }
 
     @Override
     public String toString() {
-        if (isEmpty()) {
+        if (values.isEmpty()) {
             return "unknown[]";
         }
 
-        val solidityName = EthType.getSolidityName(get(0).getClass());
+        val solidityName = EthType.getSolidityName(values.get(0).getClass());
         val size = capacity >= 0 ? "[" + capacity + "]" : "";
         val children = values().stream().map(Object::toString).collect(Collectors.joining(","));
         return solidityName + size + "[" + children + "]";
@@ -63,6 +64,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      * @return a fixed-sized ethereum array representation
      */
     @NotNull
+    @SafeVarargs
     public static <T extends EthType> EthArray<T> array(int size, @NotNull T... values) {
         return new EthArray<>(size, ImmutableList.copyOf(values));
     }
@@ -86,6 +88,7 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
      * @return a dynamic-size ethereum array representation
      */
     @NotNull
+    @SafeVarargs
     public static <T extends EthType> EthArray<T> array(@NotNull T... values) {
         return array(-1, values);
     }
@@ -100,5 +103,5 @@ public record EthArray<T extends EthType>(int capacity, ImmutableList<T> values)
     public static <T extends EthType> EthArray<T> array(@NotNull Iterable<T> values) {
         return array(-1, values);
     }
-    
+
 }

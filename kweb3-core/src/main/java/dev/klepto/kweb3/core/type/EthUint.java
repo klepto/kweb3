@@ -16,7 +16,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthUint(int size, BigInteger value) implements EthNumericType, EthSizedType {
+public record EthUint(int size, BigInteger value) implements EthType, EthNumericType, EthSizedType {
 
     /**
      * Zero uint constant.
