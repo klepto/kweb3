@@ -22,7 +22,7 @@ interface Multicall3 : MulticallExecutor {
     override suspend fun execute(allowFailure: Boolean, calls: List<MulticallExecutor.Call>): List<EthBytes?> {
         val encodedCalls = array(calls.map { Call(it.address, bool(allowFailure), it.data) })
         val response = aggregate3(encodedCalls)
-        return response.map {
+        return response.values.map {
             if (it.success.value) it.returnData else null
         }
     }

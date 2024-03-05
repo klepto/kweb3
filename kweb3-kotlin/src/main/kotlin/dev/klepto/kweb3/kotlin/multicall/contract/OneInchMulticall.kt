@@ -23,7 +23,7 @@ interface OneInchMulticall : MulticallExecutor {
     override suspend fun execute(allowFailure: Boolean, calls: List<MulticallExecutor.Call>): List<EthBytes?> {
         val encodedCalls = array(calls.map { Call(it.address, it.data) })
         val response = multicallWithGasLimitation(encodedCalls)
-        return response.results
+        return response.results.values
     }
 
     /**
