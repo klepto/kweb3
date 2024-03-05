@@ -1,8 +1,14 @@
 package dev.klepto.kweb3.core.abi.descriptor;
 
+import dev.klepto.kweb3.core.type.EthAddress;
+import dev.klepto.kweb3.core.type.EthBool;
+import dev.klepto.kweb3.core.type.EthString;
 import dev.klepto.kweb3.core.type.EthType;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
+import lombok.val;
+
+import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
  * An ABI type descriptor for a simple ethereum data type.
@@ -14,6 +20,13 @@ import lombok.With;
  */
 @With
 public record EthTypeDescriptor(UnreflectType type) implements TypeDescriptor {
+
+    public EthTypeDescriptor {
+        val isString = type.matchesExact(EthString.class);
+        val isBool = type.matchesExact(EthBool.class);
+        val isAddress = type.matchesExact(EthAddress.class);
+        require(isString || isBool || isAddress, "Unsupported simple descriptor type: " + type);
+    }
 
     public EthTypeDescriptor(Class<? extends EthType> type) {
         this(UnreflectType.of(type));
