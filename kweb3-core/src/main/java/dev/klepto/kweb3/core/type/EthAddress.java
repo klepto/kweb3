@@ -2,6 +2,7 @@ package dev.klepto.kweb3.core.type;
 
 import dev.klepto.kweb3.core.util.Hex;
 import dev.klepto.kweb3.core.util.hash.Keccak256;
+import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -12,12 +13,13 @@ import static dev.klepto.kweb3.core.util.Hex.stripPrefix;
 import static dev.klepto.kweb3.core.util.Hex.toBigInteger;
 
 /**
- * Represents ethereum <code>address</code> data type.
+ * Container for <code>ethereum address</code> value.
  *
- * @param value the integer value
+ * @param value the big integer value
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthAddress(BigInteger value) implements EthNumericType {
+@With
+public record EthAddress(BigInteger value) implements EthNumericType<EthAddress> {
 
     /**
      * Zero address constant.

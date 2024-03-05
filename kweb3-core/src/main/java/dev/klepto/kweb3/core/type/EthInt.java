@@ -5,47 +5,157 @@ import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
- * Represents ethereum <code>int</code> data type.
+ * Container for ethereum <code>int</code> value.
  *
- * @param size  the size in bits of this <code>int</code>, from 1 to 256
- * @param value the integer value
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthInt(int size, BigInteger value) implements EthType, EthNumericType, EthSizedType {
+public class EthInt extends Number implements EthType, EthNumericType<EthInt>, EthSizedType {
 
     /**
-     * Zero int constant.
+     * Zero <code>ethereum int</code> constant.
      */
     public static final EthInt ZERO = int256(0);
 
-    public EthInt {
+    private final int size;
+    private final BigInteger value;
+
+    /**
+     * Creates a new instance of <code>ethereum int</code> with given size and value.
+     *
+     * @param size  the size in bits of this <code>ethereum int</code>, from 1 to 256
+     * @param value the big integer value
+     */
+    public EthInt(int size, BigInteger value) {
         require(size >= value.bitLength(), "int{} cannot fit value: {}", size, value);
+        this.size = size;
+        this.value = value;
     }
 
+    /**
+     * Returns {@link BigInteger} value that represents this <code>ethereum int</code>.
+     *
+     * @return the big integer value of this <code>ethereum int</code>
+     */
+    @Override
+    public @NotNull BigInteger value() {
+        return value;
+    }
+
+    /**
+     * Returns the size in bits of this <code>ethereum int</code>
+     *
+     * @return the size in bits of this <code>ethereum int</code>
+     */
+    @Override
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Increments this <code>ethereum int</code> value by one.
+     *
+     * @return a new instance of <code>ethereum int</code> with the incremented value
+     */
+    public EthInt inc() {
+        return plus(1);
+    }
+
+    /**
+     * Decrements this <code>ethereum int</code> value by one.
+     *
+     * @return a new instance of <code>ethereum int</code> with the decremented value
+     */
+    public EthInt dec() {
+        return minus(1);
+    }
+
+    /**
+     * Converts this value to an <code>int</code>.
+     *
+     * @return the value of this as an <code>int</code>
+     */
+    @Override
+    public int intValue() {
+        return ((EthNumericType<?>) this).intValue();
+    }
+
+    /**
+     * Converts this value to a <code>long</code>.
+     *
+     * @return the value of this as a <code>long</code>
+     */
+    @Override
+    public long longValue() {
+        return ((EthNumericType<?>) this).longValue();
+    }
+
+    /**
+     * Converts this value to a <code>float</code>.
+     *
+     * @return the value of this as a <code>float</code>
+     */
+    @Override
+    public float floatValue() {
+        return ((EthNumericType<?>) this).floatValue();
+    }
+
+    /**
+     * Converts this value to a <code>double</code>.
+     *
+     * @return the value of this as a <code>double</code>
+     */
+    @Override
+    public double doubleValue() {
+        return ((EthNumericType<?>) this).doubleValue();
+    }
+
+    /**
+     * Returns string representation of this <code>ethereum int</code>.
+     *
+     * @return string representation of this <code>ethereum int</code>
+     */
     @Override
     public String toString() {
         return "int" + size + "(" + value + ")";
     }
 
+    /**
+     * Returns hash code of this <code>ethereum int</code>.
+     *
+     * @return hash code of this <code>ethereum int</code>
+     */
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return Objects.hash(size, value);
     }
 
-    /* Solidity style int initializers */
-    @NotNull
-    public static EthInt int256(@NotNull BigInteger value) {
-        return new EthInt(256, value);
+    /**
+     * Compares this <code>ethereum int</code> to the specified object.
+     *
+     * @param other the object to compare with
+     * @return true if the objects are the same; false otherwise
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof EthInt otherInt)) {
+            return false;
+        }
+        return size == otherInt.size && value.equals(otherInt.value);
     }
 
+    /* Solidity style static initializers */
     @NotNull
-    public static EthInt int256(long value) {
-        return int256(BigInteger.valueOf(value));
+    public static EthInt int256(@NotNull Number value) {
+        return new EthInt(256, EthNumericType.parseBigInteger(value));
     }
 
     @NotNull
@@ -56,622 +166,622 @@ public record EthInt(int size, BigInteger value) implements EthType, EthNumericT
 
     /* Smaller size solidity int initializers */
     @NotNull
-    public static EthInt int8(long value) {
+    public static EthInt int8(@NotNull Number value) {
         return int256(value).withSize(8);
     }
 
     @NotNull
-    public static EthInt int10(long value) {
+    public static EthInt int10(@NotNull Number value) {
         return int256(value).withSize(10);
     }
 
     @NotNull
-    public static EthInt int12(long value) {
+    public static EthInt int12(@NotNull Number value) {
         return int256(value).withSize(12);
     }
 
     @NotNull
-    public static EthInt int14(long value) {
+    public static EthInt int14(@NotNull Number value) {
         return int256(value).withSize(14);
     }
 
     @NotNull
-    public static EthInt int16(long value) {
+    public static EthInt int16(@NotNull Number value) {
         return int256(value).withSize(16);
     }
 
     @NotNull
-    public static EthInt int18(long value) {
+    public static EthInt int18(@NotNull Number value) {
         return int256(value).withSize(18);
     }
 
     @NotNull
-    public static EthInt int20(long value) {
+    public static EthInt int20(@NotNull Number value) {
         return int256(value).withSize(20);
     }
 
     @NotNull
-    public static EthInt int22(long value) {
+    public static EthInt int22(@NotNull Number value) {
         return int256(value).withSize(22);
     }
 
     @NotNull
-    public static EthInt int24(long value) {
+    public static EthInt int24(@NotNull Number value) {
         return int256(value).withSize(24);
     }
 
     @NotNull
-    public static EthInt int26(long value) {
+    public static EthInt int26(@NotNull Number value) {
         return int256(value).withSize(26);
     }
 
     @NotNull
-    public static EthInt int28(long value) {
+    public static EthInt int28(@NotNull Number value) {
         return int256(value).withSize(28);
     }
 
     @NotNull
-    public static EthInt int30(long value) {
+    public static EthInt int30(@NotNull Number value) {
         return int256(value).withSize(30);
     }
 
     @NotNull
-    public static EthInt int32(long value) {
+    public static EthInt int32(@NotNull Number value) {
         return int256(value).withSize(32);
     }
 
     @NotNull
-    public static EthInt int34(long value) {
+    public static EthInt int34(@NotNull Number value) {
         return int256(value).withSize(34);
     }
 
     @NotNull
-    public static EthInt int36(long value) {
+    public static EthInt int36(@NotNull Number value) {
         return int256(value).withSize(36);
     }
 
     @NotNull
-    public static EthInt int38(long value) {
+    public static EthInt int38(@NotNull Number value) {
         return int256(value).withSize(38);
     }
 
     @NotNull
-    public static EthInt int40(long value) {
+    public static EthInt int40(@NotNull Number value) {
         return int256(value).withSize(40);
     }
 
     @NotNull
-    public static EthInt int42(long value) {
+    public static EthInt int42(@NotNull Number value) {
         return int256(value).withSize(42);
     }
 
     @NotNull
-    public static EthInt int44(long value) {
+    public static EthInt int44(@NotNull Number value) {
         return int256(value).withSize(44);
     }
 
     @NotNull
-    public static EthInt int46(long value) {
+    public static EthInt int46(@NotNull Number value) {
         return int256(value).withSize(46);
     }
 
     @NotNull
-    public static EthInt int48(long value) {
+    public static EthInt int48(@NotNull Number value) {
         return int256(value).withSize(48);
     }
 
     @NotNull
-    public static EthInt int50(long value) {
+    public static EthInt int50(@NotNull Number value) {
         return int256(value).withSize(50);
     }
 
     @NotNull
-    public static EthInt int52(long value) {
+    public static EthInt int52(@NotNull Number value) {
         return int256(value).withSize(52);
     }
 
     @NotNull
-    public static EthInt int54(long value) {
+    public static EthInt int54(@NotNull Number value) {
         return int256(value).withSize(54);
     }
 
     @NotNull
-    public static EthInt int56(long value) {
+    public static EthInt int56(@NotNull Number value) {
         return int256(value).withSize(56);
     }
 
     @NotNull
-    public static EthInt int58(long value) {
+    public static EthInt int58(@NotNull Number value) {
         return int256(value).withSize(58);
     }
 
     @NotNull
-    public static EthInt int60(long value) {
+    public static EthInt int60(@NotNull Number value) {
         return int256(value).withSize(60);
     }
 
     @NotNull
-    public static EthInt int62(long value) {
+    public static EthInt int62(@NotNull Number value) {
         return int256(value).withSize(62);
     }
 
     @NotNull
-    public static EthInt int64(long value) {
+    public static EthInt int64(@NotNull Number value) {
         return int256(value).withSize(64);
     }
 
     @NotNull
-    public static EthInt int66(long value) {
+    public static EthInt int66(@NotNull Number value) {
         return int256(value).withSize(66);
     }
 
     @NotNull
-    public static EthInt int68(long value) {
+    public static EthInt int68(@NotNull Number value) {
         return int256(value).withSize(68);
     }
 
     @NotNull
-    public static EthInt int70(long value) {
+    public static EthInt int70(@NotNull Number value) {
         return int256(value).withSize(70);
     }
 
     @NotNull
-    public static EthInt int72(long value) {
+    public static EthInt int72(@NotNull Number value) {
         return int256(value).withSize(72);
     }
 
     @NotNull
-    public static EthInt int74(long value) {
+    public static EthInt int74(@NotNull Number value) {
         return int256(value).withSize(74);
     }
 
     @NotNull
-    public static EthInt int76(long value) {
+    public static EthInt int76(@NotNull Number value) {
         return int256(value).withSize(76);
     }
 
     @NotNull
-    public static EthInt int78(long value) {
+    public static EthInt int78(@NotNull Number value) {
         return int256(value).withSize(78);
     }
 
     @NotNull
-    public static EthInt int80(long value) {
+    public static EthInt int80(@NotNull Number value) {
         return int256(value).withSize(80);
     }
 
     @NotNull
-    public static EthInt int82(long value) {
+    public static EthInt int82(@NotNull Number value) {
         return int256(value).withSize(82);
     }
 
     @NotNull
-    public static EthInt int84(long value) {
+    public static EthInt int84(@NotNull Number value) {
         return int256(value).withSize(84);
     }
 
     @NotNull
-    public static EthInt int86(long value) {
+    public static EthInt int86(@NotNull Number value) {
         return int256(value).withSize(86);
     }
 
     @NotNull
-    public static EthInt int88(long value) {
+    public static EthInt int88(@NotNull Number value) {
         return int256(value).withSize(88);
     }
 
     @NotNull
-    public static EthInt int90(long value) {
+    public static EthInt int90(@NotNull Number value) {
         return int256(value).withSize(90);
     }
 
     @NotNull
-    public static EthInt int92(long value) {
+    public static EthInt int92(@NotNull Number value) {
         return int256(value).withSize(92);
     }
 
     @NotNull
-    public static EthInt int94(long value) {
+    public static EthInt int94(@NotNull Number value) {
         return int256(value).withSize(94);
     }
 
     @NotNull
-    public static EthInt int96(long value) {
+    public static EthInt int96(@NotNull Number value) {
         return int256(value).withSize(96);
     }
 
     @NotNull
-    public static EthInt int98(long value) {
+    public static EthInt int98(@NotNull Number value) {
         return int256(value).withSize(98);
     }
 
     @NotNull
-    public static EthInt int100(long value) {
+    public static EthInt int100(@NotNull Number value) {
         return int256(value).withSize(100);
     }
 
     @NotNull
-    public static EthInt int102(long value) {
+    public static EthInt int102(@NotNull Number value) {
         return int256(value).withSize(102);
     }
 
     @NotNull
-    public static EthInt int104(long value) {
+    public static EthInt int104(@NotNull Number value) {
         return int256(value).withSize(104);
     }
 
     @NotNull
-    public static EthInt int106(long value) {
+    public static EthInt int106(@NotNull Number value) {
         return int256(value).withSize(106);
     }
 
     @NotNull
-    public static EthInt int108(long value) {
+    public static EthInt int108(@NotNull Number value) {
         return int256(value).withSize(108);
     }
 
     @NotNull
-    public static EthInt int110(long value) {
+    public static EthInt int110(@NotNull Number value) {
         return int256(value).withSize(110);
     }
 
     @NotNull
-    public static EthInt int112(long value) {
+    public static EthInt int112(@NotNull Number value) {
         return int256(value).withSize(112);
     }
 
     @NotNull
-    public static EthInt int114(long value) {
+    public static EthInt int114(@NotNull Number value) {
         return int256(value).withSize(114);
     }
 
     @NotNull
-    public static EthInt int116(long value) {
+    public static EthInt int116(@NotNull Number value) {
         return int256(value).withSize(116);
     }
 
     @NotNull
-    public static EthInt int118(long value) {
+    public static EthInt int118(@NotNull Number value) {
         return int256(value).withSize(118);
     }
 
     @NotNull
-    public static EthInt int120(long value) {
+    public static EthInt int120(@NotNull Number value) {
         return int256(value).withSize(120);
     }
 
     @NotNull
-    public static EthInt int122(long value) {
+    public static EthInt int122(@NotNull Number value) {
         return int256(value).withSize(122);
     }
 
     @NotNull
-    public static EthInt int124(long value) {
+    public static EthInt int124(@NotNull Number value) {
         return int256(value).withSize(124);
     }
 
     @NotNull
-    public static EthInt int126(long value) {
+    public static EthInt int126(@NotNull Number value) {
         return int256(value).withSize(126);
     }
 
     @NotNull
-    public static EthInt int128(long value) {
+    public static EthInt int128(@NotNull Number value) {
         return int256(value).withSize(128);
     }
 
     @NotNull
-    public static EthInt int130(long value) {
+    public static EthInt int130(@NotNull Number value) {
         return int256(value).withSize(130);
     }
 
     @NotNull
-    public static EthInt int132(long value) {
+    public static EthInt int132(@NotNull Number value) {
         return int256(value).withSize(132);
     }
 
     @NotNull
-    public static EthInt int134(long value) {
+    public static EthInt int134(@NotNull Number value) {
         return int256(value).withSize(134);
     }
 
     @NotNull
-    public static EthInt int136(long value) {
+    public static EthInt int136(@NotNull Number value) {
         return int256(value).withSize(136);
     }
 
     @NotNull
-    public static EthInt int138(long value) {
+    public static EthInt int138(@NotNull Number value) {
         return int256(value).withSize(138);
     }
 
     @NotNull
-    public static EthInt int140(long value) {
+    public static EthInt int140(@NotNull Number value) {
         return int256(value).withSize(140);
     }
 
     @NotNull
-    public static EthInt int142(long value) {
+    public static EthInt int142(@NotNull Number value) {
         return int256(value).withSize(142);
     }
 
     @NotNull
-    public static EthInt int144(long value) {
+    public static EthInt int144(@NotNull Number value) {
         return int256(value).withSize(144);
     }
 
     @NotNull
-    public static EthInt int146(long value) {
+    public static EthInt int146(@NotNull Number value) {
         return int256(value).withSize(146);
     }
 
     @NotNull
-    public static EthInt int148(long value) {
+    public static EthInt int148(@NotNull Number value) {
         return int256(value).withSize(148);
     }
 
     @NotNull
-    public static EthInt int150(long value) {
+    public static EthInt int150(@NotNull Number value) {
         return int256(value).withSize(150);
     }
 
     @NotNull
-    public static EthInt int152(long value) {
+    public static EthInt int152(@NotNull Number value) {
         return int256(value).withSize(152);
     }
 
     @NotNull
-    public static EthInt int154(long value) {
+    public static EthInt int154(@NotNull Number value) {
         return int256(value).withSize(154);
     }
 
     @NotNull
-    public static EthInt int156(long value) {
+    public static EthInt int156(@NotNull Number value) {
         return int256(value).withSize(156);
     }
 
     @NotNull
-    public static EthInt int158(long value) {
+    public static EthInt int158(@NotNull Number value) {
         return int256(value).withSize(158);
     }
 
     @NotNull
-    public static EthInt int160(long value) {
+    public static EthInt int160(@NotNull Number value) {
         return int256(value).withSize(160);
     }
 
     @NotNull
-    public static EthInt int162(long value) {
+    public static EthInt int162(@NotNull Number value) {
         return int256(value).withSize(162);
     }
 
     @NotNull
-    public static EthInt int164(long value) {
+    public static EthInt int164(@NotNull Number value) {
         return int256(value).withSize(164);
     }
 
     @NotNull
-    public static EthInt int166(long value) {
+    public static EthInt int166(@NotNull Number value) {
         return int256(value).withSize(166);
     }
 
     @NotNull
-    public static EthInt int168(long value) {
+    public static EthInt int168(@NotNull Number value) {
         return int256(value).withSize(168);
     }
 
     @NotNull
-    public static EthInt int170(long value) {
+    public static EthInt int170(@NotNull Number value) {
         return int256(value).withSize(170);
     }
 
     @NotNull
-    public static EthInt int172(long value) {
+    public static EthInt int172(@NotNull Number value) {
         return int256(value).withSize(172);
     }
 
     @NotNull
-    public static EthInt int174(long value) {
+    public static EthInt int174(@NotNull Number value) {
         return int256(value).withSize(174);
     }
 
     @NotNull
-    public static EthInt int176(long value) {
+    public static EthInt int176(@NotNull Number value) {
         return int256(value).withSize(176);
     }
 
     @NotNull
-    public static EthInt int178(long value) {
+    public static EthInt int178(@NotNull Number value) {
         return int256(value).withSize(178);
     }
 
     @NotNull
-    public static EthInt int180(long value) {
+    public static EthInt int180(@NotNull Number value) {
         return int256(value).withSize(180);
     }
 
     @NotNull
-    public static EthInt int182(long value) {
+    public static EthInt int182(@NotNull Number value) {
         return int256(value).withSize(182);
     }
 
     @NotNull
-    public static EthInt int184(long value) {
+    public static EthInt int184(@NotNull Number value) {
         return int256(value).withSize(184);
     }
 
     @NotNull
-    public static EthInt int186(long value) {
+    public static EthInt int186(@NotNull Number value) {
         return int256(value).withSize(186);
     }
 
     @NotNull
-    public static EthInt int188(long value) {
+    public static EthInt int188(@NotNull Number value) {
         return int256(value).withSize(188);
     }
 
     @NotNull
-    public static EthInt int190(long value) {
+    public static EthInt int190(@NotNull Number value) {
         return int256(value).withSize(190);
     }
 
     @NotNull
-    public static EthInt int192(long value) {
+    public static EthInt int192(@NotNull Number value) {
         return int256(value).withSize(192);
     }
 
     @NotNull
-    public static EthInt int194(long value) {
+    public static EthInt int194(@NotNull Number value) {
         return int256(value).withSize(194);
     }
 
     @NotNull
-    public static EthInt int196(long value) {
+    public static EthInt int196(@NotNull Number value) {
         return int256(value).withSize(196);
     }
 
     @NotNull
-    public static EthInt int198(long value) {
+    public static EthInt int198(@NotNull Number value) {
         return int256(value).withSize(198);
     }
 
     @NotNull
-    public static EthInt int200(long value) {
+    public static EthInt int200(@NotNull Number value) {
         return int256(value).withSize(200);
     }
 
     @NotNull
-    public static EthInt int202(long value) {
+    public static EthInt int202(@NotNull Number value) {
         return int256(value).withSize(202);
     }
 
     @NotNull
-    public static EthInt int204(long value) {
+    public static EthInt int204(@NotNull Number value) {
         return int256(value).withSize(204);
     }
 
     @NotNull
-    public static EthInt int206(long value) {
+    public static EthInt int206(@NotNull Number value) {
         return int256(value).withSize(206);
     }
 
     @NotNull
-    public static EthInt int208(long value) {
+    public static EthInt int208(@NotNull Number value) {
         return int256(value).withSize(208);
     }
 
     @NotNull
-    public static EthInt int210(long value) {
+    public static EthInt int210(@NotNull Number value) {
         return int256(value).withSize(210);
     }
 
     @NotNull
-    public static EthInt int212(long value) {
+    public static EthInt int212(@NotNull Number value) {
         return int256(value).withSize(212);
     }
 
     @NotNull
-    public static EthInt int214(long value) {
+    public static EthInt int214(@NotNull Number value) {
         return int256(value).withSize(214);
     }
 
     @NotNull
-    public static EthInt int216(long value) {
+    public static EthInt int216(@NotNull Number value) {
         return int256(value).withSize(216);
     }
 
     @NotNull
-    public static EthInt int218(long value) {
+    public static EthInt int218(@NotNull Number value) {
         return int256(value).withSize(218);
     }
 
     @NotNull
-    public static EthInt int220(long value) {
+    public static EthInt int220(@NotNull Number value) {
         return int256(value).withSize(220);
     }
 
     @NotNull
-    public static EthInt int222(long value) {
+    public static EthInt int222(@NotNull Number value) {
         return int256(value).withSize(222);
     }
 
     @NotNull
-    public static EthInt int224(long value) {
+    public static EthInt int224(@NotNull Number value) {
         return int256(value).withSize(224);
     }
 
     @NotNull
-    public static EthInt int226(long value) {
+    public static EthInt int226(@NotNull Number value) {
         return int256(value).withSize(226);
     }
 
     @NotNull
-    public static EthInt int228(long value) {
+    public static EthInt int228(@NotNull Number value) {
         return int256(value).withSize(228);
     }
 
     @NotNull
-    public static EthInt int230(long value) {
+    public static EthInt int230(@NotNull Number value) {
         return int256(value).withSize(230);
     }
 
     @NotNull
-    public static EthInt int232(long value) {
+    public static EthInt int232(@NotNull Number value) {
         return int256(value).withSize(232);
     }
 
     @NotNull
-    public static EthInt int234(long value) {
+    public static EthInt int234(@NotNull Number value) {
         return int256(value).withSize(234);
     }
 
     @NotNull
-    public static EthInt int236(long value) {
+    public static EthInt int236(@NotNull Number value) {
         return int256(value).withSize(236);
     }
 
     @NotNull
-    public static EthInt int238(long value) {
+    public static EthInt int238(@NotNull Number value) {
         return int256(value).withSize(238);
     }
 
     @NotNull
-    public static EthInt int240(long value) {
+    public static EthInt int240(@NotNull Number value) {
         return int256(value).withSize(240);
     }
 
     @NotNull
-    public static EthInt int242(long value) {
+    public static EthInt int242(@NotNull Number value) {
         return int256(value).withSize(242);
     }
 
     @NotNull
-    public static EthInt int244(long value) {
+    public static EthInt int244(@NotNull Number value) {
         return int256(value).withSize(244);
     }
 
     @NotNull
-    public static EthInt int246(long value) {
+    public static EthInt int246(@NotNull Number value) {
         return int256(value).withSize(246);
     }
 
     @NotNull
-    public static EthInt int248(long value) {
+    public static EthInt int248(@NotNull Number value) {
         return int256(value).withSize(248);
     }
 
     @NotNull
-    public static EthInt int250(long value) {
+    public static EthInt int250(@NotNull Number value) {
         return int256(value).withSize(250);
     }
 
     @NotNull
-    public static EthInt int252(long value) {
+    public static EthInt int252(@NotNull Number value) {
         return int256(value).withSize(252);
     }
 
     @NotNull
-    public static EthInt int254(long value) {
+    public static EthInt int254(@NotNull Number value) {
         return int256(value).withSize(254);
     }
 
