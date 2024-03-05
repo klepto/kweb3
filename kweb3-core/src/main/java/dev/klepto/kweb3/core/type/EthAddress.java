@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 import static dev.klepto.kweb3.core.util.Hex.stripPrefix;
 import static dev.klepto.kweb3.core.util.Hex.toBigInteger;
@@ -19,53 +18,63 @@ import static dev.klepto.kweb3.core.util.Hex.toBigInteger;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthAddress(BigInteger value) implements EthNumericType<EthAddress> {
+public record EthAddress(BigInteger value) implements EthType, EthNumericType<EthAddress> {
 
     /**
      * Zero address constant.
      */
-    public static final EthAddress ZERO = address("0x0");
+    public static final EthAddress ZERO = address(0);
 
     public EthAddress {
         require(value.bitLength() <= 160, "Malformed address: {}", Hex.toHex(value));
     }
 
+    /**
+     * Returns string representation of this <code>ethereum address</code>.
+     *
+     * @return the string representation of this <code>ethereum address</code>.
+     */
     @Override
     public String toString() {
         return "address(" + toChecksumHex() + ")";
     }
 
+    /**
+     * Returns hash code of this <code>ethereum address</code>.
+     *
+     * @return hash code of this <code>ethereum address</code>
+     */
     @Override
     public int hashCode() {
         return value.hashCode();
     }
 
-    /* Solidity style address initializers */
-
     /**
-     * Converts {@link BigInteger} to ethereum address type.
+     * Compares this <code>ethereum address</code> to the specified object.
+     *
+     * @param object the object to compare with
+     * @return true if the objects are the same; false otherwise
      */
-    @NotNull
-    public static EthAddress address(@NotNull BigInteger value) {
-        return new EthAddress(value);
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof EthAddress other)) {
+            return false;
+        }
+        return value.equals(other.value);
     }
 
-    /**
-     * Converts hexadecimal string to ethereum address type.
-     */
+    /* Solidity style static initializers */
+    @NotNull
+    public static EthAddress address(@NotNull Number value) {
+        return new EthAddress(EthNumericType.parseBigInteger(value));
+    }
+
     @NotNull
     public static EthAddress address(@NotNull String hex) {
         hex = stripPrefix(Keccak256.keccak256Checksum(hex));
         return address(toBigInteger(hex));
-    }
-
-    /**
-     * Converts ethereum {@link EthUint} to ethereum address type.
-     */
-    @NotNull
-    public static EthAddress address(@NotNull EthUint value) {
-        checkArgument(value.size() == 160, "Only uint160 can be converted to address");
-        return address(value.value());
     }
 
 }
