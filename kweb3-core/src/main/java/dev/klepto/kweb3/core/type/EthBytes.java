@@ -10,28 +10,40 @@ import org.jetbrains.annotations.NotNull;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
- * Represents ethereum <code>bytes</code> data type.
+ * Container for <code>ethereum bytes</code> value.
  *
  * @param size  the size in bytes, from 1 to 32, -1 to indicate dynamic size
  * @param value the byte array in a form of immutable list
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthBytes(@With int size, ImmutableList<Byte> value) implements EthSizedType {
+public record EthBytes(@With int size, ImmutableList<Byte> value) implements EthType, EthSizedType {
 
     /**
-     * Empty bytes constant.
+     * Empty <code>ethereum bytes</code> constant.
      */
     public static final EthBytes EMPTY = bytes(new byte[0]);
 
+    /**
+     * Constant indicating dynamic byte size.
+     */
+    public static final int DYNAMIC_SIZE = -1;
+
     public EthBytes {
         require(
-                size == -1 || size >= value.size(),
+                size == DYNAMIC_SIZE || size >= value.size(),
                 "bytes{} cannot contain {} bytes",
                 size, value.size()
         );
     }
 
+    /**
+     * Creates a new <code>ethereum bytes</code> container with the specified size. If specified <code>size</code> is
+     * larger than the current size, the new bytes will be padded with zeros.
+     *
+     * @param size the size of the new bytes
+     * @return a new <code>ethereum bytes</code> container with the specified size
+     */
     @NotNull
     public EthBytes withSize(int size) {
         if (value.size() < size) {
@@ -40,23 +52,52 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
             System.arraycopy(currentBytes, 0, newBytes, 0, currentBytes.length);
             return new EthBytes(size, ImmutableList.copyOf(Bytes.asList(newBytes)));
         }
+
         return new EthBytes(size, value);
     }
 
+    /**
+     * Returns string representation of this <code>ethereum bytes</code>.
+     *
+     * @return the string representation of this <code>ethereum bytes</code>.
+     */
     @Override
     public String toString() {
         val sizeString = size > 0 ? size : "";
         return "bytes" + sizeString + "(" + Hex.toHex(toByteArray()) + ")";
     }
 
+    /**
+     * Returns hash code of this <code>ethereum bytes</code>.
+     *
+     * @return hash code of this <code>ethereum bytes</code>
+     */
     @Override
     public int hashCode() {
         return value.hashCode();
     }
 
+    /**
+     * Compares this <code>ethereum bytes</code> to the specified object.
+     *
+     * @param object the object to compare with
+     * @return true if the objects are the same; false otherwise
+     */
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof EthBytes other)) {
+            return false;
+        }
+        return value.equals(other.value);
+    }
 
     /**
-     * Converts this value to mutable <code>byte</code> array.
+     * Converts this <code>ethereum bytes</code> value to mutable <code>byte</code> array.
      *
      * @return a mutable array of bytes
      */
@@ -64,10 +105,10 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
         return Bytes.toArray(value);
     }
 
-    /* Solidity style bytes initializers */
+    /* Solidity style static initializers */
     @NotNull
     public static EthBytes bytes(byte @NotNull [] value) {
-        return new EthBytes(-1, ImmutableList.copyOf(Bytes.asList(value)));
+        return new EthBytes(DYNAMIC_SIZE, ImmutableList.copyOf(Bytes.asList(value)));
     }
 
     @NotNull
