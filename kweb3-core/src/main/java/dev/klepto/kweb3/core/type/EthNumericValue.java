@@ -30,7 +30,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param value the value to set
      * @return a new instance of numeric type with given value
      */
-    T withValue(BigInteger value);
+    @NotNull
+    T withValue(@NotNull BigInteger value);
 
     /**
      * Compares this numeric value with another number value.
@@ -49,7 +50,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param other the number to add
      * @return a new instance of numeric type with the result of the addition
      */
-    default T plus(Number other) {
+    @NotNull
+    default T plus(@NotNull Number other) {
         val result = value().add(parseBigInteger(other));
         return withValue(result);
     }
@@ -60,7 +62,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param other the number to subtract
      * @return a new instance of numeric type with the result of the subtraction
      */
-    default T minus(Number other) {
+    @NotNull
+    default T minus(@NotNull Number other) {
         val result = value().subtract(parseBigInteger(other));
         return withValue(result);
     }
@@ -71,7 +74,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param other the number to multiply
      * @return a new instance of numeric type with the result of the multiplication
      */
-    default T times(Number other) {
+    @NotNull
+    default T times(@NotNull Number other) {
         val result = value().multiply(parseBigInteger(other));
         return withValue(result);
     }
@@ -82,7 +86,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param other the number to divide
      * @return a new instance of numeric type with the result of the division
      */
-    default T div(Number other) {
+    @NotNull
+    default T div(@NotNull Number other) {
         val result = value().divide(parseBigInteger(other));
         return withValue(result);
     }
@@ -93,7 +98,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param other the number to divide by
      * @return a new instance of numeric type with the remainder of the division
      */
-    default T rem(Number other) {
+    @NotNull
+    default T rem(@NotNull Number other) {
         val result = value().remainder(parseBigInteger(other));
         return withValue(result);
     }
@@ -103,6 +109,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      *
      * @return a new instance of this numeric value
      */
+    @NotNull
     default T unaryPlus() {
         return withValue(value());
     }
@@ -112,6 +119,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      *
      * @return a new instance of numeric type with the negation of this value
      */
+    @NotNull
     default T unaryMinus() {
         val result = value().negate();
         return withValue(result);
@@ -122,6 +130,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      *
      * @return the numeric value as big decimal with 18 decimal places
      */
+    @NotNull
     default BigDecimal decimalValue() {
         return decimalValue(18);
     }
@@ -132,6 +141,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param decimals the amount of decimal places
      * @return the numeric value as big decimal
      */
+    @NotNull
     default BigDecimal decimalValue(int decimals) {
         return new BigDecimal(value(), decimals);
     }
@@ -166,7 +176,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @param number the number to parse
      * @return the parsed big integer
      */
-    static BigInteger parseBigInteger(Number number) {
+    @NotNull
+    static BigInteger parseBigInteger(@NotNull Number number) {
         if (number instanceof BigInteger) {
             return (BigInteger) number;
         } else if (number instanceof Float) {

@@ -22,9 +22,9 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
 public record EthSizedTypeDescriptor(UnreflectType type, int valueSize) implements TypeDescriptor {
 
     public EthSizedTypeDescriptor {
-        val isInt = type.matchesExact(EthInt.class);
-        val isUint = type.matchesExact(EthUint.class);
-        val isBytes = type.matchesExact(EthBytes.class);
+        val isInt = type.matches(EthInt.class);
+        val isUint = type.matches(EthUint.class);
+        val isBytes = type.matches(EthBytes.class);
         require(isInt || isUint || isBytes, "Unsupported sized descriptor type: {}", type);
     }
 

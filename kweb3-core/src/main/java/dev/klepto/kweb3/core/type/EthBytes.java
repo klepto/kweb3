@@ -6,18 +6,17 @@ import dev.klepto.kweb3.core.util.Hex;
 import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
  * Container for <code>ethereum bytes</code> value.
  *
- * @param size  the size in bytes, from 1 to 32, -1 to indicate dynamic size
- * @param value the byte array in a form of immutable list
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthBytes(@With int size, ImmutableList<Byte> value) implements EthValue, EthSizedValue {
+public class EthBytes implements EthValue, EthSizedValue {
 
     /**
      * Empty <code>ethereum bytes</code> constant.
@@ -29,12 +28,27 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
      */
     public static final int DYNAMIC_SIZE = -1;
 
-    public EthBytes {
+    @With
+    private final int size;
+
+    @NotNull
+    private final ImmutableList<Byte> value;
+
+    /**
+     * Constructs new <code>ethereum bytes</code> with the specified size and value.
+     *
+     * @param size  the size of the bytes, <code>-1</code> indicates dynamic size, any other positive value indicates a
+     *              fixed size bytes
+     * @param value the immutable list containing bytes of the bytes
+     */
+    public EthBytes(int size, @NotNull ImmutableList<Byte> value) {
         require(
                 size == DYNAMIC_SIZE || size >= value.size(),
                 "bytes{} cannot contain {} bytes",
                 size, value.size()
         );
+        this.size = size;
+        this.value = value;
     }
 
     /**
@@ -57,11 +71,21 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
     }
 
     /**
+     * Returns the size of this <code>ethereum bytes</code>.
+     *
+     * @return the size of this <code>ethereum bytes</code>
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
      * Returns string representation of this <code>ethereum bytes</code>.
      *
      * @return the string representation of this <code>ethereum bytes</code>.
      */
     @Override
+    @NotNull
     public String toString() {
         val sizeString = size > 0 ? size : "";
         return "bytes" + sizeString + "(" + Hex.toHex(toByteArray()) + ")";
@@ -83,7 +107,7 @@ public record EthBytes(@With int size, ImmutableList<Byte> value) implements Eth
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (object == null) {
             return false;
         }

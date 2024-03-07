@@ -3,6 +3,7 @@ package dev.klepto.kweb3.core.type;
 import dev.klepto.kweb3.core.util.Hex;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.Objects;
@@ -31,7 +32,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      * @param size  the size in bits of this <code>ethereum int</code>, from 1 to 256
      * @param value the big integer value
      */
-    public EthInt(int size, BigInteger value) {
+    public EthInt(int size, @NotNull BigInteger value) {
         require(size >= value.bitLength(), "int{} cannot fit value: {}", size, value);
         this.size = size;
         this.value = value;
@@ -62,6 +63,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      *
      * @return a new instance of <code>ethereum int</code> with the incremented value
      */
+    @NotNull
     public EthInt inc() {
         return plus(1);
     }
@@ -71,6 +73,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      *
      * @return a new instance of <code>ethereum int</code> with the decremented value
      */
+    @NotNull
     public EthInt dec() {
         return minus(1);
     }
@@ -121,6 +124,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      * @return string representation of this <code>ethereum int</code>
      */
     @Override
+    @NotNull
     public String toString() {
         return "int" + size + "(" + value + ")";
     }
@@ -142,7 +146,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      * @return true if the objects are the same; false otherwise
      */
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (object == null) {
             return false;
         }

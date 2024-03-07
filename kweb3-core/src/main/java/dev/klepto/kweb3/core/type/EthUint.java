@@ -23,6 +23,8 @@ public class EthUint extends Number implements EthValue, EthNumericValue<EthUint
     public static final EthUint ZERO = uint256(0);
 
     private final int size;
+
+    @NotNull
     private final BigInteger value;
 
     /**
@@ -31,7 +33,7 @@ public class EthUint extends Number implements EthValue, EthNumericValue<EthUint
      * @param size  the size in bits of this <code>ethereum uint</code>, from 1 to 256
      * @param value the positive big integer value
      */
-    public EthUint(int size, BigInteger value) {
+    public EthUint(int size, @NotNull BigInteger value) {
         require(size >= value.bitLength(), "uint{} cannot fit value: {}", size, value);
         require(value.signum() >= 0, "uint{} cannot be negative: {}", size, value);
         this.size = size;

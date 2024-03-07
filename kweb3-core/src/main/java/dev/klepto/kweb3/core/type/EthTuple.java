@@ -3,6 +3,7 @@ package dev.klepto.kweb3.core.type;
 import com.google.common.collect.ImmutableList;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -11,10 +12,31 @@ import java.util.stream.Collectors;
  * Container for <code>ethereum tuple</code> value. Used to represent smart contract return values and <code>ethereum
  * structs</code>.
  *
- * @param values a list of values contained within this tuple
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record EthTuple(ImmutableList<EthValue> values) implements EthValue, EthCollectionValue<EthValue> {
+public class EthTuple implements EthValue, EthCollectionValue<EthValue> {
+
+    @NotNull
+    private final ImmutableList<EthValue> values;
+
+    /**
+     * Constructs new <code>ethereum tuple</code> with the specified values.
+     *
+     * @param values the collection containing elements of the tuple
+     */
+    public EthTuple(@NotNull Collection<EthValue> values) {
+        this.values = ImmutableList.copyOf(values);
+    }
+
+    /**
+     * Returns the values contained within this <code>ethereum tuple</code>.
+     *
+     * @return the values contained within this <code>ethereum tuple</code>
+     */
+    @NotNull
+    public ImmutableList<EthValue> values() {
+        return values;
+    }
 
     /**
      * Returns string representation of this <code>ethereum tuple</code>.
@@ -22,6 +44,7 @@ public record EthTuple(ImmutableList<EthValue> values) implements EthValue, EthC
      * @return the string representation of this <code>ethereum tuple</code>.
      */
     @Override
+    @NotNull
     public String toString() {
         val children = values().stream()
                 .map(Object::toString)
@@ -45,7 +68,7 @@ public record EthTuple(ImmutableList<EthValue> values) implements EthValue, EthC
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (object == null) {
             return false;
         }

@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableList;
 import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.klepto.kweb3.core.util.Conditions.require;
@@ -14,26 +16,54 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * Container for <code>ethereum array</code> value. Used in favor of JVM arrays in-order to enable immutability and API
  * type-safety.
  *
- * @param capacity the size of the array, <code>-1</code> indicates dynamic array, any other positive value indicates a
- *                 fixed size array
- * @param values   the elements of the array
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthArray<T extends EthValue>(int capacity,
-                                           ImmutableList<T> values) implements EthValue, EthCollectionValue<T> {
+public class EthArray<T extends EthValue> implements EthValue, EthCollectionValue<T> {
 
     /**
      * Constant indicating dynamic array size.
      */
     public static final int DYNAMIC_SIZE = -1;
 
-    public EthArray {
+    private final int capacity;
+    private final @NotNull ImmutableList<T> values;
+
+    /**
+     * Constructs new <code>ethereum array</code> with the specified capacity and elements.
+     *
+     * @param capacity the size of the array, <code>-1</code> indicates dynamic array, any other positive value
+     *                 indicates a fixed size array
+     * @param values   the collection containing elements of the array
+     */
+    public EthArray(int capacity, @NotNull Collection<T> values) {
         require(
                 capacity == DYNAMIC_SIZE || capacity == values.size(),
                 "Array of capacity {} cannot fit {} values",
                 capacity, values.size()
         );
+        this.capacity = capacity;
+        this.values = ImmutableList.copyOf(values);
+    }
+
+    /**
+     * Returns the capacity of this <code>ethereum array</code>.
+     *
+     * @return the capacity of this <code>ethereum array</code>
+     */
+    public int capacity() {
+        return capacity;
+    }
+
+    /**
+     * Returns the values contained within this <code>ethereum array</code>.
+     *
+     * @return the values contained within this <code>ethereum array</code>
+     */
+    @Override
+    @NotNull
+    public List<T> values() {
+        return values;
     }
 
     /**
@@ -84,7 +114,7 @@ public record EthArray<T extends EthValue>(int capacity,
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (object == null) {
             return false;
         }
@@ -121,7 +151,7 @@ public record EthArray<T extends EthValue>(int capacity,
      */
     @NotNull
     public static <T extends EthValue> EthArray<T> array(int size, @NotNull Collection<T> values) {
-        return new EthArray<>(size, ImmutableList.copyOf(values));
+        return new EthArray<>(size, values);
     }
 
     /**
@@ -146,5 +176,6 @@ public record EthArray<T extends EthValue>(int capacity,
     public static <T extends EthValue> EthArray<T> array(@NotNull Collection<T> values) {
         return array(DYNAMIC_SIZE, values);
     }
+
 
 }

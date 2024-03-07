@@ -122,7 +122,7 @@ public class HeadlongCodec implements AbiCodec {
                 ? (BigInteger) value
                 : BigInteger.valueOf(value.longValue());
 
-        return descriptor.type().matchesExact(EthInt.class)
+        return descriptor.type().matches(EthInt.class)
                 ? int256(integer).withSize(descriptor.valueSize())
                 : uint256(integer).withSize(descriptor.valueSize());
     }

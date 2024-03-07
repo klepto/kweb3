@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.core.type;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +21,7 @@ public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterab
      *
      * @return the values contained within this collection
      */
+    @NotNull
     List<T> values();
 
     /**
@@ -46,6 +48,7 @@ public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterab
      * @param index index of the element to return
      * @return the element at the specified position in this collection
      */
+    @Nullable
     default T get(int index) {
         return values().get(index);
     }
@@ -55,6 +58,7 @@ public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterab
      *
      * @return the first element in this collection
      */
+    @Nullable
     default T first() {
         return values().get(0);
     }
@@ -64,6 +68,7 @@ public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterab
      *
      * @return the last element in this collection
      */
+    @Nullable
     default T last() {
         return values().get(size() - 1);
     }
@@ -73,6 +78,7 @@ public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterab
      *
      * @return a sequential {@link Stream} with this collection as its source
      */
+    @NotNull
     default Stream<T> stream() {
         return values().stream();
     }

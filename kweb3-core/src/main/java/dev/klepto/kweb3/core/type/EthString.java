@@ -3,22 +3,44 @@ package dev.klepto.kweb3.core.type;
 import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 
 /**
  * Container for <code>ethereum string</code> value.
  *
- * @param value the string value
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record EthString(String value) implements EthValue {
+public class EthString implements EthValue {
 
     /**
      * Empty <code>ethereum string</code> constant.
      */
     public static final EthString EMPTY = string("");
+
+    @NotNull
+    private final String value;
+
+    /**
+     * Constructs new <code>ethereum string</code> with the specified value.
+     *
+     * @param value the string value
+     */
+    public EthString(@NotNull String value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns the value of this <code>ethereum string</code>.
+     *
+     * @return the value of this <code>ethereum string</code>
+     */
+    @NotNull
+    public String value() {
+        return value;
+    }
 
     /**
      * Returns string representation of this <code>ethereum string</code>.
@@ -26,6 +48,7 @@ public record EthString(String value) implements EthValue {
      * @return the string representation of this <code>ethereum string</code>.
      */
     @Override
+    @NotNull
     public String toString() {
         return "string(" + value + ")";
     }
@@ -46,7 +69,7 @@ public record EthString(String value) implements EthValue {
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    public boolean equals(Object object) {
+    public boolean equals(@Nullable Object object) {
         if (object == null) {
             return false;
         }

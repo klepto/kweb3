@@ -96,20 +96,20 @@ public class ContractCodec {
         if (type.matches(EthSizedValue.class)) {
             // Hard-coded defaults, not a huge fan.
             if (valueSize == -1) {
-                if (type.matchesExact(EthUint.class) || type.matchesExact(EthInt.class)) {
+                if (type.matches(EthUint.class) || type.matches(EthInt.class)) {
                     valueSize = 256;
                 }
             }
             return new EthSizedTypeDescriptor(type, valueSize);
         }
 
-        if (type.matchesExact(EthBool.class)
-                || type.matchesExact(EthString.class)
-                || type.matchesExact(EthAddress.class)) {
+        if (type.matches(EthBool.class)
+                || type.matches(EthString.class)
+                || type.matches(EthAddress.class)) {
             return new EthTypeDescriptor(type);
         }
 
-        if (type.matchesExact(EthArray.class)) {
+        if (type.matches(EthArray.class)) {
             return parseArrayDescriptor(type, arraySize, valueSize);
         }
 
@@ -129,7 +129,7 @@ public class ContractCodec {
      * @return the ABI-compatible array type descriptor
      */
     private static TypeDescriptor parseArrayDescriptor(UnreflectType type, int valueSize, int arraySize) {
-        require(type.matchesExact(EthArray.class), "Not EthArray type.");
+        require(type.matches(EthArray.class), "Not EthArray type.");
 
         val componentType = type.genericType();
         require(componentType != null, "EthArray must contain generic type.");

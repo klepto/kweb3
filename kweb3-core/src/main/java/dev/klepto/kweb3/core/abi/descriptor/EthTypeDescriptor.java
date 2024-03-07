@@ -22,9 +22,9 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
 public record EthTypeDescriptor(UnreflectType type) implements TypeDescriptor {
 
     public EthTypeDescriptor {
-        val isString = type.matchesExact(EthString.class);
-        val isBool = type.matchesExact(EthBool.class);
-        val isAddress = type.matchesExact(EthAddress.class);
+        val isString = type.matches(EthString.class);
+        val isBool = type.matches(EthBool.class);
+        val isAddress = type.matches(EthAddress.class);
         require(isString || isBool || isAddress, "Unsupported simple descriptor type: " + type);
     }
 
