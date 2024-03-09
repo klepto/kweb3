@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Client;
+import dev.klepto.kweb3.core.config.Web3Network;
 import dev.klepto.kweb3.core.type.EthAddress;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +19,15 @@ public interface Web3Contract {
      */
     @NotNull
     Web3Client getClient();
+
+    /**
+     * Returns the network that this smart contract is deployed on.
+     *
+     * @return the network that this smart contract is deployed on
+     */
+    default Web3Network getNetwork() {
+        return getClient().getNetwork();
+    }
 
     /**
      * Returns smart contract's blockchain address.
