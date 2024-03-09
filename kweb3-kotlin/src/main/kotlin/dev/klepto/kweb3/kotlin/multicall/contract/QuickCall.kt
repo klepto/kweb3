@@ -23,17 +23,21 @@ interface QuickCall : MulticallExecutor {
         val addrs = array(calls.map { it.address })
         val datas = array(calls.map { it.data })
         val result = execute(gasLimit, gasLimit, addrs, datas)
-        return result.results.values
+        return result.results.values()
     }
 
     /**
-     * Aggregates all calls into a single request and returns an array
-     * containing return data bytes of each call.
+     * Aggregates all calls into a single request and returns an
+     * array containing return data bytes of each call.
      *
-     * @param gasLimit the maximum amount of gas to be used for each call
-     * @param sizeLimit the maximum amount of bytes to be used for each call
-     * @param addrs the array of smart contract addresses to be called
-     * @param datas the array of data bytes to be called with smart contracts
+     * @param gasLimit the maximum amount of gas to be used for
+     *     each call
+     * @param sizeLimit the maximum amount of bytes to be used for
+     *     each call
+     * @param addrs the array of smart contract addresses to be
+     *     called
+     * @param datas the array of data bytes to be called with smart
+     *     contracts
      */
     @View
     suspend fun execute(

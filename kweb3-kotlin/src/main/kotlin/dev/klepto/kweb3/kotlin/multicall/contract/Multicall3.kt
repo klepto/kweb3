@@ -11,8 +11,9 @@ import dev.klepto.kweb3.core.type.EthBytes
 import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
 
 /**
- * Implementation of [Multicall3](https://github.com/mds1/multicall) smart
- * contract executor.
+ * Implementation of
+ * [Multicall3](https://github.com/mds1/multicall)
+ * smart contract executor.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
@@ -23,28 +24,29 @@ interface Multicall3 : MulticallExecutor {
         val encodedCalls = array(calls.map { Call(it.address, bool(allowFailure), it.data) })
         val response = aggregate3(encodedCalls)
         return response.map {
-            if (it.success.value) it.returnData else null
+            if (it.success.value()) it.returnData else null
         }
     }
 
     /**
-     * Aggregates all calls into a single request and returns an array
-     * containing [results][Result] of each call.
+     * Aggregates all calls into a single request and returns an
+     * array containing [results][Result] of each call.
      *
-     * @param calls an ethereum array containing calls for aggregation
+     * @param calls an ethereum array containing calls for
+     *     aggregation
      * @return an ethereum array containing result of each call
      */
     @View
     suspend fun aggregate3(calls: EthArray<Call>): EthArray<Result>
 
     /**
-     * Contains a single smart contract call request. If `allowFailure` is set
-     * to `false`, failure of this call will cause entire aggregation request
-     * to fail.
+     * Contains a single smart contract call request. If
+     * `allowFailure` is set to `false`, failure of this
+     * call will cause entire aggregation request to fail.
      *
      * @param target the target contract address
-     * @param allowFailure marks that aggregation request is allowed to
-     *     continue upon failure of this call
+     * @param allowFailure marks that aggregation request is
+     *     allowed to continue upon failure of this call
      * @param callData the call-data contained in ethereum bytes
      */
     data class Call(val target: EthAddress, val allowFailure: EthBool, val callData: EthBytes) : EthStructContainer
