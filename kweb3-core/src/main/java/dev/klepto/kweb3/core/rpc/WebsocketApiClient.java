@@ -1,7 +1,6 @@
 package dev.klepto.kweb3.core.rpc;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
@@ -24,11 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 @RequiredArgsConstructor
 public class WebsocketApiClient extends RpcClient {
-
-    /**
-     * {@link Gson} instance for json encoding/decoding.
-     */
-    private static final Gson GSON = new Gson();
 
     /**
      * The endpoint that this client is connecting to.

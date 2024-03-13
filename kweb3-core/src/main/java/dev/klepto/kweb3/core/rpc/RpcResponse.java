@@ -34,7 +34,20 @@ public record RpcResponse(String jsonrpc, long id, @Nullable JsonElement result,
         if (result == null) {
             return null;
         }
+        if (result.isJsonPrimitive()) {
+            return result.getAsString();
+        }
         return result.toString();
+    }
+
+    /**
+     * Returns the result as the specified type.
+     *
+     * @param type the type to convert the result to
+     * @return the result as the specified type
+     */
+    public <T> T resultAs(Class<T> type) {
+        return RpcApi.GSON.fromJson(result, type);
     }
 
     /**

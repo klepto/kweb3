@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.core.rpc;
 
+import com.google.gson.Gson;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.config.Web3Endpoint;
 import dev.klepto.kweb3.core.rpc.api.*;
@@ -16,6 +17,11 @@ public interface RpcApi extends
         EthSendRawTransaction,
         EthBlockNumber,
         EthGetLogs {
+
+    /**
+     * {@link Gson} instance for json encoding/decoding.
+     */
+    Gson GSON = new Gson();
 
     /**
      * Default JSON RPC version.

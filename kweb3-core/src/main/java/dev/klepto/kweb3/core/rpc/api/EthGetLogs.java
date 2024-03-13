@@ -3,7 +3,6 @@ package dev.klepto.kweb3.core.rpc.api;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.rpc.RpcMethod;
 import dev.klepto.kweb3.core.rpc.RpcRequest;
-import dev.klepto.kweb3.core.rpc.RpcResponse;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,17 +26,17 @@ public interface EthGetLogs extends RpcMethod {
      * @return an array of all the logs matching the given filters
      */
     @NotNull
-    default Web3Result<String> ethGetLogs(@Nullable String[] addresses,
-                                          @Nullable String fromBlock,
-                                          @Nullable String toBlock,
-                                          @Nullable String[] topics,
-                                          @Nullable String blockHash) {
+    default Web3Result<Log[]> ethGetLogs(@Nullable String[] addresses,
+                                         @Nullable String fromBlock,
+                                         @Nullable String toBlock,
+                                         @Nullable String[] topics,
+                                         @Nullable String blockHash) {
         val parameters = new Parameters(addresses, fromBlock, toBlock, topics, blockHash);
         val request = new RpcRequest()
                 .withMethod("eth_getLogs")
                 .withParams(parameters);
         return request(request)
-                .map(RpcResponse::resultAsString);
+                .map(response -> response.resultAs(Log[].class));
     }
 
     /**
@@ -56,6 +55,30 @@ public interface EthGetLogs extends RpcMethod {
                       @Nullable String toBlock,
                       @Nullable String[] topics,
                       @Nullable String blockHash) {
+    }
+
+    /**
+     * Represents <code>eth_getLogs</code> response log object.
+     *
+     * @param address          the address of the log
+     * @param topics           the array of topics of the log
+     * @param data             the data of the log
+     * @param blockNumber      the block number in hexadecimal format
+     * @param transactionHash  the transaction hash in hexadecimal format
+     * @param transactionIndex the transaction index in hexadecimal format
+     * @param blockHash        the block hash in hexadecimal format
+     * @param logIndex         the log index in hexadecimal format
+     * @param removed          whether the log was removed
+     */
+    record Log(@NotNull String address,
+               @NotNull String[] topics,
+               @NotNull String data,
+               @NotNull String blockNumber,
+               @NotNull String transactionHash,
+               @NotNull String transactionIndex,
+               @NotNull String blockHash,
+               @NotNull String logIndex,
+               boolean removed) {
     }
 
 }
