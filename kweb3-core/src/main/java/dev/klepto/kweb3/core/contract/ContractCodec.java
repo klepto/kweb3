@@ -45,7 +45,10 @@ import static dev.klepto.unreflect.Unreflect.reflect;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class ContractCodec {
+public final class ContractCodec {
+
+    private ContractCodec() {
+    }
 
     /**
      * Parses a tuple type descriptor for a given list of {@link Reflectable} types. List can contain method parameters,
