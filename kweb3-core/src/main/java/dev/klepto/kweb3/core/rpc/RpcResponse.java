@@ -1,6 +1,8 @@
 package dev.klepto.kweb3.core.rpc;
 
+import com.google.gson.JsonElement;
 import lombok.With;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -13,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record RpcResponse(String jsonrpc, long id, @Nullable String result, @Nullable Error error) {
+public record RpcResponse(String jsonrpc, long id, @Nullable JsonElement result, @Nullable Error error) {
 
     /**
      * Creates a new rpc response using default values.
@@ -23,12 +25,25 @@ public record RpcResponse(String jsonrpc, long id, @Nullable String result, @Nul
     }
 
     /**
+     * Returns the result as string.
+     *
+     * @return the result as string
+     */
+    @Nullable
+    public String resultAsString() {
+        if (result == null) {
+            return null;
+        }
+        return result.toString();
+    }
+
+    /**
      * Represents RPC response error.
      *
      * @param code    the error code
      * @param message the error message
      */
-    public record Error(int code, String message) {
+    public record Error(int code, @NotNull String message) {
     }
 
 }

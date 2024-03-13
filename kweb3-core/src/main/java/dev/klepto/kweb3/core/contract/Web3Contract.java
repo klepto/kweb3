@@ -6,7 +6,8 @@ import dev.klepto.kweb3.core.type.EthAddress;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Main interface for all smart contracts.
+ * Marker interface for all web3 smart contracts. Unimplemented methods are translated to real RPC calls with help of
+ * annotations and type-inference and executed using {@link ContractProxy}.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */

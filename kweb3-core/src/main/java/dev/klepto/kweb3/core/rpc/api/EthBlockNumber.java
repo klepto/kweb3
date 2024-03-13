@@ -8,21 +8,21 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Implementation of Ethereum RPC API <code>eth_gasPrice</code> method.
+ * Implementation of Ethereum RPC API <code>eth_blockNumber</code> method.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthGasPrice extends RpcMethod {
+public interface EthBlockNumber extends RpcMethod {
 
     /**
-     * Returns the current gas price in wei.
+     * Returns the current latest block number.
      *
-     * @return the hexadecimal value of the current gas price in wei
+     * @return a hexadecimal of an integer representing the current block number the client is on
      */
     @NotNull
-    default Web3Result<String> ethGasPrice() {
+    default Web3Result<String> ethBlockNumber() {
         val request = new RpcRequest()
-                .withMethod("eth_gasPrice");
+                .withMethod("eth_blockNumber");
         return request(request)
                 .map(RpcResponse::resultAsString);
     }

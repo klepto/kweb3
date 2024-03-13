@@ -2,17 +2,20 @@ package dev.klepto.kweb3.core.rpc;
 
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.config.Web3Endpoint;
-import dev.klepto.kweb3.core.rpc.api.EthCall;
-import dev.klepto.kweb3.core.rpc.api.EthEstimateGas;
-import dev.klepto.kweb3.core.rpc.api.EthGasPrice;
-import dev.klepto.kweb3.core.rpc.api.EthSendRawTransaction;
+import dev.klepto.kweb3.core.rpc.api.*;
 
 /**
  * Represents Ethereum RPC API implementing all the supported methods.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface RpcApi extends EthCall, EthGasPrice, EthEstimateGas, EthSendRawTransaction {
+public interface RpcApi extends
+        EthCall,
+        EthGasPrice,
+        EthEstimateGas,
+        EthSendRawTransaction,
+        EthBlockNumber,
+        EthGetLogs {
 
     /**
      * Default JSON RPC version.

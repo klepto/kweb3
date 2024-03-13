@@ -27,7 +27,7 @@ public interface EthSendRawTransaction extends RpcMethod {
                 .withParams(new Request(data));
 
         return request(request)
-                .map(RpcResponse::result);
+                .map(RpcResponse::resultAsString);
     }
 
     /**

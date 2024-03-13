@@ -44,7 +44,7 @@ public interface EthCall extends RpcMethod {
                 .withParams(transaction, blockNumber);
 
         return request(request)
-                .map(RpcResponse::result);
+                .map(RpcResponse::resultAsString);
     }
 
     /**
