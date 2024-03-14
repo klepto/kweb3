@@ -1,6 +1,6 @@
-package dev.klepto.kweb3.core.rpc;
+package dev.klepto.kweb3.core.rpc.io;
 
-import dev.klepto.kweb3.core.Web3Error;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -14,30 +14,38 @@ import java.util.function.Consumer;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Slf4j
-public class WebsocketClient extends WebSocketClient {
+public class WebsocketConnection extends WebSocketClient implements RpcConnection {
 
     private final String url;
-    private final Consumer<String> messageCallback;
-    private final Runnable closeCallback;
 
-    /**
-     * Creates a new client with given websocket url.
-     *
-     * @param url             the websocket url
-     * @param messageCallback the callback that gets called when websocket receives a message
-     * @param closeCallback   the callback that gets called after websocket is closed
-     */
-    public WebsocketClient(String url, Consumer<String> messageCallback, Runnable closeCallback) {
+    @Setter
+    private Consumer<String> messageCallback;
+
+    @Setter
+    private Consumer<Throwable> errorCallback;
+
+    @Setter
+    private Runnable closeCallback;
+
+    public WebsocketConnection(String url) {
         super(URI.create(url));
         this.url = url;
-        this.messageCallback = messageCallback;
-        this.closeCallback = closeCallback;
     }
 
     /**
-     * Automatically connects the client and transmits the given text message.
+     * Gets the URL of the remote server.
      *
-     * @param message the string message which will be transmitted.
+     * @return the url
+     */
+    @Override
+    public String url() {
+        return url;
+    }
+
+    /**
+     * Asynchronously sends a message to the remote server.
+     *
+     * @param message the message
      */
     @Override
     public void send(String message) {
@@ -47,7 +55,9 @@ public class WebsocketClient extends WebSocketClient {
             }
             super.send(message);
         } catch (Exception cause) {
-            throw new Web3Error(cause);
+            if (errorCallback != null) {
+                errorCallback.accept(cause);
+            }
         }
     }
 
@@ -97,6 +107,9 @@ public class WebsocketClient extends WebSocketClient {
     @Override
     public void onError(Exception cause) {
         log.error("Websocket error", cause);
+        if (errorCallback != null) {
+            errorCallback.accept(cause);
+        }
     }
 
 }

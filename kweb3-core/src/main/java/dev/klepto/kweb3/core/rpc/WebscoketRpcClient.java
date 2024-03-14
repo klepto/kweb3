@@ -1,10 +1,12 @@
 package dev.klepto.kweb3.core.rpc;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.gson.JsonObject;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.config.Web3Endpoint;
+import dev.klepto.kweb3.core.rpc.io.WebsocketConnection;
+import dev.klepto.kweb3.core.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.rpc.protocol.RpcResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class WebsocketApiClient extends RpcClient {
+public class WebscoketRpcClient extends RpcClient {
 
     /**
      * The endpoint that this client is connecting to.
@@ -31,9 +33,9 @@ public class WebsocketApiClient extends RpcClient {
     private final Web3Endpoint endpoint;
 
     /**
-     * Thread-safe reference to current {@link WebsocketClient}.
+     * Thread-safe reference to current {@link WebsocketConnection}.
      */
-    private final AtomicReference<WebsocketClient> websocketClient = new AtomicReference<>();
+    private final AtomicReference<WebsocketConnection> websocket = new AtomicReference<>();
 
     /**
      * The scheduler used to schedule reconnection attempts and request cooldown.
@@ -41,20 +43,22 @@ public class WebsocketApiClient extends RpcClient {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     /**
-     * Creates or gets currently active {@link WebsocketClient} in a thread-safe manner.
+     * Creates or gets currently active {@link WebsocketConnection} in a thread-safe manner.
      *
      * @return the websocket client instance
      */
     @Synchronized
-    public WebsocketClient getWebsocketClient() {
-        val current = websocketClient.get();
+    public WebsocketConnection getWebsocket() {
+        val current = websocket.get();
         if (current != null && !current.isClosed()) {
             return current;
         }
 
-        val client = new WebsocketClient(endpoint.url(), this::onMessage, this::onClose);
-        websocketClient.set(client);
-        return client;
+        val connection = new WebsocketConnection(endpoint.url());
+        connection.setMessageCallback(this::message);
+        connection.setCloseCallback(this::close);
+        websocket.set(connection);
+        return connection;
     }
 
     /**
@@ -70,7 +74,7 @@ public class WebsocketApiClient extends RpcClient {
             val processedRequest = beforeRequest(request, result);
             scheduler.submit(() -> {
                 try {
-                    getWebsocketClient().send(GSON.toJson(processedRequest));
+                    getWebsocket().send(processedRequest.serialize());
                 } catch (Exception cause) {
                     result.completeExceptionally(new Web3Error(cause));
                 }
@@ -86,25 +90,9 @@ public class WebsocketApiClient extends RpcClient {
     }
 
     /**
-     * Callback function for {@link WebsocketClient#onMessage(String)}.
-     *
-     * @param message the utf-8 decoded message that was received
+     * Closes this client and releases all resources.
      */
-    private void onMessage(String message) {
-        val json = GSON.fromJson(message, JsonObject.class);
-        if (!json.has("id")) {
-            log.warn("Unknown RPC message: {}", message.trim());
-            return;
-        }
-
-        val response = GSON.fromJson(json, RpcResponse.class);
-        response(response);
-    }
-
-    /**
-     * Callback function for {@link WebsocketClient#onClose(int, String, boolean)}.
-     */
-    private void onClose() {
+    private void close() {
         cancel();
     }
 

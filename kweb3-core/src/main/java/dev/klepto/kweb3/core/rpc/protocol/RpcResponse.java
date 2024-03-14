@@ -1,9 +1,11 @@
-package dev.klepto.kweb3.core.rpc;
+package dev.klepto.kweb3.core.rpc.protocol;
 
 import com.google.gson.JsonElement;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Type;
 
 /**
  * Represents ethereum JSON RPC response body.
@@ -15,14 +17,10 @@ import org.jetbrains.annotations.Nullable;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public record RpcResponse(String jsonrpc, long id, @Nullable JsonElement result, @Nullable Error error) {
-
-    /**
-     * Creates a new rpc response using default values.
-     */
-    public RpcResponse() {
-        this(RpcApi.JSON_VERSION, 1, null, null);
-    }
+public record RpcResponse(@NotNull String jsonrpc,
+                          long id,
+                          @Nullable JsonElement result,
+                          @Nullable Error error) implements RpcMessage {
 
     /**
      * Returns the result as string.
@@ -43,15 +41,25 @@ public record RpcResponse(String jsonrpc, long id, @Nullable JsonElement result,
     /**
      * Returns the result as the specified type.
      *
-     * @param type the type to convert the result to
+     * @param type the class type to convert the result to
      * @return the result as the specified type
      */
     public <T> T resultAs(Class<T> type) {
-        return RpcApi.GSON.fromJson(result, type);
+        return RpcProtocol.GSON.fromJson(result, type);
     }
 
     /**
-     * Represents RPC response error.
+     * Returns the result as the specified type.
+     *
+     * @param type the type to convert the result to
+     * @return the result as the specified type
+     */
+    public <T> T resultAs(Type type) {
+        return RpcProtocol.GSON.fromJson(result, type);
+    }
+
+    /**
+     * Represents JSON response error.
      *
      * @param code    the error code
      * @param message the error message

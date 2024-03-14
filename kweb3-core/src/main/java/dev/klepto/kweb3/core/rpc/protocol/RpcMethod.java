@@ -1,13 +1,8 @@
-package dev.klepto.kweb3.core.rpc;
+package dev.klepto.kweb3.core.rpc.protocol;
 
 import dev.klepto.kweb3.core.Web3Result;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Indicates that class contains an ethereum RPC method.
- *
- * @author <a href="http://github.com/klepto">Augustinas R.</a>
- */
 public interface RpcMethod {
 
     /**

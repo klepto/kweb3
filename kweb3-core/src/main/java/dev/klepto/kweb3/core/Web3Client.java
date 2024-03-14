@@ -3,7 +3,7 @@ package dev.klepto.kweb3.core;
 import dev.klepto.kweb3.core.config.Web3Network;
 import dev.klepto.kweb3.core.contract.ContractProxies;
 import dev.klepto.kweb3.core.contract.Web3Contract;
-import dev.klepto.kweb3.core.rpc.RpcApi;
+import dev.klepto.kweb3.core.rpc.RpcClient;
 import dev.klepto.kweb3.core.type.EthAddress;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +19,13 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
 public class Web3Client {
 
     private final Web3Network network;
-    private final RpcApi rpc;
+    private final RpcClient rpc;
     private final ContractProxies contracts;
     private final EthAddress address;
 
     public Web3Client(@NotNull Web3Network network) {
         this.network = network;
-        this.rpc = RpcApi.create(network.endpoints()[0]);
+        this.rpc = RpcClient.create(network.endpoints()[0]);
         this.contracts = new ContractProxies(this);
         this.address = null;
     }

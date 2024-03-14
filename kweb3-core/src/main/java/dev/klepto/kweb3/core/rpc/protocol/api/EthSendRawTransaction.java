@@ -1,9 +1,9 @@
-package dev.klepto.kweb3.core.rpc.api;
+package dev.klepto.kweb3.core.rpc.protocol.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.rpc.RpcMethod;
-import dev.klepto.kweb3.core.rpc.RpcRequest;
-import dev.klepto.kweb3.core.rpc.RpcResponse;
+import dev.klepto.kweb3.core.rpc.protocol.RpcMethod;
+import dev.klepto.kweb3.core.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.rpc.protocol.RpcResponse;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
