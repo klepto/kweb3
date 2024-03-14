@@ -28,22 +28,12 @@ public record RpcRequest(@NotNull String jsonrpc,
     }
 
     /**
-     * Single parameter builder for less-verbose request building.
-     *
-     * @param params the request parameter object
-     * @return a new request containing given parameter objects
-     */
-    public RpcRequest withParams(Object params) {
-        return new RpcRequest(jsonrpc, id, method, RpcProtocol.GSON.toJsonTree(params));
-    }
-
-    /**
-     * Multiple parameters builder that uses var-args for less-verbose request building.
+     * Parameters builder that uses var-args for less-verbose request building.
      *
      * @param params the request parameter objects
      * @return a new request containing given parameter objects
      */
-    public RpcRequest withMultipleParams(Object... params) {
+    public RpcRequest withParams(Object... params) {
         return new RpcRequest(jsonrpc, id, method, RpcProtocol.GSON.toJsonTree(params));
     }
 

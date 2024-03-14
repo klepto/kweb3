@@ -15,54 +15,54 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface EthCall extends RpcMethod {
 
-    /**
-     * Executes a new message call immediately without creating a transaction on the blockchain.
-     *
-     * @param from        the address from which the transaction is sent or null
-     * @param to          the address to which the transaction is addressed
-     * @param gas         the integer of gas provided for the transaction execution or null
-     * @param gasPrice    the integer of gasPrice used for each paid gas encoded as hexadecimal or null
-     * @param value       the integer of value sent with this transaction encoded as hexadecimal or null
-     * @param data        the hash of the method signature and encoded parameters
-     * @param blockNumber the block number in hexadecimal format or the string <code>latest</code>,
-     *                    <code>earliest</code> or <code>pending</code>, if <code>null>, </code>defaults to
-     *                    <code>latest</code>
-     * @return the return value of the executed contract method
-     */
-    @NotNull
-    default Web3Result<String> ethCall(@Nullable String from,
-                                       @NotNull String to,
-                                       @Nullable Integer gas,
-                                       @Nullable String gasPrice,
-                                       @Nullable String value,
-                                       @NotNull String data,
-                                       @Nullable String blockNumber) {
-        blockNumber = blockNumber == null ? "latest" : blockNumber;
-        val transaction = new Transaction(from, to, gas, gasPrice, value, data);
-        val request = new RpcRequest()
-                .withMethod("eth_call")
-                .withMultipleParams(transaction, blockNumber);
+	/**
+	 * Executes a new message call immediately without creating a transaction on the blockchain.
+	 *
+	 * @param from        the address from which the transaction is sent or null
+	 * @param to          the address to which the transaction is addressed
+	 * @param gas         the integer of gas provided for the transaction execution or null
+	 * @param gasPrice    the integer of gasPrice used for each paid gas encoded as hexadecimal or null
+	 * @param value       the integer of value sent with this transaction encoded as hexadecimal or null
+	 * @param data        the hash of the method signature and encoded parameters
+	 * @param blockNumber the block number in hexadecimal format or the string <code>latest</code>,
+	 *                    <code>earliest</code> or <code>pending</code>, if <code>null>, </code>defaults to
+	 *                    <code>latest</code>
+	 * @return the return value of the executed contract method
+	 */
+	@NotNull
+	default Web3Result<String> ethCall(@Nullable String from,
+									   @NotNull String to,
+									   @Nullable Integer gas,
+									   @Nullable String gasPrice,
+									   @Nullable String value,
+									   @NotNull String data,
+									   @Nullable String blockNumber) {
+		blockNumber = blockNumber == null ? "latest" : blockNumber;
+		val transaction = new Transaction(from, to, gas, gasPrice, value, data);
+		val request = new RpcRequest()
+			.withMethod("eth_call")
+			.withParams(transaction, blockNumber);
 
-        return request(request)
-                .map(RpcResponse::resultAsString);
-    }
+		return request(request)
+			.map(RpcResponse::resultAsString);
+	}
 
-    /**
-     * Represents <code>eth_call</code> request transaction object.
-     *
-     * @param from     the address from which the transaction is sent or null
-     * @param to       the address to which the transaction is addressed
-     * @param gas      the integer of gas provided for the transaction execution or null
-     * @param gasPrice the integer of gasPrice used for each paid gas encoded as hexadecimal or null
-     * @param value    the integer of value sent with this transaction encoded as hexadecimal or null
-     * @param data     the hash of the method signature and encoded parameters
-     */
-    record Transaction(@Nullable String from,
-                       @NotNull String to,
-                       @Nullable Integer gas,
-                       @Nullable String gasPrice,
-                       @Nullable String value,
-                       @NotNull String data) {
-    }
+	/**
+	 * Represents <code>eth_call</code> request transaction object.
+	 *
+	 * @param from     the address from which the transaction is sent or null
+	 * @param to       the address to which the transaction is addressed
+	 * @param gas      the integer of gas provided for the transaction execution or null
+	 * @param gasPrice the integer of gasPrice used for each paid gas encoded as hexadecimal or null
+	 * @param value    the integer of value sent with this transaction encoded as hexadecimal or null
+	 * @param data     the hash of the method signature and encoded parameters
+	 */
+	record Transaction(@Nullable String from,
+					   @NotNull String to,
+					   @Nullable Integer gas,
+					   @Nullable String gasPrice,
+					   @Nullable String value,
+					   @NotNull String data) {
+	}
 
 }

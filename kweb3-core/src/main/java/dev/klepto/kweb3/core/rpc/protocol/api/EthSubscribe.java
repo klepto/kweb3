@@ -37,7 +37,7 @@ public interface EthSubscribe extends RpcMethod {
         val parameters = hasParameters ? List.of(method, new Parameters(address, topics)) : method;
         val request = new RpcRequest()
                 .withMethod("eth_subscribe")
-                .withMultipleParams(parameters);
+                .withParams(parameters);
         return request(request)
                 .map(RpcResponse::resultAsString);
     }
