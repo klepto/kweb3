@@ -35,7 +35,7 @@ runBlocking {
 
 ## Smart Contracts
 
-Unlike competing libraries, `kweb3` does not generate code from ABI json.<br>Instead, in-order to interact with smart contracts,simply define their function signatures:
+Unlike competing libraries, `kweb3` does not generate code from ABI json.<br>Instead, in-order to interact with smart contracts, simply define their function signatures:
 
 **Java**
 ```java
