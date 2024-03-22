@@ -1,13 +1,10 @@
 package dev.klepto.kweb3.kotlin
 
-
 import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.config.Web3Network
 import dev.klepto.kweb3.core.contract.log.ContractCallLog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor
+import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor.LoggingException
 
 /**
  * [Web3Client] implementation that support suspend functions by use of
@@ -15,7 +12,9 @@ import kotlinx.coroutines.launch
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class CoroutineWeb3Client(network: Web3Network) : Web3Client(network) {
+class CoroutineWeb3Client(
+    network: Web3Network,
+) : Web3Client(network) {
 
     init {
         contracts.executor = CoroutineContractExecutor()
@@ -39,16 +38,17 @@ class CoroutineWeb3Client(network: Web3Network) : Web3Client(network) {
      * @return the resulting list of contract call logs
      */
     suspend fun <T> log(calls: List<suspend () -> T>): List<ContractCallLog> {
-        val executor = contracts.executor
-        require(executor is CoroutineContractExecutor) { "Executor must be a CoroutineContractExecutor." }
-        val logger = CoroutineContractExecutor.LoggingInterceptor()
-        val scope = CoroutineScope(Dispatchers.Unconfined)
+        val executor = contracts.executor as CoroutineContractExecutor
+        val logger = LoggingContractExecutor()
         executor.withInterceptor(logger) {
-            calls.forEach { call ->
-                scope.launch { call() }
+            calls.forEach {
+                try {
+                    it()
+                } catch (cause: LoggingException) {
+                    // Ignore
+                }
             }
         }
-        scope.cancel()
         return logger.logs
     }
 
