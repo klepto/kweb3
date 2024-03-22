@@ -257,7 +257,7 @@ public class HeadlongCodec implements AbiCodec {
      * @return the headlong-compatible address value
      */
     private Address encodeAddress(EthAddress value) {
-        return Address.wrap(value.toChecksumHex());
+        return Address.wrap(value.toHex());
     }
 
     /**

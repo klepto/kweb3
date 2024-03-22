@@ -18,7 +18,7 @@ public record ContractCall(ContractProxy proxy,
 
     @Override
     public String toString() {
-        val contractAddress = proxy.getAddress().toChecksumHex();
+        val contractAddress = proxy.getAddress().toHex();
         val contractName = proxy.getType().getSimpleName();
         val functionName = function.name();
         val ethereumArgs = Arrays.stream(args)

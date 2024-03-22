@@ -57,7 +57,7 @@ public class ContractProxy implements InvocationHandler {
             case "getContractClass":
                 return type;
             case "toString":
-                return type.getSimpleName() + "(" + address.toChecksumHex() + ")";
+                return type.getSimpleName() + "(" + address.toHex() + ")";
             case "hashCode":
                 return hashCode();
             case "equals":

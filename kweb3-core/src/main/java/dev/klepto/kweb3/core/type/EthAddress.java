@@ -1,8 +1,10 @@
 package dev.klepto.kweb3.core.type;
 
+import com.google.common.base.Strings;
 import dev.klepto.kweb3.core.util.Hex;
 import dev.klepto.kweb3.core.util.hash.Keccak256;
 import lombok.With;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +13,7 @@ import java.math.BigInteger;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 import static dev.klepto.kweb3.core.util.Hex.stripPrefix;
 import static dev.klepto.kweb3.core.util.Hex.toBigInteger;
+import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256Checksum;
 
 /**
  * Container for <code>ethereum address</code> value.
@@ -49,6 +52,18 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
     }
 
     /**
+     * Generates a hex of this <code>ethereum address</code> with checksum.
+     *
+     * @return a check-summed hex of this <code>ethereum address</code>
+     */
+    @Override
+    public @NotNull String toHex() {
+        val hex = value().toString(16);
+        val paddedHex = Strings.padStart(hex, 40, '0');
+        return keccak256Checksum(paddedHex);
+    }
+
+    /**
      * Returns string representation of this <code>ethereum address</code>.
      *
      * @return the string representation of this <code>ethereum address</code>.
@@ -56,7 +71,7 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
     @Override
     @NotNull
     public String toString() {
-        return "address(" + toChecksumHex() + ")";
+        return "address(" + toHex() + ")";
     }
 
     /**
