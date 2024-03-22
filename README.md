@@ -16,13 +16,9 @@ In this example, we are obtaining the WETH balance of a wallet address:
 var client = new Web3Client(PublicNode.ETHEREUM);
 var contract = client.contract(Erc20.class, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
 var result = contract.balanceOf(walletAddress).get();
-System.out.
-
-println(result);
+System.out.println(result);
 ```
-
-##  
-
+##
 Or in **Kotlin** using `kweb3-kotlin` dependency:
 
 ```kotlin
@@ -34,7 +30,6 @@ runBlocking {
 }
 ```
 
-<br>
 
 ## Smart Contracts
 
@@ -49,9 +44,7 @@ public interface Erc20 extends Web3Contract {
     Web3Result<EthUint> balanceOf(EthAddress account);
 }
 ```
-
-##  
-
+##
 **Kotlin (for coroutine support)**
 
 ```kotlin
@@ -61,7 +54,6 @@ interface Erc20 : Web3Contract {
 }
 ```
 
-<br>
 
 ## Note
 
