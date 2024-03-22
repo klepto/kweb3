@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.contract.log;
+package dev.klepto.kweb3.core.contract.event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface Web3Log {
+public interface Web3EventLog {
 
     /**
      * Annotates the event name that created this log. If empty, the class name is used instead.

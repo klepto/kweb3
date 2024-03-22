@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.contract.log;
+package dev.klepto.kweb3.core.contract.event;
 
 import dev.klepto.kweb3.core.abi.AbiCodec;
 import dev.klepto.kweb3.core.abi.HeadlongCodec;
@@ -18,7 +18,7 @@ import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class LogCodec {
+public class EventLogCodec {
 
     private static final AbiCodec abiCodec = new HeadlongCodec();
 
@@ -32,10 +32,10 @@ public class LogCodec {
      * @return the decoded log container instance
      */
     @NotNull
-    public static Web3Log decode(@NotNull LogDescriptor descriptor,
-                                 @NotNull String[] topics,
-                                 @NotNull String data,
-                                 @NotNull String address) {
+    public static Web3EventLog decode(@NotNull EventLogDescriptor descriptor,
+                                      @NotNull String[] topics,
+                                      @NotNull String data,
+                                      @NotNull String address) {
         val result = descriptor.type().allocate();
 
         val encodedIndexedValues = arrayRemove(topics, 0);
@@ -60,7 +60,7 @@ public class LogCodec {
                     .set(address(address));
         }
 
-        return (Web3Log) result;
+        return (Web3EventLog) result;
     }
 
     /**
@@ -70,28 +70,28 @@ public class LogCodec {
      * @return the parsed log container descriptor
      */
     @NotNull
-    public static LogDescriptor parseDescriptor(Class<? extends Web3Log> type) {
+    public static EventLogDescriptor parseDescriptor(Class<? extends Web3EventLog> type) {
         val classAccess = Unreflect.reflect(type);
         val name = parseEventName(classAccess);
         val fields = classAccess.fields().toList();
         val addressField = fields.stream()
-                .filter(field -> field.containsAnnotation(Web3Log.Address.class))
+                .filter(field -> field.containsAnnotation(Web3EventLog.Address.class))
                 .findFirst().orElse(null);
         val nonAddressFields = fields.stream()
-                .filter(field -> !field.containsAnnotation(Web3Log.Address.class))
+                .filter(field -> !field.containsAnnotation(Web3EventLog.Address.class))
                 .toList();
         val valueFields = nonAddressFields.stream()
-                .filter(field -> !field.containsAnnotation(Web3Log.Indexed.class))
+                .filter(field -> !field.containsAnnotation(Web3EventLog.Indexed.class))
                 .toList();
         val indexedFields = nonAddressFields.stream()
-                .filter(field -> field.containsAnnotation(Web3Log.Indexed.class))
+                .filter(field -> field.containsAnnotation(Web3EventLog.Indexed.class))
                 .toList();
         val descriptor = ContractCodec.parseTupleDescriptor(nonAddressFields);
         val valueDescriptor = ContractCodec.parseTupleDescriptor(valueFields);
         val indexedDescriptor = ContractCodec.parseTupleDescriptor(indexedFields);
         val signature = name + descriptor.toAbiDescriptor();
         val signatureHash = "0x" + keccak256(signature).toLowerCase();
-        return new LogDescriptor(
+        return new EventLogDescriptor(
                 classAccess.type(),
                 name,
                 signatureHash,
@@ -111,8 +111,8 @@ public class LogCodec {
      */
     @NotNull
     private static String parseEventName(ClassAccess<?> classAccess) {
-        if (classAccess.containsAnnotation(Web3Log.Event.class)) {
-            val annotatedName = classAccess.annotation(Web3Log.Event.class).value();
+        if (classAccess.containsAnnotation(Web3EventLog.Event.class)) {
+            val annotatedName = classAccess.annotation(Web3EventLog.Event.class).value();
             if (!annotatedName.isEmpty()) {
                 return annotatedName;
             }

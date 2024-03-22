@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.contract.log;
+package dev.klepto.kweb3.core.contract.event;
 
 import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.unreflect.FieldAccess;
@@ -21,12 +21,12 @@ import java.util.List;
  * @param indexedDescriptor the descriptor of the indexed fields
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record LogDescriptor(@NotNull UnreflectType type,
-                            @NotNull String name,
-                            @NotNull String signature,
-                            @Nullable FieldAccess addressField,
-                            @NotNull List<FieldAccess> valueFields,
-                            @NotNull List<FieldAccess> indexedFields,
-                            @NotNull EthTupleTypeDescriptor valueDescriptor,
-                            @NotNull EthTupleTypeDescriptor indexedDescriptor) {
+public record EventLogDescriptor(@NotNull UnreflectType type,
+                                 @NotNull String name,
+                                 @NotNull String signature,
+                                 @Nullable FieldAccess addressField,
+                                 @NotNull List<FieldAccess> valueFields,
+                                 @NotNull List<FieldAccess> indexedFields,
+                                 @NotNull EthTupleTypeDescriptor valueDescriptor,
+                                 @NotNull EthTupleTypeDescriptor indexedDescriptor) {
 }
