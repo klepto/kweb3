@@ -23,6 +23,11 @@ public class Web3Client {
     private final ContractProxies contracts;
     private final EthAddress address;
 
+    /**
+     * Creates a new Web3Client instance with a given network configuration.
+     *
+     * @param network the network configuration
+     */
     public Web3Client(@NotNull Web3Network network) {
         this.network = network;
         this.rpc = RpcClient.create(network.endpoints()[0]);
