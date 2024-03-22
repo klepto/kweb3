@@ -1,14 +1,17 @@
 package dev.klepto.kweb3.kotlin
 
+import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.ContractExecutor
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
+import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor
 import dev.klepto.kweb3.kotlin.ContractCallExtensions.continuation
 import dev.klepto.kweb3.kotlin.ContractCallExtensions.isSuspending
 import dev.klepto.kweb3.kotlin.Web3ResultExtensions.await
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
  * Contract executor implementation supporting coroutine (suspend)
@@ -70,6 +73,21 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
             this.interceptor.set(interceptor)
             block()
             this.interceptor.set(current)
+        }
+    }
+
+    /**
+     * A [LoggingContractExecutor] interceptor that marks execution coroutine
+     * as suspended after logging a request.
+     */
+    class LoggingInterceptor : LoggingContractExecutor() {
+        override fun request(call: ContractCall, data: String): Web3Result<String> {
+            appendLog(call, data)
+            return Web3Result()
+        }
+
+        override fun decode(call: ContractCall, result: Web3Result<String>): Any {
+            return COROUTINE_SUSPENDED
         }
     }
 

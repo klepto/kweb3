@@ -3,17 +3,12 @@ package dev.klepto.kweb3.kotlin.multicall
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
-import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor
 import dev.klepto.kweb3.core.type.EthBytes
 import dev.klepto.kweb3.core.type.EthValue
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import dev.klepto.kweb3.kotlin.CoroutineWeb3Client
 import java.util.*
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.math.min
 
 /**
@@ -80,16 +75,9 @@ class MulticallDispatcher<T : EthValue>(
      * @return a list of encoded calls
      */
     private suspend fun encodeCalls(calls: List<suspend () -> T>): List<MulticallExecutor.Call> {
-        val logger = LoggingInterceptor()
-        val scope = CoroutineScope(Dispatchers.Unconfined)
-        executor.contractExecutor().withInterceptor(logger) {
-            calls.forEach { call ->
-                scope.launch { call() }
-            }
-        }
-        scope.cancel()
-
-        return logger.logs.map {
+        val client = executor.client
+        require(client is CoroutineWeb3Client) { "Client must be a CoroutineWeb3Client." }
+        return client.log(calls).map {
             MulticallExecutor.Call(it.transaction.to, it.transaction.data)
         }
     }
@@ -134,21 +122,6 @@ class MulticallDispatcher<T : EthValue>(
             }
         }
         return result
-    }
-
-    /**
-     * A [LoggingContractExecutor] interceptor that marks execution coroutine
-     * as suspended after logging a request.
-     */
-    private class LoggingInterceptor : LoggingContractExecutor() {
-        override fun request(call: ContractCall, data: String): Web3Result<String> {
-            appendLog(call, data)
-            return Web3Result()
-        }
-
-        override fun decode(call: ContractCall, result: Web3Result<String>): Any {
-            return COROUTINE_SUSPENDED
-        }
     }
 
     /**
