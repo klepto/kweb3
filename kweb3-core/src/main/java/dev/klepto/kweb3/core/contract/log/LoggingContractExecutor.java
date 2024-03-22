@@ -1,12 +1,10 @@
 package dev.klepto.kweb3.core.contract.log;
 
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.contract.ContractCall;
 import dev.klepto.kweb3.core.contract.ContractExecutor;
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor;
-import dev.klepto.kweb3.core.type.EthAddress;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +60,7 @@ public class LoggingContractExecutor extends DefaultContractExecutor {
         val contractAddress = call.proxy().getAddress();
         val calldata = bytes(call.function().signature() + data);
         val transaction = new ContractCallLog.Transaction(
-                clientAddress, contractAddress, null, null, null, null, calldata
+                contractAddress, clientAddress, null, null, null, null, calldata
         );
         return new ContractCallLog(call, transaction);
     }
