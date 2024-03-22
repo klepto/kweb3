@@ -88,7 +88,17 @@ public class EthBytes implements EthValue, EthSizedValue {
     @NotNull
     public String toString() {
         val sizeString = size > 0 ? size : "";
-        return "bytes" + sizeString + "(" + Hex.toHex(toByteArray()) + ")";
+        return "bytes" + sizeString + "(" + toHex() + ")";
+    }
+
+    /**
+     * Returns hex string representation of this <code>ethereum bytes</code>.
+     *
+     * @return the hex string representation of this <code>ethereum bytes</code>
+     */
+    @NotNull
+    public String toHex() {
+        return Hex.toHex(toByteArray());
     }
 
     /**
