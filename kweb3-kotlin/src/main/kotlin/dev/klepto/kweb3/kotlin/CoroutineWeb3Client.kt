@@ -4,7 +4,6 @@ package dev.klepto.kweb3.kotlin
 import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.config.Web3Network
 import dev.klepto.kweb3.core.contract.log.ContractCallLog
-import dev.klepto.kweb3.core.type.EthValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -29,7 +28,7 @@ class CoroutineWeb3Client(network: Web3Network) : Web3Client(network) {
      * @param call the contract call
      * @return the resulting contract call log
      */
-    suspend fun <T : EthValue> log(call: suspend () -> T): ContractCallLog {
+    suspend fun <T> log(call: suspend () -> T): ContractCallLog {
         return log(listOf(call)).first()
     }
 
@@ -39,7 +38,7 @@ class CoroutineWeb3Client(network: Web3Network) : Web3Client(network) {
      * @param calls the list of contract calls
      * @return the resulting list of contract call logs
      */
-    suspend fun <T : EthValue> log(calls: List<suspend () -> T>): List<ContractCallLog> {
+    suspend fun <T> log(calls: List<suspend () -> T>): List<ContractCallLog> {
         val executor = contracts.executor
         require(executor is CoroutineContractExecutor) { "Executor must be a CoroutineContractExecutor." }
         val logger = CoroutineContractExecutor.LoggingInterceptor()
