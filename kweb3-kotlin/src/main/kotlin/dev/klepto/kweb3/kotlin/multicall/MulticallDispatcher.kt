@@ -3,7 +3,7 @@ package dev.klepto.kweb3.kotlin.multicall
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
-import dev.klepto.kweb3.core.contract.LoggingContractExecutor
+import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor
 import dev.klepto.kweb3.core.type.EthBytes
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
@@ -89,7 +89,7 @@ class MulticallDispatcher<T>(
         scope.cancel()
 
         return logger.logs.map {
-            MulticallExecutor.Call(it.contractAddress, EthBytes.bytes(it.data))
+            MulticallExecutor.Call(it.transaction.to, it.transaction.data)
         }
     }
 
@@ -140,6 +140,11 @@ class MulticallDispatcher<T>(
      * as suspended after logging a request.
      */
     private class LoggingInterceptor : LoggingContractExecutor() {
+        override fun request(call: ContractCall, data: String): Web3Result<String> {
+            appendLog(call, data)
+            return Web3Result()
+        }
+
         override fun decode(call: ContractCall, result: Web3Result<String>): Any {
             return COROUTINE_SUSPENDED
         }
