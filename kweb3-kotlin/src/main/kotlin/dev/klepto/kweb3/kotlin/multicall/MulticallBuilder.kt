@@ -1,5 +1,7 @@
 package dev.klepto.kweb3.kotlin.multicall
 
+import dev.klepto.kweb3.core.type.EthValue
+
 /**
  * A type-bound builder for constructing a *multicall* request. This
  * builder enables individual call queueing via [call], [callRange] and
@@ -13,7 +15,7 @@ package dev.klepto.kweb3.kotlin.multicall
  *     fail
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class MulticallBuilder<T>(
+class MulticallBuilder<T : EthValue>(
     private var executor: MulticallExecutor,
     private var calls: MutableList<suspend () -> T> = mutableListOf(),
     private var batchSize: Int = 1024,

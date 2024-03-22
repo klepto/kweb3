@@ -5,6 +5,7 @@ import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
 import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor
 import dev.klepto.kweb3.core.type.EthBytes
+import dev.klepto.kweb3.core.type.EthValue
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +29,7 @@ import kotlin.math.min
  * @param allowFailure indicates whether to allow failed calls
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class MulticallDispatcher<T>(
+class MulticallDispatcher<T : EthValue>(
     private val executor: MulticallExecutor,
     private val calls: List<suspend () -> T>,
     private val batchSize: Int,
