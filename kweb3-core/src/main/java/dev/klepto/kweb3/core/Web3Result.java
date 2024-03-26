@@ -25,8 +25,22 @@ public class Web3Result<T> {
         this(new CompletableFuture<>());
     }
 
+    /**
+     * Creates new web3 result with given completion stage.
+     *
+     * @param stage the completion stage
+     */
     private Web3Result(CompletionStage<T> stage) {
         this.stage = stage;
+    }
+
+    /**
+     * Returns {@code true} if completed in any fashion: normally, exceptionally, or via cancellation.
+     *
+     * @return {@code true} if completed
+     */
+    public boolean isDone() {
+        return stage.toCompletableFuture().isDone();
     }
 
     /**
@@ -109,5 +123,5 @@ public class Web3Result<T> {
         val newStage = stage.thenApply(mapper);
         return new Web3Result<>(newStage);
     }
-    
+
 }
