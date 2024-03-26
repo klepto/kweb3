@@ -16,6 +16,7 @@ java-websocket = { module = "org.java-websocket:Java-WebSocket", version = "1.5.
 unreflect = { module = "dev.klepto.unreflect:unreflect", version = "1.5" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.7.3" }
+resilience4j = { module = "io.github.resilience4j:resilience4j-all", version = "2.2.0" }
 
 [bundles]
 slf4j = ["slf4j-api", "slf4j-simple"]

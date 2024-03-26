@@ -30,7 +30,7 @@ public class Web3Client {
      */
     public Web3Client(@NotNull Web3Network network) {
         this.network = network;
-        this.rpc = RpcClient.create(network.endpoints()[0]);
+        this.rpc = new RpcClient(network);
         this.contracts = new ContractProxies(this);
         this.address = EthAddress.ZERO;
     }

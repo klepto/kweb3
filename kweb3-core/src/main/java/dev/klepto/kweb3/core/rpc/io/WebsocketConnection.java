@@ -43,6 +43,20 @@ public class WebsocketConnection extends WebSocketClient implements RpcConnectio
     }
 
     /**
+     * Connects to the remote server.
+     */
+    @Override
+    public void open() {
+        try {
+            connectBlocking();
+        } catch (Throwable cause) {
+            if (errorCallback != null) {
+                errorCallback.accept(cause);
+            }
+        }
+    }
+
+    /**
      * Asynchronously sends a message to the remote server.
      *
      * @param message the message
@@ -50,9 +64,6 @@ public class WebsocketConnection extends WebSocketClient implements RpcConnectio
     @Override
     public void send(String message) {
         try {
-            if (!isOpen()) {
-                connectBlocking();
-            }
             super.send(message);
         } catch (Exception cause) {
             if (errorCallback != null) {

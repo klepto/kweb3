@@ -17,7 +17,17 @@ public interface RpcConnection {
     String url();
 
     /**
-     * Asynchronously sends a message to the remote server.
+     * Connects to the remote server.
+     */
+    void open();
+
+    /**
+     * Checks if the connection is currently open.
+     */
+    boolean isOpen();
+
+    /**
+     * Sends a message to the remote server.
      *
      * @param message the message
      */

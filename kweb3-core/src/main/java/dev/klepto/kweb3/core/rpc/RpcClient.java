@@ -1,65 +1,145 @@
 package dev.klepto.kweb3.core.rpc;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.config.Web3Endpoint;
+import dev.klepto.kweb3.core.config.Web3Network;
+import dev.klepto.kweb3.core.config.Web3Transport;
+import dev.klepto.kweb3.core.rpc.io.RpcConnection;
+import dev.klepto.kweb3.core.rpc.io.WebsocketConnection;
 import dev.klepto.kweb3.core.rpc.protocol.RpcMessage;
 import dev.klepto.kweb3.core.rpc.protocol.RpcProtocol;
 import dev.klepto.kweb3.core.rpc.protocol.RpcRequest;
 import dev.klepto.kweb3.core.rpc.protocol.RpcResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
- * Represents Ethereum RPC API client, without exposing underlying protocol.
+ * Implementation of Ethereum RPC API client.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public abstract class RpcClient implements RpcProtocol {
+@Slf4j
+@RequiredArgsConstructor
+public class RpcClient implements RpcProtocol {
 
+    private final Web3Network network;
+    private final AtomicReference<Web3Endpoint> endpoint = new AtomicReference<>();
+    private final AtomicReference<RpcConnection> connection = new AtomicReference<>();
+
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final AtomicLong requestId = new AtomicLong(1);
-    private final Map<Long, Web3Result<RpcResponse>> results = new ConcurrentHashMap<>();
-    private final Set<Consumer<RpcMessage>> messageCallbacks = ConcurrentHashMap.newKeySet();
+    private final Set<Request> requests = ConcurrentHashMap.newKeySet();
+    private final Set<Consumer<RpcMessage>> callbacks = ConcurrentHashMap.newKeySet();
 
     /**
-     * Gets called before sending out {@link RpcRequest}. Used to pre-process rpc request, for example attaching unique
-     * request id.
+     * Gets the current {@link Web3Endpoint} instance.
      *
-     * @param request the rpc request to process
-     * @param result  the rpc response result that is yet to be completed
-     * @return the processed rpc request
+     * @return the endpoint instance
      */
-    public RpcRequest beforeRequest(RpcRequest request, Web3Result<RpcResponse> result) {
-        request = request.withId(requestId.incrementAndGet());
-        results.put(request.id(), result);
-        return request;
+    @Synchronized
+    public Web3Endpoint endpoint() {
+        if (endpoint.get() == null) {
+            selectNextEndpoint();
+        }
+        return endpoint.get();
     }
 
     /**
-     * Sends a new RPC request using implemented protocol.
+     * Gets the current {@link RpcConnection} instance.
+     *
+     * @return the connection instance
+     */
+    @Synchronized
+    public RpcConnection connection() {
+        val current = connection.get();
+        if (current != null && current.isOpen()) {
+            return current;
+        }
+
+        val next = new WebsocketConnection(endpoint().url());
+        next.setMessageCallback(this::onMessage);
+        next.setErrorCallback(this::onError);
+        next.setCloseCallback(this::onClose);
+        next.open();
+        connection.set(next);
+
+        // Replay requests if connection was closed.
+        if (current != null) {
+            replay();
+        }
+
+        return next;
+    }
+
+    /**
+     * Replays the current request queue to the current {@link RpcConnection}.
+     */
+    @Synchronized
+    public void replay() {
+        requests.forEach(request -> send(request.request));
+    }
+
+    /**
+     * Selects the next endpoint from the network for {@link RpcConnection} to connect to.
+     */
+    @Synchronized
+    public void selectNextEndpoint() {
+        val endpoints = Arrays.asList(network.endpoints());
+        val index = endpoints.indexOf(endpoint.get());
+        val nextIndex = (index + 1) % endpoints.size();
+        val next = endpoints.get(nextIndex);
+        if (next.transport() != Web3Transport.WEBSOCKET) {
+            throw new Web3Error("Unsupported transport: {}", next.transport());
+        }
+        endpoint.set(next);
+    }
+
+    /**
+     * Sends a given request to the underlying {@link RpcConnection}.
+     *
+     * @param request the rpc request object
+     */
+    @Synchronized
+    public void send(RpcRequest request) {
+        val cooldown = endpoint().requestCooldown();
+        executor.submit(() -> {
+            try {
+                connection().send(request.serialize());
+                if (cooldown != null) {
+                    Uninterruptibles.sleepUninterruptibly(cooldown);
+                }
+            } catch (Throwable cause) {
+                onError(cause);
+            }
+        });
+    }
+
+    /**
+     * Creates and sends a new RPC request using implemented protocol.
      *
      * @param request the rpc request object
      * @return a {@link Web3Result} containing rpc response object that will be completed asynchronously
      */
-    public abstract @NotNull Web3Result<RpcResponse> request(@NotNull RpcRequest request);
-
-    /**
-     * Called when new RPC message is received.
-     *
-     * @param message the rpc message
-     */
-    public void message(String message) {
-        val response = RpcProtocol.decode(message);
-        if (response instanceof RpcResponse) {
-            response((RpcResponse) response);
-        }
-        messageCallbacks.forEach(callback -> callback.accept(response));
+    public @NotNull Web3Result<RpcResponse> request(@NotNull RpcRequest request) {
+        request = request.withId(requestId.incrementAndGet());
+        val result = new Web3Result<RpcResponse>();
+        requests.add(new Request(request, result));
+        send(request);
+        return result;
     }
 
     /**
@@ -68,25 +148,56 @@ public abstract class RpcClient implements RpcProtocol {
      * @param response the rpc response
      */
     public void response(RpcResponse response) {
-        val result = results.remove(response.id());
-        if (result == null) {
+        val request = requests.stream()
+                .filter(value -> value.request.id() == response.id())
+                .findFirst()
+                .orElse(null);
+        if (request == null) {
             return;
         }
+        requests.remove(request);
 
+        val result = request.result();
         if (response.error() != null) {
-            result.completeExceptionally(new Web3Error("RPC error occurred: {}", response.error().message()));
+            val error = new Web3Error("RPC error occurred: {}", response.error().message());
+            result.completeExceptionally(error);
             return;
         }
-
         result.complete(response);
     }
 
     /**
-     * Called to indicate that RPC requests need to be cancelled, usually because of IO error.
+     * Called when new RPC message is received.
+     *
+     * @param message the rpc message
      */
-    public void cancel() {
-        results.values().forEach(Web3Result::cancel);
-        results.clear();
+    public void onMessage(String message) {
+        val response = RpcProtocol.decode(message);
+        if (response instanceof RpcResponse) {
+            response((RpcResponse) response);
+        }
+        callbacks.forEach(callback -> callback.accept(response));
+    }
+
+    /**
+     * Called when an error occurs during RPC message processing.
+     *
+     * @param cause the error cause
+     */
+    public void onError(Throwable cause) {
+        if (cause instanceof Web3Error) {
+            log.error("An RPC error occurred: {}", cause.getMessage());
+            return;
+        }
+        selectNextEndpoint();
+        connection();
+    }
+
+    /**
+     * Called when the connection is closed.
+     */
+    public void onClose() {
+        connection();
     }
 
     /**
@@ -94,8 +205,8 @@ public abstract class RpcClient implements RpcProtocol {
      *
      * @param callback the message callback to add
      */
-    public void addMessageCallback(Consumer<RpcMessage> callback) {
-        messageCallbacks.add(callback);
+    public void addCallback(Consumer<RpcMessage> callback) {
+        callbacks.add(callback);
     }
 
     /**
@@ -103,21 +214,18 @@ public abstract class RpcClient implements RpcProtocol {
      *
      * @param callback the message callback to remove
      */
-    public void removeMessageCallback(Consumer<RpcMessage> callback) {
-        messageCallbacks.remove(callback);
+    public void removeCallback(Consumer<RpcMessage> callback) {
+        callbacks.remove(callback);
     }
 
     /**
-     * Creates a new RPC API instance for the specified transport and URL.
+     * Represents a request that was sent to the RPC server.
      *
-     * @param endpoint the endpoint to create the RPC API for
-     * @return a new RPC API instance
+     * @param request the request object
+     * @param result  the result object
      */
-    public static RpcClient create(Web3Endpoint endpoint) {
-        return switch (endpoint.transport()) {
-            case WEBSOCKET -> new WebscoketRpcClient(endpoint);
-            default -> throw new Web3Error("Unsupported transport: {}", endpoint.transport());
-        };
+    private record Request(RpcRequest request, Web3Result<RpcResponse> result) {
     }
+
 
 }
