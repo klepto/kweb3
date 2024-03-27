@@ -5,6 +5,7 @@ import dev.klepto.kweb3.core.abi.AbiCodec;
 import dev.klepto.kweb3.core.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
+import dev.klepto.kweb3.core.contract.type.EthVoid;
 import dev.klepto.kweb3.core.type.EthValue;
 import lombok.val;
 import one.util.streamex.StreamEx;
@@ -110,16 +111,19 @@ public class DefaultContractExecutor implements ContractExecutor {
      */
     @NotNull
     public Object decodeResult(@NotNull ContractCall call, @Nullable String result) {
+        val function = call.function();
+        val type = function.returnType();
+        if (EthVoid.isVoid(type)) {
+            return new Object();
+        }
+
         val noResultMessage = (Supplier<String>) () ->
                 message(
                         "No result for smart contract call. \nFunction: {}\nNetwork: {}",
                         call,
                         call.proxy().getClient().getNetwork()
                 );
-
         require(result != null, noResultMessage);
-        val function = call.function();
-        val type = function.returnType();
         val descriptor = function.returnTuple()
                 ? function.returnDescriptor()
                 : function.returnDescriptor().wrap();

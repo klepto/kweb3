@@ -8,6 +8,7 @@ import dev.klepto.kweb3.core.contract.annotation.ArraySize;
 import dev.klepto.kweb3.core.contract.annotation.ValueSize;
 import dev.klepto.kweb3.core.contract.type.EthStructContainer;
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
+import dev.klepto.kweb3.core.contract.type.EthVoid;
 import dev.klepto.kweb3.core.type.*;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.ParameterAccess;
@@ -58,9 +59,7 @@ public final class ContractCodec {
      * @return the ABI-compatible type descriptor
      */
     public static EthTupleTypeDescriptor parseTupleDescriptor(List<? extends Reflectable> reflectables) {
-        val values = reflectables.stream()
-                .map(ContractCodec::parseDescriptor)
-                .collect(toImmutableList());
+        val values = reflectables.stream().map(ContractCodec::parseDescriptor).collect(toImmutableList());
 
         return new EthTupleTypeDescriptor(values);
     }
@@ -96,6 +95,10 @@ public final class ContractCodec {
             return parseDescriptor(genericType, valueSize, arraySize);
         }
 
+        if (EthVoid.isVoid(type)) {
+            return new EthVoidTypeDescriptor();
+        }
+
         if (type.matches(EthSizedValue.class)) {
             // Hard-coded defaults, not a huge fan.
             if (valueSize == -1) {
@@ -106,9 +109,7 @@ public final class ContractCodec {
             return new EthSizedTypeDescriptor(type, valueSize);
         }
 
-        if (type.matches(EthBool.class)
-                || type.matches(EthString.class)
-                || type.matches(EthAddress.class)) {
+        if (type.matches(EthBool.class) || type.matches(EthString.class) || type.matches(EthAddress.class)) {
             return new EthTypeDescriptor(type);
         }
 
@@ -119,6 +120,7 @@ public final class ContractCodec {
         if (type.matches(EthTupleContainer.class)) {
             return parseTupleContainerDescriptor(type);
         }
+
 
         throw new Web3Error("Couldn't parse descriptor for type: {}", type);
     }
@@ -149,9 +151,7 @@ public final class ContractCodec {
      * @return the ABI-compatible array type descriptor
      */
     private static TypeDescriptor parseTupleContainerDescriptor(UnreflectType type) {
-        val fields = type.reflect().fields()
-                .filter(field -> !field.isStatic())
-                .toList();
+        val fields = type.reflect().fields().filter(field -> !field.isStatic()).toList();
         return parseTupleDescriptor(fields);
     }
 
@@ -191,10 +191,7 @@ public final class ContractCodec {
         }
 
         if (isTupleDescriptor) {
-            require(
-                    value instanceof EthTuple || value instanceof EthTupleContainer,
-                    "Incorrect EthTuple value type."
-            );
+            require(value instanceof EthTuple || value instanceof EthTupleContainer, "Incorrect EthTuple value type.");
             if (value instanceof EthTuple) {
                 return value;
             }
@@ -219,10 +216,7 @@ public final class ContractCodec {
             return value;
         }
 
-        val result = value
-                .stream()
-                .map(element -> encodeParameterValue(componentDescriptor, (EthValue) element))
-                .toList();
+        val result = value.stream().map(element -> encodeParameterValue(componentDescriptor, (EthValue) element)).toList();
 
         return array(value.capacity(), result);
     }
@@ -236,9 +230,7 @@ public final class ContractCodec {
      * @return normalized parameter value ready to be used with ABI encoding
      */
     public static EthTuple encodeTupleParameterValue(EthTupleTypeDescriptor descriptor, EthTupleContainer value) {
-        val fields = reflect(value).fields()
-                .filter(field -> !field.isStatic())
-                .toList();
+        val fields = reflect(value).fields().filter(field -> !field.isStatic()).toList();
         require(fields.size() == descriptor.children().size(), "Tuple field size mismatch.");
 
         val result = new ArrayList<EthValue>();
@@ -295,26 +287,17 @@ public final class ContractCodec {
      * @return the decoded JVM container containing tuple values
      */
     public static EthValue decodeTupleContainer(UnreflectType type, EthTuple tuple) {
-        require(
-                type.matches(EthTupleContainer.class),
-                "Given type {} is not a {} or {}",
-                type, EthTupleContainer.class, EthStructContainer.class
-        );
+        require(type.matches(EthTupleContainer.class), "Given type {} is not a {} or {}", type, EthTupleContainer.class, EthStructContainer.class);
 
         val classAccess = type.reflect();
-        val fields = classAccess
-                .fields()
-                .filter(field -> !field.isStatic())
-                .toList();
+        val fields = classAccess.fields().filter(field -> !field.isStatic()).toList();
         require(fields.size() == tuple.size(), "Tuple container size mismatch: {}", type);
 
         val values = new ArrayList<>();
         for (var i = 0; i < tuple.size(); i++) {
             val field = fields.get(i);
             val value = tuple.get(i);
-            val decodedValue = value instanceof EthTuple valueTuple
-                    ? decodeTupleContainer(field.type(), valueTuple)
-                    : value;
+            val decodedValue = value instanceof EthTuple valueTuple ? decodeTupleContainer(field.type(), valueTuple) : value;
             values.add(decodedValue);
         }
 
