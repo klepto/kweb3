@@ -1,13 +1,10 @@
 package dev.klepto.kweb3.core.type;
 
-import dev.klepto.kweb3.core.util.hash.Keccak;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256Checksum;
 
 /**
  * Represents an ethereum numeric data type that's backed by {@link BigInteger}.
@@ -177,6 +174,28 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
             return ((EthNumericValue<?>) number).value();
         }
         return BigInteger.valueOf(number.longValue());
+    }
+
+    /**
+     * Returns the minimum of two numeric values.
+     *
+     * @param valueA the first numeric value
+     * @param valueB the second numeric value
+     * @return the minimum of two numeric values
+     */
+    static <T extends EthNumericValue<T>> T min(T valueA, T valueB) {
+        return valueA.compareTo(valueB.value()) < 0 ? valueA : valueB;
+    }
+
+    /**
+     * Returns the maximum of two numeric values.
+     *
+     * @param valueA the first numeric value
+     * @param valueB the second numeric value
+     * @return the maximum of two numeric values
+     */
+    static <T extends EthNumericValue<T>> T max(T valueA, T valueB) {
+        return valueA.compareTo(valueB.value()) > 0 ? valueA : valueB;
     }
 
 }
