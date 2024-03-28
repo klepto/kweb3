@@ -150,7 +150,7 @@ public final class ContractCodec {
      * @param type the JVM type containing ethereum data fields
      * @return the ABI-compatible array type descriptor
      */
-    private static TypeDescriptor parseTupleContainerDescriptor(UnreflectType type) {
+    private static EthTupleTypeDescriptor parseTupleContainerDescriptor(UnreflectType type) {
         val fields = type.reflect().fields().filter(field -> !field.isStatic()).toList();
         return parseTupleDescriptor(fields);
     }
@@ -239,6 +239,17 @@ public final class ContractCodec {
         }
 
         return tuple(result);
+    }
+
+    /**
+     * Converts given {@link EthTupleContainer} value to ABI-compatible {@link EthTuple} value.
+     *
+     * @param value the tuple container
+     * @return normalized value ready to be used with ABI encoding
+     */
+    public static EthTuple encodeTupleContainerValue(EthTupleContainer value) {
+        val descriptor = parseTupleContainerDescriptor(UnreflectType.of(value));
+        return encodeTupleParameterValue(descriptor, value);
     }
 
     /**
