@@ -279,11 +279,7 @@ public class HeadlongCodec implements AbiCodec {
     private Number encodeNumeric(EthNumericValue value) {
         val integer = (BigInteger) value.value();
         if (value instanceof EthSizedValue sized) {
-            if (sized.size() <= 8) {
-                return integer.byteValue();
-            } else if (sized.size() <= 16) {
-                return integer.shortValue();
-            } else if (sized.size() <= 32) {
+            if (sized.size() <= 32) {
                 return integer.intValue();
             } else if (sized.size() <= 64) {
                 return integer.longValue();
