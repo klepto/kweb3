@@ -12,7 +12,8 @@ public interface RpcProtocol extends
         EthGasPrice,
         EthGetLogs,
         EthSendRawTransaction,
-        EthSubscribe {
+        EthSubscribe,
+        EthGetBlock {
 
     /**
      * {@link Gson} instance for json encoding/decoding.
