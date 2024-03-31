@@ -11,15 +11,33 @@ import static dev.klepto.kweb3.core.type.EthUint.uint256;
 /**
  * Contains information about an endpoint of the network.
  *
- * @param transport       the transport protocol used to communicate with the endpoint
  * @param url             the URL of the endpoint
+ * @param transport       the transport protocol used to communicate with the endpoint, or {@code null} if not
+ *                        specified
  * @param gasCap          the maximum amount of gas defined by the endpoint
  * @param requestCooldown the minimum duration to wait between requests to the endpoint
  * @param requestTimeout  the maximum duration to wait for a response from the endpoint
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record Web3Endpoint(@NotNull Web3Transport transport, @NotNull String url, @NotNull EthUint gasCap,
+public record Web3Endpoint(@NotNull String url, @Nullable Web3Transport transport, @NotNull EthUint gasCap,
                            @Nullable Duration requestCooldown, @Nullable Duration requestTimeout) {
+
+    /**
+     * Returns the transport protocol used to communicate with the endpoint. If the transport protocol is not specified,
+     * the method will attempt to infer it from the URL prefix.
+     *
+     * @return the transport protocol used to communicate with the endpoint
+     */
+    public Web3Transport transport() {
+        if (transport != null) {
+            return transport;
+        } else if (url.startsWith("http://") || url.startsWith("https://")) {
+            return Web3Transport.HTTP;
+        } else if (url.startsWith("ws://") || url.startsWith("wss://")) {
+            return Web3Transport.WEBSOCKET;
+        }
+        return Web3Transport.IPC;
+    }
 
     /**
      * Returns a new builder for {@link Web3Endpoint} with the same configuration as this instance.
@@ -28,8 +46,8 @@ public record Web3Endpoint(@NotNull Web3Transport transport, @NotNull String url
      */
     public Builder toBuilder() {
         return new Builder()
-                .transport(transport)
                 .url(url)
+                .transport(transport)
                 .gasCap(gasCap)
                 .requestCooldown(requestCooldown)
                 .requestTimeout(requestTimeout);
@@ -119,7 +137,7 @@ public record Web3Endpoint(@NotNull Web3Transport transport, @NotNull String url
          * @return a new instance of {@link Web3Endpoint}
          */
         public Web3Endpoint build() {
-            return new Web3Endpoint(transport, url, gasCap, requestCooldown, requestTimeout);
+            return new Web3Endpoint(url, transport, gasCap, requestCooldown, requestTimeout);
         }
     }
 
