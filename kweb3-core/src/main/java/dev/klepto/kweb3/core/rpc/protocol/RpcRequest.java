@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.core.rpc.protocol;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public record RpcRequest(@NotNull String jsonrpc,
      * Creates a new rpc request using default values.
      */
     public RpcRequest() {
-        this(RpcProtocol.JSON_VERSION, 1, "", new JsonObject());
+        this(RpcProtocol.JSON_VERSION, 1, "", new JsonArray());
     }
 
     /**
