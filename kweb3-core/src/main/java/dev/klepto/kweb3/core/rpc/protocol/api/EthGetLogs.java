@@ -31,17 +31,17 @@ public interface EthGetLogs extends RpcMethod {
      * @return an array of all the logs matching the given filters
      */
     @NotNull
-    default Web3Result<List<Log>> ethGetLogs(@Nullable String[] addresses,
-                                             @Nullable String fromBlock,
-                                             @Nullable String toBlock,
-                                             @Nullable String[] topics,
-                                             @Nullable String blockHash) {
+    default Web3Result<List<LogResponse>> ethGetLogs(@Nullable String[] addresses,
+                                                     @Nullable String fromBlock,
+                                                     @Nullable String toBlock,
+                                                     @Nullable String[] topics,
+                                                     @Nullable String blockHash) {
         val parameters = new Parameters(addresses, fromBlock, toBlock, topics, blockHash);
         val request = new RpcRequest()
                 .withMethod("eth_getLogs")
                 .withParams(parameters);
         return request(request)
-                .map(response -> response.resultAs(Log.LIST_TYPE));
+                .map(response -> response.resultAs(LogResponse.LIST_TYPE));
     }
 
     /**
@@ -75,16 +75,16 @@ public interface EthGetLogs extends RpcMethod {
      * @param logIndex         the log index in hexadecimal format
      * @param removed          whether the log was removed
      */
-    record Log(@NotNull String address,
-               @NotNull String[] topics,
-               @NotNull String data,
-               @NotNull String blockNumber,
-               @NotNull String transactionHash,
-               @NotNull String transactionIndex,
-               @NotNull String blockHash,
-               @NotNull String logIndex,
-               boolean removed) {
-        static Type LIST_TYPE = new TypeToken<ArrayList<Log>>() {
+    record LogResponse(@NotNull String address,
+                       @NotNull String[] topics,
+                       @NotNull String data,
+                       @NotNull String blockNumber,
+                       @NotNull String transactionHash,
+                       @NotNull String transactionIndex,
+                       @NotNull String blockHash,
+                       @NotNull String logIndex,
+                       boolean removed) {
+        static Type LIST_TYPE = new TypeToken<ArrayList<LogResponse>>() {
         }.getType();
     }
 

@@ -21,12 +21,12 @@ public interface EthGetBlock extends RpcMethod {
      * @return information about a block by block number
      */
     @NotNull
-    default Web3Result<Block> ethGetBlockByNumber(String blockNumber) {
+    default Web3Result<BlockResponse> ethGetBlockByNumber(String blockNumber) {
         val request = new RpcRequest()
                 .withMethod("eth_getBlockByNumber")
                 .withParams(blockNumber, false);
         return request(request)
-                .map(result -> result.resultAs(Block.class));
+                .map(result -> result.resultAs(BlockResponse.class));
     }
 
     /**
@@ -36,12 +36,12 @@ public interface EthGetBlock extends RpcMethod {
      * @return information about a block by block hash
      */
     @NotNull
-    default Web3Result<Block> ethGetBlockByHash(@NotNull String blockHash) {
+    default Web3Result<BlockResponse> ethGetBlockByHash(@NotNull String blockHash) {
         val request = new RpcRequest()
                 .withMethod("eth_getBlockByHash")
                 .withParams(blockHash, false);
         return request(request)
-                .map(result -> result.resultAs(Block.class));
+                .map(result -> result.resultAs(BlockResponse.class));
     }
 
     /**
@@ -72,7 +72,7 @@ public interface EthGetBlock extends RpcMethod {
      * @param transactionsRoot the root of the transaction trie of the block
      * @param uncles           an array of uncle hashes
      */
-    record Block(
+    record BlockResponse(
             @NotNull String baseFeePerGas,
             @NotNull String difficulty,
             @NotNull String extraData,
@@ -81,9 +81,9 @@ public interface EthGetBlock extends RpcMethod {
             @Nullable String hash,
             @NotNull String logsBloom,
             @Nullable String miner,
-            @Nullable String mixHash,
+            @NotNull String mixHash,
             @Nullable String nonce,
-            @Nullable String number,
+            @NotNull String number,
             @NotNull String parentHash,
             @NotNull String receiptsRoot,
             @NotNull String sha3Uncles,

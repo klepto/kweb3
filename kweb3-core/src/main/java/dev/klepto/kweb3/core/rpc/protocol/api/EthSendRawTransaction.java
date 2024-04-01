@@ -24,7 +24,7 @@ public interface EthSendRawTransaction extends RpcMethod {
     default Web3Result<String> ethSendRawTransaction(@NotNull String data) {
         val request = new RpcRequest()
                 .withMethod("eth_sendRawTransaction")
-                .withParams(new Request(data));
+                .withParams(new TransactionParameter(data));
 
         return request(request)
                 .map(RpcResponse::resultAsString);
@@ -35,7 +35,7 @@ public interface EthSendRawTransaction extends RpcMethod {
      *
      * @param data the signed transaction data (typically signed with a library, using your private key)
      */
-    record Request(@NotNull String data) {
+    record TransactionParameter(@NotNull String data) {
     }
 
 }
