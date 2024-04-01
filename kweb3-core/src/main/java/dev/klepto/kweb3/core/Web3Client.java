@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.core;
 
+import dev.klepto.kweb3.core.blockchain.BlockchainClient;
 import dev.klepto.kweb3.core.config.Web3Network;
 import dev.klepto.kweb3.core.contract.ContractProxies;
 import dev.klepto.kweb3.core.contract.Web3Contract;
@@ -20,6 +21,7 @@ public class Web3Client {
 
     private final Web3Network network;
     private final RpcClient rpc;
+    private final BlockchainClient blockchain;
     private final ContractProxies contracts;
     private final EthAddress address;
 
@@ -31,6 +33,7 @@ public class Web3Client {
     public Web3Client(@NotNull Web3Network network) {
         this.network = network;
         this.rpc = new RpcClient(network);
+        this.blockchain = new BlockchainClient(rpc);
         this.contracts = new ContractProxies(this);
         this.address = EthAddress.ZERO;
     }
