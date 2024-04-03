@@ -62,6 +62,10 @@ public final class Hex {
      */
     @NotNull
     public static String toHex(byte @NotNull [] value, boolean prefix, boolean leadingZero) {
+        if (value.length == 0) {
+            return prefix ? "0x0" : "0";
+        }
+
         var hex = BaseEncoding.base16().encode(value).toLowerCase();
         if (!leadingZero) {
             hex = CharMatcher.is('0').trimLeadingFrom(hex);
@@ -96,6 +100,10 @@ public final class Hex {
      */
     @NotNull
     public static String toHex(@NotNull BigInteger value, boolean prefix, boolean leadingZero) {
+        if (value.equals(BigInteger.ZERO)) {
+            return prefix ? "0x0" : "0";
+        }
+        
         var hex = value.toString(16).toLowerCase();
         if (leadingZero && hex.length() % 2 != 0) {
             hex = "0" + hex;
@@ -111,6 +119,11 @@ public final class Hex {
      */
     @NotNull
     public static BigInteger toBigInteger(@NotNull String hex) {
+        val stripped = stripPrefix(hex);
+        if (stripped.isEmpty()) {
+            return BigInteger.ZERO;
+        }
+
         return new BigInteger(stripPrefix(hex), 16);
     }
 
@@ -121,8 +134,13 @@ public final class Hex {
      * @return a byte array containing hexadecimal string value
      */
     public static byte @NotNull [] toByteArray(@NotNull String hex) {
+        val stripped = stripPrefix(hex);
+        if (stripped.isEmpty()) {
+            return new byte[0];
+        }
+
         val encoding = BaseEncoding.base16().omitPadding();
-        return encoding.decode(stripPrefix(hex).toUpperCase());
+        return encoding.decode(stripped.toUpperCase());
     }
 
 }
