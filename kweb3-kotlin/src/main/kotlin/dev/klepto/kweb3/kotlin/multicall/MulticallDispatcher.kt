@@ -8,6 +8,7 @@ import dev.klepto.kweb3.core.type.EthValue
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 import dev.klepto.kweb3.kotlin.CoroutineWeb3Client
+import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor.Companion.contractExecutor
 import java.util.*
 import kotlin.math.min
 

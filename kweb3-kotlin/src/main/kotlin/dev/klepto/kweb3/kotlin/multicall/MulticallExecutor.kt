@@ -14,7 +14,6 @@ import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 interface MulticallExecutor : Web3Contract {
-
     /**
      * Executes multiple calls to the blockchain in a single transaction and
      * returns list of their return data. If [allowFailure] is set to `false`,
@@ -27,7 +26,10 @@ interface MulticallExecutor : Web3Contract {
      * @return an ordered list of return data from each call, possibly `null`
      *     for failed calls
      */
-    suspend fun execute(allowFailure: Boolean, calls: List<Call>): List<EthBytes?>
+    suspend fun execute(
+        allowFailure: Boolean,
+        calls: List<Call>,
+    ): List<EthBytes?>
 
     /**
      * A single smart contract call to be executed in a *multicall*
@@ -36,28 +38,32 @@ interface MulticallExecutor : Web3Contract {
      * @param address the address of the smart contract
      * @param data the encoded call data represented as ethereum bytes
      */
-    data class Call(val address: EthAddress, val data: EthBytes) : EthStructContainer
+    data class Call(
+        val address: EthAddress,
+        val data: EthBytes,
+    ) : EthStructContainer
 
-    /**
-     * Gets the underlying [CoroutineContractExecutor] used to execute this
-     * *multicall* transactions.
-     */
-    fun contractExecutor(): CoroutineContractExecutor {
-        val contractExecutor = client.contracts.executor
-        require(contractExecutor is CoroutineContractExecutor) {
-            "${this::class.simpleName} requires a ${CoroutineContractExecutor::class.simpleName}."
+    companion object {
+        /**
+         * Gets the underlying [CoroutineContractExecutor] used to execute this
+         * *multicall* transactions.
+         */
+        fun MulticallExecutor.contractExecutor(): CoroutineContractExecutor {
+            val contractExecutor = client.contracts.executor
+            require(contractExecutor is CoroutineContractExecutor) {
+                "${this::class.simpleName} requires a ${CoroutineContractExecutor::class.simpleName}."
+            }
+            return contractExecutor
         }
-        return contractExecutor
-    }
 
-    /**
-     * Creates a new [MulticallBuilder] for constructing a *multicall* request
-     * using this *multicall* executor.
-     *
-     * @return a new multicall builder
-     */
-    fun builder(): MulticallBuilder<EthValue> {
-        return MulticallBuilder(this)
+        /**
+         * Creates a new [MulticallBuilder] for constructing a *multicall* request
+         * using this *multicall* executor.
+         *
+         * @return a new multicall builder
+         */
+        inline fun <reified T : EthValue> MulticallExecutor.builder(): MulticallBuilder<T> {
+            return MulticallBuilder(this)
+        }
     }
-
 }
