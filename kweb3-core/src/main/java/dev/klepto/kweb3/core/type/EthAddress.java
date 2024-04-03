@@ -28,6 +28,9 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
      */
     public static final EthAddress ZERO = address(0);
 
+    /**
+     * Address value.
+     */
     @NotNull
     private final BigInteger value;
 

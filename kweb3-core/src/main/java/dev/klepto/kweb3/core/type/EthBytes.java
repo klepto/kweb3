@@ -1,12 +1,11 @@
 package dev.klepto.kweb3.core.type;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.primitives.Bytes;
 import dev.klepto.kweb3.core.util.Hex;
-import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.math.BigInteger;
 
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
@@ -15,8 +14,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@With
-public class EthBytes implements EthValue, EthSizedValue {
+public class EthBytes implements EthValue, EthNumericValue<EthBytes>, EthSizedValue {
 
     /**
      * Empty <code>ethereum bytes</code> constant.
@@ -28,46 +26,39 @@ public class EthBytes implements EthValue, EthSizedValue {
      */
     public static final int DYNAMIC_SIZE = -1;
 
-    @With
+    /**
+     * The maximum amount of bytes.
+     */
     private final int size;
 
+    /**
+     * The bytes value represented as {@link BigInteger}.
+     */
     @NotNull
-    private final ImmutableList<Byte> value;
+    private final BigInteger value;
+
+    /**
+     * The bytes value represented as <code>byte</code> array.
+     */
+    private final byte @NotNull [] arrayValue;
 
     /**
      * Constructs new <code>ethereum bytes</code> with the specified size and value.
      *
-     * @param size  the size of the bytes, <code>-1</code> indicates dynamic size, any other positive value indicates a
-     *              fixed size bytes
-     * @param value the immutable list containing bytes of the bytes
+     * @param size   the size of the bytes, <code>-1</code> indicates dynamic size, any other positive value indicates a
+     *               fixed size bytes
+     * @param values the array containing byte values
      */
-    public EthBytes(int size, @NotNull ImmutableList<Byte> value) {
+    public EthBytes(int size, byte @NotNull [] values) {
         require(
-                size == DYNAMIC_SIZE || size >= value.size(),
+                size == DYNAMIC_SIZE || size >= values.length,
                 "bytes{} cannot contain {} bytes",
-                size, value.size()
+                size, values.length
         );
+
         this.size = size;
-        this.value = value;
-    }
-
-    /**
-     * Creates a new <code>ethereum bytes</code> container with the specified size. If specified <code>size</code> is
-     * larger than the current size, the new bytes will be padded with zeros.
-     *
-     * @param size the size of the new bytes
-     * @return a new <code>ethereum bytes</code> container with the specified size
-     */
-    @NotNull
-    public EthBytes withSize(int size) {
-        if (value.size() < size) {
-            val currentBytes = toByteArray();
-            val newBytes = new byte[size];
-            System.arraycopy(currentBytes, 0, newBytes, 0, currentBytes.length);
-            return new EthBytes(size, ImmutableList.copyOf(Bytes.asList(newBytes)));
-        }
-
-        return new EthBytes(size, value);
+        this.value = Hex.toBigInteger(Hex.toHex(values));
+        this.arrayValue = values;
     }
 
     /**
@@ -90,6 +81,46 @@ public class EthBytes implements EthValue, EthSizedValue {
         val sizeString = size > 0 ? size : "";
         return "bytes" + sizeString + "(" + toHex() + ")";
     }
+
+    /**
+     * Returns {@link BigInteger} value that represents this <code>ethereum bytes</code>.
+     *
+     * @return the big integer value of this <code>ethereum bytes</code>
+     */
+    @Override
+    public @NotNull BigInteger value() {
+        return value;
+    }
+
+    /**
+     * Creates a new instance of {@link EthBytes} with the specified value.
+     *
+     * @return a new instance of {@link EthBytes} with the specified value
+     */
+    @Override
+    public @NotNull EthBytes withValue(@NotNull BigInteger value) {
+        val arrayValue = Hex.toByteArray(Hex.toHex(value));
+        return new EthBytes(size, arrayValue);
+    }
+
+    /**
+     * Creates a new <code>ethereum bytes</code> container with the specified size. If specified <code>size</code> is
+     * larger than the current size, the new bytes will be padded with zeros.
+     *
+     * @param size the size of the new bytes
+     * @return a new <code>ethereum bytes</code> container with the specified size
+     */
+    @NotNull
+    public EthBytes withSize(int size) {
+        if (size() < size) {
+            val currentBytes = toByteArray();
+            val newBytes = new byte[size];
+            System.arraycopy(currentBytes, 0, newBytes, 0, currentBytes.length);
+            return new EthBytes(size, newBytes);
+        }
+        return new EthBytes(size, arrayValue);
+    }
+
 
     /**
      * Returns hex string representation of this <code>ethereum bytes</code>.
@@ -131,18 +162,20 @@ public class EthBytes implements EthValue, EthSizedValue {
     }
 
     /**
-     * Converts this <code>ethereum bytes</code> value to mutable <code>byte</code> array.
+     * Returns <code>ethereum bytes</code> array value.
      *
-     * @return a mutable array of bytes
+     * @return an array of bytes
      */
     public byte @NotNull [] toByteArray() {
-        return Bytes.toArray(value);
+        val result = new byte[arrayValue.length];
+        System.arraycopy(arrayValue, 0, result, 0, arrayValue.length);
+        return result;
     }
 
     /* Solidity style static initializers */
     @NotNull
     public static EthBytes bytes(byte @NotNull [] value) {
-        return new EthBytes(DYNAMIC_SIZE, ImmutableList.copyOf(Bytes.asList(value)));
+        return new EthBytes(DYNAMIC_SIZE, value);
     }
 
     @NotNull

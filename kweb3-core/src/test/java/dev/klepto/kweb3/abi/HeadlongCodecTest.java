@@ -132,12 +132,12 @@ public class HeadlongCodecTest {
     public void testDecodeBoolean() {
         assertTrue(((EthBool) (codec.decode(
                 "0000000000000000000000000000000000000000000000000000000000000001",
-                new EthTypeDescriptor(EthBool.class)).get(0))).value()
+                new EthTypeDescriptor(EthBool.class)).get(0))).check()
         );
 
         assertFalse(((EthBool) (codec.decode(
                 "0000000000000000000000000000000000000000000000000000000000000000",
-                new EthTypeDescriptor(EthBool.class)).get(0))).value()
+                new EthTypeDescriptor(EthBool.class)).get(0))).check()
         );
     }
 

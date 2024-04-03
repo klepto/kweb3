@@ -224,12 +224,12 @@ public class HeadlongCodec implements AbiCodec {
             return encodeAddress(address);
         } else if (value instanceof EthBytes bytes) {
             return encodeBytes(bytes);
+        } else if (value instanceof EthBool bool) {
+            return encodeBool(bool);
         } else if (value instanceof EthNumericValue numeric) {
             return encodeNumeric(numeric);
         } else if (value instanceof EthString string) {
             return encodeString(string);
-        } else if (value instanceof EthBool bool) {
-            return encodeBool(bool);
         } else if (value instanceof EthTuple tuple) {
             return encodeTuple(tuple);
         }
@@ -305,7 +305,7 @@ public class HeadlongCodec implements AbiCodec {
      * @return the headlong-compatible boolean value
      */
     private boolean encodeBool(EthBool value) {
-        return value.value();
+        return value.check();
     }
 
     /**

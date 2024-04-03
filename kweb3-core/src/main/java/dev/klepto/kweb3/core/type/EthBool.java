@@ -16,7 +16,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public class EthBool implements EthValue {
+public class EthBool implements EthValue, EthNumericValue<EthBool> {
 
     /**
      * True bool constant.
@@ -28,15 +28,31 @@ public class EthBool implements EthValue {
      */
     public static final EthBool FALSE = bool(false);
 
-    private final boolean value;
+    /**
+     * Boolean value.
+     */
+    @NotNull
+    private final BigInteger value;
 
     /**
      * Constructs new <code>ethereum bool</code> with the specified value.
      *
      * @param value the boolean value
      */
-    public EthBool(boolean value) {
+    public EthBool(BigInteger value) {
+        val isTrue = value.equals(BigInteger.ONE);
+        val isFalse = value.equals(BigInteger.ZERO);
+        require(isTrue || isFalse, "BigInteger {} is not a boolean value.", value);
         this.value = value;
+    }
+
+    /**
+     * Returns <code>true</code> if this <code>ethereum bool</code> is <code>true</code>, <code>false</code> otherwise.
+     *
+     * @return <code>true</code> if this <code>ethereum bool</code> is <code>true</code>, <code>false</code> otherwise
+     */
+    public boolean check() {
+        return value.equals(BigInteger.ONE);
     }
 
     /**
@@ -44,7 +60,8 @@ public class EthBool implements EthValue {
      *
      * @return the value of this <code>ethereum bool</code>
      */
-    public boolean value() {
+    @NotNull
+    public BigInteger value() {
         return value;
     }
 
@@ -56,7 +73,7 @@ public class EthBool implements EthValue {
     @Override
     @NotNull
     public String toString() {
-        return "bool(" + value + ")";
+        return "bool(" + check() + ")";
     }
 
     /**
@@ -85,22 +102,19 @@ public class EthBool implements EthValue {
         if (!(object instanceof EthBool other)) {
             return false;
         }
-        return value == other.value;
+        return check() == other.check();
     }
 
     /* Solidity style static initializers */
     @NotNull
-    public static EthBool bool(boolean value) {
-        return new EthBool(value);
+    public static EthBool bool(@NotNull Number value) {
+        val intValue = EthNumericValue.parseBigInteger(value);
+        return new EthBool(intValue);
     }
 
     @NotNull
-    public static EthBool bool(@NotNull Number value) {
-        val intValue = EthNumericValue.parseBigInteger(value);
-        val isTrue = intValue.equals(BigInteger.ONE);
-        val isFalse = intValue.equals(BigInteger.ZERO);
-        require(isTrue || isFalse, "Number {} is not a boolean value.", value);
-        return new EthBool(isTrue);
+    public static EthBool bool(boolean value) {
+        return bool(value ? BigInteger.ONE : BigInteger.ZERO);
     }
 
 }

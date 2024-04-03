@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * Represents an ethereum numeric data type that's backed by {@link BigInteger}.
+ * Represents an ethereum data type that's backed by {@link BigInteger}.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */

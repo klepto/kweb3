@@ -26,7 +26,14 @@ public class EthArray<T extends EthValue> implements EthValue, EthCollectionValu
      */
     public static final int DYNAMIC_SIZE = -1;
 
+    /**
+     * Array capacity.
+     */
     private final int capacity;
+
+    /**
+     * Array values.
+     */
     private final @NotNull ImmutableList<T> values;
 
     /**
