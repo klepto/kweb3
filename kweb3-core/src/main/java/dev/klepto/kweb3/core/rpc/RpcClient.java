@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -35,7 +36,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class RpcClient implements RpcProtocol {
+public class RpcClient implements Closeable, RpcProtocol {
 
     private final Web3Network network;
     private final AtomicReference<Web3Endpoint> endpoint = new AtomicReference<>();
@@ -219,6 +220,17 @@ public class RpcClient implements RpcProtocol {
      */
     public void removeCallback(Consumer<RpcMessage> callback) {
         callbacks.remove(callback);
+    }
+
+    /**
+     * Closes the RPC client and all underlying connections.
+     */
+    @Override
+    public void close() {
+        val conn = connection.get();
+        if (conn != null) {
+            conn.close();
+        }
     }
 
     /**

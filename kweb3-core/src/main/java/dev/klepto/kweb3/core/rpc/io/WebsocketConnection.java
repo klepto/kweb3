@@ -123,4 +123,12 @@ public class WebsocketConnection extends WebSocketClient implements RpcConnectio
         }
     }
 
+    /**
+     * Closes the connection to the remote server.
+     */
+    @Override
+    public void close() {
+        super.close();
+    }
+
 }

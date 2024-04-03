@@ -9,6 +9,8 @@ import dev.klepto.kweb3.core.type.EthAddress;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
+
 import static dev.klepto.kweb3.core.type.EthAddress.address;
 
 /**
@@ -17,7 +19,7 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Getter
-public class Web3Client {
+public class Web3Client implements Closeable {
 
     private final Web3Network network;
     private final RpcClient rpc;
@@ -62,4 +64,12 @@ public class Web3Client {
         return contract(type, address(address));
     }
 
+    /**
+     * Closes the client and releases all resources.
+     */
+    @Override
+    public void close() {
+        rpc.close();
+    }
+    
 }

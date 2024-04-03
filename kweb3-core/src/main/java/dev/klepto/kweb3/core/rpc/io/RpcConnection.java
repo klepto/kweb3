@@ -22,6 +22,11 @@ public interface RpcConnection {
     void open();
 
     /**
+     * Closes the connection to the remote server.
+     */
+    void close();
+
+    /**
      * Checks if the connection is currently open.
      */
     boolean isOpen();
