@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -26,6 +25,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
  * Implementation of Ethereum RPC API client.
@@ -98,7 +99,9 @@ public class RpcClient implements RpcProtocol {
      */
     @Synchronized
     public void selectNextEndpoint() {
-        val endpoints = Arrays.asList(network.endpoints());
+        val endpoints = network.endpoints();
+        require(!endpoints.isEmpty(), "No endpoints available");
+
         val index = endpoints.indexOf(endpoint.get());
         val nextIndex = (index + 1) % endpoints.size();
         val next = endpoints.get(nextIndex);

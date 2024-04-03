@@ -4,6 +4,8 @@ import dev.klepto.kweb3.core.type.EthAddress;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Represents information about a web3 network, such as chain id, testnet status, RPC endpoints etc. Default container
  * implementation can be seen at {@link Web3Chain}.
@@ -50,9 +52,9 @@ public interface Web3Network {
     /**
      * Returns the endpoints of the network.
      *
-     * @return an array containing endpoints of the network
+     * @return a list containing endpoints of the network
      */
-    Web3Endpoint[] endpoints();
+    List<Web3Endpoint> endpoints();
 
     /**
      * Contains the default addresses used within the network.

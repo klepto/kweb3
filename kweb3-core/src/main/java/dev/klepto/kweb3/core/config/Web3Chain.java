@@ -1,9 +1,11 @@
 package dev.klepto.kweb3.core.config;
 
+import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.List;
 
 import static dev.klepto.kweb3.core.type.EthAddress.address;
 
@@ -23,7 +25,7 @@ public record Web3Chain(@NotNull String name,
                         boolean testnet,
                         @Nullable Addresses addresses,
                         @Nullable Currency currency,
-                        @NotNull Web3Endpoint... endpoints) implements Web3Network {
+                        @NotNull List<Web3Endpoint> endpoints) implements Web3Network {
 
     /**
      * Returns a new builder for {@link Web3Chain} with the same configuration as this instance.
@@ -58,7 +60,7 @@ public record Web3Chain(@NotNull String name,
         private boolean testnet = false;
         private Addresses addresses = null;
         private Currency currency = null;
-        private Web3Endpoint[] endpoints;
+        private List<Web3Endpoint> endpoints;
 
         private Builder() {
         }
@@ -125,7 +127,17 @@ public record Web3Chain(@NotNull String name,
          * @return the builder
          */
         public Builder endpoints(Web3Endpoint... endpoints) {
-            this.endpoints = endpoints;
+            return endpoints(ImmutableList.copyOf(endpoints));
+        }
+
+        /**
+         * Sets the endpoints of the network.
+         *
+         * @param endpoints a list containing endpoints of the network
+         * @return the builder
+         */
+        public Builder endpoints(List<Web3Endpoint> endpoints) {
+            this.endpoints = ImmutableList.copyOf(endpoints);
             return this;
         }
 
