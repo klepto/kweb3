@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,7 +32,7 @@ public class ContractProxies {
      * @return the contract proxy instance
      */
     public <T extends Web3Contract> T createProxy(Class<T> type, EthAddress address) {
-        val contracts = cache.computeIfAbsent(type, key -> new HashMap<>());
+        val contracts = cache.computeIfAbsent(type, key -> new ConcurrentHashMap<>());
         val contract = contracts.computeIfAbsent(address, key ->
                 (Web3Contract) Proxy.newProxyInstance(
                         ContractProxies.class.getClassLoader(),
