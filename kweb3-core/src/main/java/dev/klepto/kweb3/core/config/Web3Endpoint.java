@@ -19,7 +19,7 @@ import static dev.klepto.kweb3.core.type.EthUint.uint256;
  * @param requestTimeout  the maximum duration to wait for a response from the endpoint
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public record Web3Endpoint(@NotNull String url, @Nullable Web3Transport transport, @NotNull EthUint gasCap,
+public record Web3Endpoint(@NotNull String url, @Nullable Web3Transport transport, @Nullable EthUint gasCap,
                            @Nullable Duration requestCooldown, @Nullable Duration requestTimeout) {
 
     /**
@@ -37,6 +37,19 @@ public record Web3Endpoint(@NotNull String url, @Nullable Web3Transport transpor
             return Web3Transport.WEBSOCKET;
         }
         return Web3Transport.IPC;
+    }
+
+    /**
+     * Returns the maximum amount of gas defined by the endpoint. If the gas cap is not specified, the method will
+     * return a default value of <code></code>50,000,000</code>.
+     *
+     * @return the maximum amount of gas defined by the endpoint
+     */
+    public EthUint gasCap() {
+        if (gasCap == null) {
+            return uint256(50_000_000);
+        }
+        return gasCap;
     }
 
     /**
@@ -67,9 +80,9 @@ public record Web3Endpoint(@NotNull String url, @Nullable Web3Transport transpor
      */
     public static class Builder {
 
-        private Web3Transport transport = Web3Transport.HTTP;
+        private Web3Transport transport = null;
         private String url = null;
-        private EthUint gasCap = uint256(50_000_000);
+        private EthUint gasCap = null;
         private Duration requestCooldown = null;
         private Duration requestTimeout = null;
 
