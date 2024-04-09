@@ -1,5 +1,6 @@
 package dev.klepto.kweb3.kotlin
 
+import dev.klepto.kweb3.core.Web3Error
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.ContractExecutor
@@ -33,8 +34,12 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
      *     return type of the interface method
      */
     override fun execute(call: ContractCall): Any {
-        if (call.isSuspending()) {
-            return ::executeMutexSuspending.call(call, call.continuation())
+        try {
+            if (call.isSuspending()) {
+                return ::executeMutexSuspending.call(call, call.continuation())
+            }
+        } catch (cause: Throwable) {
+            throw Web3Error.unwrap(cause)
         }
         return super.execute(call)
     }

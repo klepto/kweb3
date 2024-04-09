@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Client;
+import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.type.EthAddress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +72,11 @@ public class ContractProxy implements InvocationHandler {
             default:
                 val function = contracts.getParser().parseFunction(method);
                 val call = new ContractCall(this, function, args);
-                return contracts.getExecutor().execute(call);
+                try {
+                    return contracts.getExecutor().execute(call);
+                } catch (Throwable throwable) {
+                    throw Web3Error.unwrap(throwable);
+                }
         }
     }
 

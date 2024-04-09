@@ -95,4 +95,22 @@ public class Web3Error extends RuntimeException {
         return MessageFormatter.arrayFormat(message, args).getMessage();
     }
 
+    /**
+     * Unwraps the given throwable and throws the original cause, or throws itself it is an instance of Web3Error.
+     *
+     * @param throwable the throwable to unwrap
+     * @return the unwrapped throwable
+     */
+    public static Throwable unwrap(Throwable throwable) {
+        if (throwable instanceof Web3Error) {
+            return throwable;
+        } else {
+            val cause = throwable.getCause();
+            if (cause != null) {
+                return unwrap(cause);
+            }
+            return throwable.getCause();
+        }
+    }
+
 }
