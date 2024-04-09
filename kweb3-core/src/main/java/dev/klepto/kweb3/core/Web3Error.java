@@ -102,15 +102,13 @@ public class Web3Error extends RuntimeException {
      * @return the unwrapped throwable
      */
     public static Throwable unwrap(Throwable throwable) {
-        if (throwable instanceof Web3Error) {
-            return throwable;
-        } else {
+        if (!(throwable instanceof Web3Error)) {
             val cause = throwable.getCause();
             if (cause != null) {
                 return unwrap(cause);
             }
-            return throwable.getCause();
         }
+        return throwable;
     }
 
 }
