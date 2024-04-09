@@ -23,6 +23,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
  */
 class CoroutineContractExecutor : DefaultContractExecutor() {
     val mutex = Mutex(false)
+    val mutexContext = AtomicReference<Any>()
     val interceptor = AtomicReference<ContractExecutor>()
 
     /**
@@ -53,7 +54,7 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
      */
     suspend fun executeMutexSuspending(call: ContractCall): Any {
         val context = currentCoroutineContext()
-        if (!mutex.holdsLock(context)) {
+        if (mutex.isLocked && mutexContext.get() != context) {
             return mutex.withLock(context) {
                 executeSuspending(call)
             }
@@ -90,7 +91,8 @@ class CoroutineContractExecutor : DefaultContractExecutor() {
         interceptor: ContractExecutor,
         block: suspend () -> Unit,
     ) {
-        mutex.withLock(currentCoroutineContext()) {
+        mutex.withLock {
+            mutexContext.set(currentCoroutineContext())
             val current = this.interceptor.get()
             this.interceptor.set(interceptor)
             block()
