@@ -156,6 +156,15 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
     }
 
     /**
+     * Converts numeric value to string.
+     *
+     * @return a string representation of the numeric value
+     */
+    default String toValueString() {
+        return value().toString();
+    }
+
+    /**
      * Parses a number into a {@link BigInteger}.
      *
      * @param number the number to parse
