@@ -105,7 +105,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      */
     @Override
     public float floatValue() {
-        return decimalValue().floatValue();
+        return toBigDecimal().floatValue();
     }
 
     /**
@@ -115,7 +115,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
      */
     @Override
     public double doubleValue() {
-        return decimalValue().doubleValue();
+        return toBigDecimal().doubleValue();
     }
 
     /**

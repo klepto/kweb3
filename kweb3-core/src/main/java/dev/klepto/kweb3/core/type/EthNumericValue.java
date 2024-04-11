@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 /**
  * Represents an ethereum data type that's backed by {@link BigInteger}.
@@ -73,8 +74,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      */
     @NotNull
     default T times(@NotNull Number other) {
-        val result = value().multiply(parseBigInteger(other));
-        return withValue(result);
+        val result = parseBigDecimal(value()).multiply(parseBigDecimal(other));
+        return withValue(result.toBigInteger());
     }
 
     /**
@@ -85,8 +86,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      */
     @NotNull
     default T div(@NotNull Number other) {
-        val result = value().divide(parseBigInteger(other));
-        return withValue(result);
+        val result = parseBigDecimal(value()).divide(parseBigDecimal(other), RoundingMode.FLOOR);
+        return withValue(result.toBigInteger());
     }
 
     /**
@@ -97,8 +98,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      */
     @NotNull
     default T rem(@NotNull Number other) {
-        val result = value().remainder(parseBigInteger(other));
-        return withValue(result);
+        val result = parseBigDecimal(value()).remainder(parseBigDecimal(other));
+        return withValue(result.toBigInteger());
     }
 
     /**
@@ -128,8 +129,8 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @return the numeric value as big decimal with 18 decimal places
      */
     @NotNull
-    default BigDecimal decimalValue() {
-        return decimalValue(18);
+    default BigDecimal toBigDecimal() {
+        return toBigDecimal(18);
     }
 
     /**
@@ -139,7 +140,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      * @return the numeric value as big decimal
      */
     @NotNull
-    default BigDecimal decimalValue(int decimals) {
+    default BigDecimal toBigDecimal(int decimals) {
         return new BigDecimal(value(), decimals);
     }
 
@@ -162,19 +163,32 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      */
     @NotNull
     static BigInteger parseBigInteger(@NotNull Number number) {
-        if (number instanceof BigInteger) {
-            return (BigInteger) number;
-        } else if (number instanceof Float) {
-            return BigDecimal.valueOf(number.floatValue()).toBigInteger();
-        } else if (number instanceof Double) {
-            return BigDecimal.valueOf(number.doubleValue()).toBigInteger();
-        } else if (number instanceof BigDecimal) {
-            return ((BigDecimal) number).toBigInteger();
-        } else if (number instanceof EthNumericValue) {
-            return ((EthNumericValue<?>) number).value();
-        }
-        return BigInteger.valueOf(number.longValue());
+        return parseBigDecimal(number).toBigInteger();
     }
+
+    /**
+     * Parses a {@link Number} into a {@link BigDecimal}.
+     *
+     * @param number the {@link Number} to parse
+     * @return the parsed {@link BigDecimal}
+     */
+    @NotNull
+    static BigDecimal parseBigDecimal(@NotNull Number number) {
+        var result = new BigDecimal(number.longValue());
+        if (number instanceof BigDecimal value) {
+            result = value;
+        } else if (number instanceof BigInteger value) {
+            result = new BigDecimal(value);
+        } else if (number instanceof Float value) {
+            result = BigDecimal.valueOf(value);
+        } else if (number instanceof Double value) {
+            result = BigDecimal.valueOf(value);
+        } else if (number instanceof EthNumericValue<?> value) {
+            result = new BigDecimal(value.value());
+        }
+        return result.setScale(18, RoundingMode.FLOOR);
+    }
+
 
     /**
      * Returns the minimum of two numeric values.
