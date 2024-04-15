@@ -162,9 +162,14 @@ public class RpcClient implements Closeable, RpcProtocol {
         requests.remove(request);
 
         val result = request.result();
-        if (response.error() != null) {
-            val error = new Web3Error("RPC error occurred: {}", response.error().message());
-            result.completeExceptionally(error);
+        val error = response.error();
+        if (error != null) {
+            val cause = new Web3Error(
+                    "RPC error occurred: [request: {}, error: {}]",
+                    request.request.serialize(),
+                    error.message()
+            );
+            result.completeExceptionally(cause);
             return;
         }
         result.complete(response);
