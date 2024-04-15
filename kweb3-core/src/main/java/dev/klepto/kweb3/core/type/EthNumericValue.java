@@ -130,7 +130,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      */
     @NotNull
     default BigDecimal toBigDecimal() {
-        return toBigDecimal(18);
+        return toBigDecimal(0).setScale(18, RoundingMode.FLOOR);
     }
 
     /**
