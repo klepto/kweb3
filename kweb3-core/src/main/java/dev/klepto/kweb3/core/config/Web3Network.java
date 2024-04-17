@@ -1,8 +1,6 @@
 package dev.klepto.kweb3.core.config;
 
-import dev.klepto.kweb3.core.type.EthAddress;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -36,13 +34,6 @@ public interface Web3Network {
     boolean testnet();
 
     /**
-     * Returns the default addresses used within the network.
-     *
-     * @return the default addresses used within the network
-     */
-    Addresses addresses();
-
-    /**
      * Returns the default currency of the network.
      *
      * @return the default currency of the network
@@ -55,14 +46,6 @@ public interface Web3Network {
      * @return a list containing endpoints of the network
      */
     List<Web3Endpoint> endpoints();
-
-    /**
-     * Contains the default addresses used within the network.
-     *
-     * @param nativeToken the native token address
-     */
-    record Addresses(@Nullable EthAddress nativeToken) {
-    }
 
     /**
      * Contains information about the default currency of the network.

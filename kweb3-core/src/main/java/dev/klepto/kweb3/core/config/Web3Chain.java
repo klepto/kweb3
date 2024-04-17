@@ -7,15 +7,12 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.List;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
-
 /**
  * Contains information about a {@link Web3Network}.
  *
  * @param name      the name of the network
  * @param chainId   the chain id of the network
  * @param testnet   whether the network is a testnet
- * @param addresses the default addresses used within the network
  * @param currency  the default currency of the network
  * @param endpoints the endpoints of the network
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
@@ -23,7 +20,6 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
 public record Web3Chain(@NotNull String name,
                         long chainId,
                         boolean testnet,
-                        @Nullable Addresses addresses,
                         @Nullable Currency currency,
                         @NotNull List<Web3Endpoint> endpoints) implements Web3Network {
 
@@ -37,7 +33,6 @@ public record Web3Chain(@NotNull String name,
                 .name(name)
                 .chainId(chainId)
                 .testnet(testnet)
-                .addresses(addresses)
                 .currency(currency)
                 .endpoints(endpoints);
     }
@@ -58,7 +53,6 @@ public record Web3Chain(@NotNull String name,
         private String name;
         private long chainId = 1;
         private boolean testnet = false;
-        private Addresses addresses = null;
         private Currency currency = null;
         private List<Web3Endpoint> endpoints;
 
@@ -95,17 +89,6 @@ public record Web3Chain(@NotNull String name,
          */
         public Builder testnet(boolean testnet) {
             this.testnet = testnet;
-            return this;
-        }
-
-        /**
-         * Sets the default addresses used within the network.
-         *
-         * @param addresses the default addresses used within the network
-         * @return the builder
-         */
-        public Builder addresses(Addresses addresses) {
-            this.addresses = addresses;
             return this;
         }
 
@@ -147,7 +130,7 @@ public record Web3Chain(@NotNull String name,
          * @return a new instance of {@link Web3Chain}
          */
         public Web3Chain build() {
-            return new Web3Chain(name, chainId, testnet, addresses, currency, endpoints);
+            return new Web3Chain(name, chainId, testnet, currency, endpoints);
         }
     }
 
@@ -162,7 +145,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain ETHEREUM = Web3Chain.builder()
                 .name("Ethereum")
                 .chainId(1)
-                .addresses(new Addresses(address("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")))
                 .currency(new Currency("Ether", "ETH", 18))
                 .endpoints(websocketEndpoint("ethereum"))
                 .build();
@@ -173,7 +155,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain BSC = Web3Chain.builder()
                 .name("BNB Smart Chain")
                 .chainId(56)
-                .addresses(new Addresses(address("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c")))
                 .currency(new Currency("BNB", "BNB", 18))
                 .endpoints(websocketEndpoint("bsc"))
                 .build();
@@ -184,7 +165,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain POLYGON = Web3Chain.builder()
                 .name("Polygon")
                 .chainId(137)
-                .addresses(new Addresses(address("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270")))
                 .currency(new Currency("Matic", "MATIC", 18))
                 .endpoints(websocketEndpoint("polygon-bor"))
                 .build();
@@ -195,7 +175,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain AVALANCHE = Web3Chain.builder()
                 .name("Avalanche C")
                 .chainId(43114)
-                .addresses(new Addresses(address("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")))
                 .currency(new Currency("AVAX", "AVAX", 18))
                 .endpoints(websocketEndpoint("avalanche-c-chain"))
                 .build();
@@ -206,7 +185,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain ARBITRUM = Web3Chain.builder()
                 .name("Arbitrum One")
                 .chainId(42161)
-                .addresses(new Addresses(address("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1")))
                 .currency(ETHEREUM.currency())
                 .endpoints(websocketEndpoint("arbitrum-one"))
                 .build();
@@ -217,7 +195,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain BASE = Web3Chain.builder()
                 .name("Base Mainnet")
                 .chainId(8453)
-                .addresses(new Addresses(address("0x4200000000000000000000000000000000000006")))
                 .currency(ETHEREUM.currency())
                 .endpoints(websocketEndpoint("base"))
                 .build();
@@ -228,7 +205,6 @@ public record Web3Chain(@NotNull String name,
         Web3Chain OPTIMISM = Web3Chain.builder()
                 .name("Optimism")
                 .chainId(10)
-                .addresses(new Addresses(address("0x4200000000000000000000000000000000000006")))
                 .currency(new Currency("Optimism", "OP", 18))
                 .endpoints(websocketEndpoint("optimism"))
                 .build();
