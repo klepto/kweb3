@@ -4,21 +4,19 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
-import dev.klepto.kweb3.core.chain.Web3Transport;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.WebsocketConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcProtocol;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -27,19 +25,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static dev.klepto.kweb3.core.util.Conditions.require;
-
 /**
  * Implementation of Ethereum RPC API client.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Slf4j
-@RequiredArgsConstructor
 public class RpcClient implements Closeable, RpcProtocol {
 
-    private final List<Web3Endpoint> endpoints;
-    private final AtomicReference<Web3Endpoint> endpoint = new AtomicReference<>();
+    private final EndpointProvider endpointProvider;
     private final AtomicReference<RpcConnection> connection = new AtomicReference<>();
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -48,16 +42,21 @@ public class RpcClient implements Closeable, RpcProtocol {
     private final Set<Consumer<RpcMessage>> callbacks = ConcurrentHashMap.newKeySet();
 
     /**
-     * Gets the current {@link Web3Endpoint} instance.
+     * Creates a new RPC client instance for the given endpoints.
+     *
+     * @param endpoints the endpoints this client can connect to
+     */
+    public RpcClient(@NotNull Web3Endpoint... endpoints) {
+        this.endpointProvider = new EndpointProvider(Arrays.asList(endpoints));
+    }
+
+    /**
+     * Gets the {@link Web3Endpoint} that this client currently connects to.
      *
      * @return the endpoint instance
      */
-    @Synchronized
     public Web3Endpoint endpoint() {
-        if (endpoint.get() == null) {
-            selectNextEndpoint();
-        }
-        return endpoint.get();
+        return endpointProvider.current();
     }
 
     /**
@@ -93,22 +92,6 @@ public class RpcClient implements Closeable, RpcProtocol {
     @Synchronized
     public void replay() {
         requests.forEach(request -> send(request.request));
-    }
-
-    /**
-     * Selects the next endpoint from the network for {@link RpcConnection} to connect to.
-     */
-    @Synchronized
-    public void selectNextEndpoint() {
-        require(!endpoints.isEmpty(), "No endpoints available");
-
-        val index = endpoints.indexOf(endpoint.get());
-        val nextIndex = (index + 1) % endpoints.size();
-        val next = endpoints.get(nextIndex);
-        if (next.transport() != Web3Transport.WEBSOCKET) {
-            throw new Web3Error("Unsupported transport: {}", next.transport());
-        }
-        endpoint.set(next);
     }
 
     /**
@@ -197,7 +180,7 @@ public class RpcClient implements Closeable, RpcProtocol {
             log.error("An RPC error occurred: {}", cause.getMessage());
             return;
         }
-        selectNextEndpoint();
+        endpointProvider.next();
         connection();
     }
 

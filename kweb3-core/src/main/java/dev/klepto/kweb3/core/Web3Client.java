@@ -11,8 +11,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
-import java.util.Arrays;
-import java.util.List;
 
 import static dev.klepto.kweb3.core.type.EthAddress.address;
 
@@ -24,8 +22,6 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
 @Getter
 public class Web3Client implements Closeable {
 
-    private final Web3Chain chain;
-    private final List<Web3Endpoint> endpoints;
     private final RpcClient rpc;
     private final EthereumClient ethereum;
     private final ContractProxies contracts;
@@ -37,12 +33,28 @@ public class Web3Client implements Closeable {
      * @param endpoints the endpoints this client connects to
      */
     public Web3Client(@NotNull Web3Endpoint... endpoints) {
-        this.chain = endpoints[0].chain();
-        this.endpoints = Arrays.asList(endpoints);
-        this.rpc = new RpcClient(this.endpoints);
+        this.rpc = new RpcClient(endpoints);
         this.ethereum = new EthereumClient(rpc);
         this.contracts = new ContractProxies(this);
         this.address = EthAddress.ZERO;
+    }
+
+    /**
+     * Returns the {@link Web3Endpoint} that the client currently connects to.
+     *
+     * @return the current endpoint of the client
+     */
+    public Web3Endpoint getEndpoint() {
+        return rpc.endpoint();
+    }
+
+    /**
+     * Returns the {@link Web3Chain} of this client.
+     *
+     * @return the web3 chain of this client
+     */
+    public Web3Chain getChain() {
+        return getEndpoint().chain();
     }
 
     /**

@@ -19,7 +19,7 @@ interface QuickCall : MulticallExecutor {
 
     override suspend fun execute(allowFailure: Boolean, calls: List<MulticallExecutor.Call>): List<EthBytes?> {
         // TODO: Implement proper endpoint resolution.
-        val gasLimit = client.endpoints[0].settings.gasLimit / calls.size
+        val gasLimit = client.endpoint.settings.gasLimit / calls.size
         val addrs = array(calls.map { it.address })
         val datas = array(calls.map { it.data })
         val result = execute(gasLimit, gasLimit, addrs, datas)
