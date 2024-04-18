@@ -1,14 +1,14 @@
 package dev.klepto.kweb3.core.contract.event;
 
-import dev.klepto.kweb3.core.abi.AbiCodec;
-import dev.klepto.kweb3.core.abi.HeadlongCodec;
+import dev.klepto.kweb3.core.ethereum.abi.AbiCodec;
+import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.contract.ContractCodec;
 import dev.klepto.unreflect.ClassAccess;
 import dev.klepto.unreflect.Unreflect;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 import static dev.klepto.kweb3.core.util.Collections.arrayRemove;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256;

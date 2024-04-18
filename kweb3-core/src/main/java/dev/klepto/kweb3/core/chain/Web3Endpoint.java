@@ -2,14 +2,14 @@ package dev.klepto.kweb3.core.chain;
 
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.chain.auth.Authorization;
-import dev.klepto.kweb3.core.type.EthUint;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
-import static dev.klepto.kweb3.core.type.EthUint.uint256;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
 
 /**
  * Describes a web3 RPC endpoint that allows for communication with a specific {@link Web3Chain}.

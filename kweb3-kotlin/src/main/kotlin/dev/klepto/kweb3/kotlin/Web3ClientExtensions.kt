@@ -2,8 +2,8 @@ package dev.klepto.kweb3.kotlin
 
 import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.contract.Web3Contract
-import dev.klepto.kweb3.core.type.EthAddress
-import dev.klepto.kweb3.core.type.EthAddress.address
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address
 
 /**
  * Extension functions for [Web3Client].

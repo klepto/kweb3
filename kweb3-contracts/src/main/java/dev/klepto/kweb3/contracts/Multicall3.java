@@ -4,12 +4,12 @@ import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.contract.Web3Contract;
 import dev.klepto.kweb3.core.contract.annotation.View;
 import dev.klepto.kweb3.core.contract.type.EthStructContainer;
-import dev.klepto.kweb3.core.type.EthAddress;
-import dev.klepto.kweb3.core.type.EthArray;
-import dev.klepto.kweb3.core.type.EthBool;
-import dev.klepto.kweb3.core.type.EthBytes;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBool;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 
 /**
  * Implementation of <a href="https://github.com/mds1/multicall">Multicall3</a> smart contract.

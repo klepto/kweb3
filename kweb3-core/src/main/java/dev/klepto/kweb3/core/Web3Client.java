@@ -6,13 +6,13 @@ import dev.klepto.kweb3.core.contract.ContractProxies;
 import dev.klepto.kweb3.core.contract.Web3Contract;
 import dev.klepto.kweb3.core.ethereum.EthereumClient;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
-import dev.klepto.kweb3.core.type.EthAddress;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 
 /**
  * Web3Client implementation.

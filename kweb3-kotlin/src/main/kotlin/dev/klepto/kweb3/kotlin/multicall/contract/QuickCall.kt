@@ -2,11 +2,11 @@ package dev.klepto.kweb3.kotlin.multicall.contract
 
 import dev.klepto.kweb3.core.contract.annotation.View
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer
-import dev.klepto.kweb3.core.type.EthAddress
-import dev.klepto.kweb3.core.type.EthArray
-import dev.klepto.kweb3.core.type.EthArray.array
-import dev.klepto.kweb3.core.type.EthBytes
-import dev.klepto.kweb3.core.type.EthUint
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint
 import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
 
 /**

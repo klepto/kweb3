@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.contract;
 
-import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
 import dev.klepto.unreflect.UnreflectType;
 import org.jetbrains.annotations.NotNull;
 

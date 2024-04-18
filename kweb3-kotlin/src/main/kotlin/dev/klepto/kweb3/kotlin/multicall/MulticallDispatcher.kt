@@ -3,8 +3,8 @@ package dev.klepto.kweb3.kotlin.multicall
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.DefaultContractExecutor
-import dev.klepto.kweb3.core.type.EthBytes
-import dev.klepto.kweb3.core.type.EthValue
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
+import dev.klepto.kweb3.core.ethereum.type.EthValue
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 import dev.klepto.kweb3.kotlin.CoroutineWeb3Client

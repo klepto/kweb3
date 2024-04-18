@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.contract.event;
 
-import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.unreflect.FieldAccess;
 import dev.klepto.unreflect.UnreflectType;
 import org.jetbrains.annotations.NotNull;

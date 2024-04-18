@@ -1,7 +1,7 @@
-package dev.klepto.kweb3.core.abi;
+package dev.klepto.kweb3.core.ethereum.abi;
 
-import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor;
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import org.jetbrains.annotations.NotNull;
 
 /**

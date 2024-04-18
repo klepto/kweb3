@@ -1,13 +1,13 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
 import dev.klepto.kweb3.core.contract.annotation.Transaction;
 import dev.klepto.kweb3.core.contract.annotation.View;
 import dev.klepto.kweb3.core.contract.type.EthStructContainer;
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.Unreflect;
 import dev.klepto.unreflect.UnreflectType;

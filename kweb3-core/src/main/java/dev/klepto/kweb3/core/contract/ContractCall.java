@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.contract;
 
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.val;
 
 import java.util.Arrays;

@@ -4,9 +4,9 @@ import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.contract.Web3Contract;
 import dev.klepto.kweb3.core.contract.annotation.ValueSize;
 import dev.klepto.kweb3.core.contract.annotation.View;
-import dev.klepto.kweb3.core.type.EthAddress;
-import dev.klepto.kweb3.core.type.EthString;
-import dev.klepto.kweb3.core.type.EthUint;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthString;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 
 /**
  * Implementation of ERC-20 standard and commonly available functions of ERC-20 tokens.

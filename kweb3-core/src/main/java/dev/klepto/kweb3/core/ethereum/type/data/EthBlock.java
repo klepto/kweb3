@@ -1,8 +1,8 @@
-package dev.klepto.kweb3.core.ethereum.type;
+package dev.klepto.kweb3.core.ethereum.type.data;
 
-import dev.klepto.kweb3.core.type.EthAddress;
-import dev.klepto.kweb3.core.type.EthBytes;
-import dev.klepto.kweb3.core.type.EthUint;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,9 +1,9 @@
-package dev.klepto.kweb3.core.abi.descriptor;
+package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
-import dev.klepto.kweb3.core.type.EthAddress;
-import dev.klepto.kweb3.core.type.EthBool;
-import dev.klepto.kweb3.core.type.EthString;
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBool;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthString;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
 import lombok.val;
@@ -14,9 +14,9 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * An ABI type descriptor for a simple ethereum data type.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
- * @see dev.klepto.kweb3.core.type.EthAddress
- * @see dev.klepto.kweb3.core.type.EthString
- * @see dev.klepto.kweb3.core.type.EthBool
+ * @see EthAddress
+ * @see EthString
+ * @see EthBool
  */
 @With
 public record EthTypeDescriptor(UnreflectType type) implements TypeDescriptor {

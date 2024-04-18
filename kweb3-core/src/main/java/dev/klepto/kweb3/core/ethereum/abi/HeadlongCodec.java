@@ -1,14 +1,17 @@
-package dev.klepto.kweb3.core.abi;
+package dev.klepto.kweb3.core.ethereum.abi;
 
 import com.esaulpaugh.headlong.abi.Address;
 import com.esaulpaugh.headlong.abi.Tuple;
 import com.esaulpaugh.headlong.abi.TupleType;
 import com.esaulpaugh.headlong.util.FastHex;
-import dev.klepto.kweb3.core.abi.descriptor.EthArrayTypeDescriptor;
-import dev.klepto.kweb3.core.abi.descriptor.EthSizedTypeDescriptor;
-import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
-import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor;
-import dev.klepto.kweb3.core.type.*;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthArrayTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthSizedTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
+import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.*;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,14 +20,14 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
-import static dev.klepto.kweb3.core.type.EthArray.array;
-import static dev.klepto.kweb3.core.type.EthBool.bool;
-import static dev.klepto.kweb3.core.type.EthBytes.bytes;
-import static dev.klepto.kweb3.core.type.EthInt.int256;
-import static dev.klepto.kweb3.core.type.EthString.string;
-import static dev.klepto.kweb3.core.type.EthTuple.tuple;
-import static dev.klepto.kweb3.core.type.EthUint.uint256;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBool.bool;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthInt.int256;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthString.string;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple.tuple;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
 import static dev.klepto.kweb3.core.util.Collections.arrayCast;
 import static dev.klepto.kweb3.core.util.Hex.toByteArray;
 

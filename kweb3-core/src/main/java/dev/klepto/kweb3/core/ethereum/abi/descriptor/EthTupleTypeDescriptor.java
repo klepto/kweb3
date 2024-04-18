@@ -1,7 +1,7 @@
-package dev.klepto.kweb3.core.abi.descriptor;
+package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.type.EthTuple;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
 import lombok.val;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * An ABI type descriptor for {@link EthTuple} ethereum data type.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
- * @see dev.klepto.kweb3.core.type.EthTuple
+ * @see EthTuple
  */
 @With
 public record EthTupleTypeDescriptor(ImmutableList<TypeDescriptor> children) implements TypeDescriptor {

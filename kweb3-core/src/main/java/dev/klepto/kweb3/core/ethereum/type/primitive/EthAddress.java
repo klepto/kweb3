@@ -1,6 +1,8 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type.primitive;
 
 import com.google.common.base.Strings;
+import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.util.Hex;
 import dev.klepto.kweb3.core.util.hash.Keccak256;
 import lombok.With;

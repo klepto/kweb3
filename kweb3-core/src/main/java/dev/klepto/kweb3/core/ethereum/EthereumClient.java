@@ -5,8 +5,8 @@ import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.api.EthGetBlock;
-import dev.klepto.kweb3.core.ethereum.type.EthBlock;
-import dev.klepto.kweb3.core.type.EthUint;
+import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.val;
 
 import java.util.Arrays;
@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
-import static dev.klepto.kweb3.core.type.EthBytes.bytes;
-import static dev.klepto.kweb3.core.type.EthUint.uint256;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
 
 /**
  * A client for interacting with a blockchain metadata related RPC methods.

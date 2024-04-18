@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type;
 
 import lombok.val;
 import org.jetbrains.annotations.NotNull;

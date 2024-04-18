@@ -3,13 +3,15 @@ package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.abi.descriptor.*;
 import dev.klepto.kweb3.core.contract.annotation.ArraySize;
 import dev.klepto.kweb3.core.contract.annotation.ValueSize;
 import dev.klepto.kweb3.core.contract.type.EthStructContainer;
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
 import dev.klepto.kweb3.core.contract.type.EthVoid;
-import dev.klepto.kweb3.core.type.*;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.*;
+import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.*;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.ParameterAccess;
 import dev.klepto.unreflect.UnreflectType;
@@ -20,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static dev.klepto.kweb3.core.type.EthArray.array;
-import static dev.klepto.kweb3.core.type.EthTuple.tuple;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple.tuple;
 import static dev.klepto.kweb3.core.util.Conditions.require;
 import static dev.klepto.unreflect.Unreflect.reflect;
 

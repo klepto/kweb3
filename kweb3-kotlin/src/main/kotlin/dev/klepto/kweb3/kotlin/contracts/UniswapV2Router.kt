@@ -2,9 +2,9 @@ package dev.klepto.kweb3.kotlin.contracts
 
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.annotation.View
-import dev.klepto.kweb3.core.type.EthAddress
-import dev.klepto.kweb3.core.type.EthArray
-import dev.klepto.kweb3.core.type.EthUint
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint
 
 /**
  * Implementation of Uniswap V2 router smart contract.

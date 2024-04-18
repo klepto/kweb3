@@ -1,12 +1,12 @@
 package dev.klepto.kweb3.core.contract.type;
 
-import dev.klepto.kweb3.core.abi.HeadlongCodec;
+import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.contract.ContractCodec;
-import dev.klepto.kweb3.core.type.EthBytes;
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.val;
 
-import static dev.klepto.kweb3.core.type.EthBytes.bytes;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
 
 /**
  * Marks any JVM class as a tuple container. A tuple container is a class that <b>only</b> consists of fields dedicated

@@ -1,6 +1,8 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type.primitive;
 
 import com.google.common.collect.ImmutableList;
+import dev.klepto.kweb3.core.ethereum.type.EthCollectionValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;

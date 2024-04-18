@@ -2,7 +2,7 @@ package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Client;
 import dev.klepto.kweb3.core.Web3Error;
-import dev.klepto.kweb3.core.type.EthAddress;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

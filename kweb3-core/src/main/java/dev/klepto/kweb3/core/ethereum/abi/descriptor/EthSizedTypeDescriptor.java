@@ -1,9 +1,9 @@
-package dev.klepto.kweb3.core.abi.descriptor;
+package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
-import dev.klepto.kweb3.core.type.EthBytes;
-import dev.klepto.kweb3.core.type.EthInt;
-import dev.klepto.kweb3.core.type.EthSizedValue;
-import dev.klepto.kweb3.core.type.EthUint;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthInt;
+import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
 import lombok.val;
@@ -14,9 +14,9 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  * An ABI type descriptor for a sized ethereum data type.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
- * @see dev.klepto.kweb3.core.type.EthBytes
- * @see dev.klepto.kweb3.core.type.EthInt
- * @see dev.klepto.kweb3.core.type.EthUint
+ * @see EthBytes
+ * @see EthInt
+ * @see EthUint
  */
 @With
 public record EthSizedTypeDescriptor(UnreflectType type, int valueSize) implements TypeDescriptor {

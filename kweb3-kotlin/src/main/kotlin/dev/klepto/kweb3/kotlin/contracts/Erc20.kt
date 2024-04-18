@@ -3,9 +3,9 @@ package dev.klepto.kweb3.kotlin.contracts
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.annotation.ValueSize
 import dev.klepto.kweb3.core.contract.annotation.View
-import dev.klepto.kweb3.core.type.EthAddress
-import dev.klepto.kweb3.core.type.EthString
-import dev.klepto.kweb3.core.type.EthUint
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthString
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint
 
 /**
  * Suspending implementation of ERC-20 standard and commonly available

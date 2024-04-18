@@ -1,6 +1,6 @@
-package dev.klepto.kweb3.core.abi.descriptor;
+package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
-import dev.klepto.kweb3.core.type.EthArray;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
 import lombok.val;
@@ -9,7 +9,7 @@ import lombok.val;
  * An ABI type descriptor for {@link EthArray} ethereum data type.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
- * @see dev.klepto.kweb3.core.type.EthArray
+ * @see EthArray
  */
 @With
 public record EthArrayTypeDescriptor(TypeDescriptor descriptor, int arraySize) implements TypeDescriptor {

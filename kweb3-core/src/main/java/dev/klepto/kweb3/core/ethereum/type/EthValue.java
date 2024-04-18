@@ -1,5 +1,6 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type;
 
+import dev.klepto.kweb3.core.ethereum.type.primitive.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

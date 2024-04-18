@@ -1,5 +1,8 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type.primitive;
 
+import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
+import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.util.Hex;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;

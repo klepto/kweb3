@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.abi;
+package dev.klepto.kweb3.core.ethereum.abi;
 
 /**
  * Represents a codec combining {@link AbiDecoder} and {@link AbiEncoder} behavior.

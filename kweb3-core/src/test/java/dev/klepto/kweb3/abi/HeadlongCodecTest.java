@@ -1,26 +1,26 @@
 package dev.klepto.kweb3.abi;
 
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.abi.AbiCodec;
-import dev.klepto.kweb3.core.abi.HeadlongCodec;
-import dev.klepto.kweb3.core.abi.descriptor.EthArrayTypeDescriptor;
-import dev.klepto.kweb3.core.abi.descriptor.EthSizedTypeDescriptor;
-import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
-import dev.klepto.kweb3.core.abi.descriptor.EthTypeDescriptor;
-import dev.klepto.kweb3.core.type.*;
+import dev.klepto.kweb3.core.ethereum.abi.AbiCodec;
+import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthArrayTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthSizedTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.type.primitive.*;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static dev.klepto.kweb3.core.type.EthAddress.address;
-import static dev.klepto.kweb3.core.type.EthArray.array;
-import static dev.klepto.kweb3.core.type.EthBool.bool;
-import static dev.klepto.kweb3.core.type.EthBytes.bytes;
-import static dev.klepto.kweb3.core.type.EthInt.*;
-import static dev.klepto.kweb3.core.type.EthString.string;
-import static dev.klepto.kweb3.core.type.EthTuple.tuple;
-import static dev.klepto.kweb3.core.type.EthUint.uint256;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBool.bool;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthInt.*;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthString.string;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple.tuple;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

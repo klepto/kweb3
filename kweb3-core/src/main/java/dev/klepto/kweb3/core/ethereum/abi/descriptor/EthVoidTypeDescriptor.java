@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.abi.descriptor;
+package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
 import dev.klepto.kweb3.core.contract.type.EthVoid;
 import dev.klepto.unreflect.UnreflectType;

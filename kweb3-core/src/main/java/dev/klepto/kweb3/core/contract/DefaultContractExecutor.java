@@ -1,12 +1,12 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.abi.AbiCodec;
-import dev.klepto.kweb3.core.abi.HeadlongCodec;
-import dev.klepto.kweb3.core.abi.descriptor.EthTupleTypeDescriptor;
+import dev.klepto.kweb3.core.ethereum.abi.AbiCodec;
+import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
 import dev.klepto.kweb3.core.contract.type.EthVoid;
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.val;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;

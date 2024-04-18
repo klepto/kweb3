@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.contract.type;
 
-import dev.klepto.kweb3.core.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.val;
 
@@ -21,7 +21,7 @@ public class EthVoid implements EthValue {
         if (type.matches(EthVoid.class)) {
             return true;
         }
-        
+
         val name = type.name();
         return name.equals("void")
                 || name.equals("java.lang.Void")

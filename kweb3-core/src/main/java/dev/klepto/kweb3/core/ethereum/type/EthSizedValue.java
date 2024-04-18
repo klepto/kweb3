@@ -1,4 +1,8 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type;
+
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthInt;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 
 /**
  * Represents an ethereum data type contains size parameter. Shared between {@link EthUint}, {@link EthBytes} and

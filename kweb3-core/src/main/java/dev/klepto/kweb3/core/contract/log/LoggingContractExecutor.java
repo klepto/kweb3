@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static dev.klepto.kweb3.core.type.EthBytes.bytes;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
 
 /**
  * Implementation {@link ContractExecutor} that logs incoming requests and fails to complete a response. This executor

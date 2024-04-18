@@ -1,5 +1,7 @@
-package dev.klepto.kweb3.core.type;
+package dev.klepto.kweb3.core.ethereum.type;
 
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

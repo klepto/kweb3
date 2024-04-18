@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.kotlin
 
-import dev.klepto.kweb3.core.abi.descriptor.TypeDescriptor
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor
 import dev.klepto.kweb3.core.contract.ContractCodec
 import dev.klepto.kweb3.core.contract.DefaultContractParser
 import dev.klepto.kweb3.core.contract.annotation.ArraySize
@@ -48,11 +48,11 @@ class CoroutineContractParser : DefaultContractParser() {
         val kotlinFunction = method.kotlinFunction ?: return super.parseReturnTypeDescriptor(method)
         val type = UnreflectType.of(kotlinFunction.returnType.javaType)
         val valueSize = kotlinFunction.findAnnotations(ValueSize::class)
-                .map(ValueSize::value)
-                .getOrNull(0) ?: -1
+            .map(ValueSize::value)
+            .getOrNull(0) ?: -1
         val arraySize = kotlinFunction.findAnnotations(ArraySize::class)
-                .map(ArraySize::value)
-                .getOrNull(0) ?: -1
+            .map(ArraySize::value)
+            .getOrNull(0) ?: -1
         return ContractCodec.parseDescriptor(type, valueSize, arraySize)
     }
 

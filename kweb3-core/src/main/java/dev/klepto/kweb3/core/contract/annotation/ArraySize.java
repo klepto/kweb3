@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.contract.annotation;
 
-import dev.klepto.kweb3.core.type.EthArray;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

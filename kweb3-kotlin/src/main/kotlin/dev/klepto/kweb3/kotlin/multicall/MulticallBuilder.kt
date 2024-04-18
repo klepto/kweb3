@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.kotlin.multicall
 
-import dev.klepto.kweb3.core.type.EthValue
+import dev.klepto.kweb3.core.ethereum.type.EthValue
 
 /**
  * A type-bound builder for constructing a *multicall* request. This
