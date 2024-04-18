@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.rpc.io;
+package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

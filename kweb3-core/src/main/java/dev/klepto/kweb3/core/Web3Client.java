@@ -1,15 +1,18 @@
 package dev.klepto.kweb3.core;
 
-import dev.klepto.kweb3.core.blockchain.BlockchainClient;
-import dev.klepto.kweb3.core.config.Web3Network;
+import dev.klepto.kweb3.core.chain.Web3Chain;
+import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.contract.ContractProxies;
 import dev.klepto.kweb3.core.contract.Web3Contract;
-import dev.klepto.kweb3.core.rpc.RpcClient;
+import dev.klepto.kweb3.core.ethereum.EthereumClient;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
 import dev.klepto.kweb3.core.type.EthAddress;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
+import java.util.Arrays;
+import java.util.List;
 
 import static dev.klepto.kweb3.core.type.EthAddress.address;
 
@@ -21,21 +24,23 @@ import static dev.klepto.kweb3.core.type.EthAddress.address;
 @Getter
 public class Web3Client implements Closeable {
 
-    private final Web3Network network;
+    private final Web3Chain chain;
+    private final List<Web3Endpoint> endpoints;
     private final RpcClient rpc;
-    private final BlockchainClient blockchain;
+    private final EthereumClient ethereum;
     private final ContractProxies contracts;
     private final EthAddress address;
 
     /**
-     * Creates a new Web3Client instance with a given network configuration.
+     * Creates a new client instance for the given endpoints.
      *
-     * @param network the network configuration
+     * @param endpoints the endpoints this client connects to
      */
-    public Web3Client(@NotNull Web3Network network) {
-        this.network = network;
-        this.rpc = new RpcClient(network);
-        this.blockchain = new BlockchainClient(rpc);
+    public Web3Client(@NotNull Web3Endpoint... endpoints) {
+        this.chain = endpoints[0].chain();
+        this.endpoints = Arrays.asList(endpoints);
+        this.rpc = new RpcClient(this.endpoints);
+        this.ethereum = new EthereumClient(rpc);
         this.contracts = new ContractProxies(this);
         this.address = EthAddress.ZERO;
     }
@@ -71,5 +76,5 @@ public class Web3Client implements Closeable {
     public void close() {
         rpc.close();
     }
-    
+
 }

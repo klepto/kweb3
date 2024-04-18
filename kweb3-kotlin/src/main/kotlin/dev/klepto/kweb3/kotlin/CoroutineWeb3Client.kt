@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.kotlin
 
 import dev.klepto.kweb3.core.Web3Client
-import dev.klepto.kweb3.core.config.Web3Network
+import dev.klepto.kweb3.core.chain.Web3Endpoint
 import dev.klepto.kweb3.core.contract.log.ContractCallLog
 import kotlinx.coroutines.*
 
@@ -12,8 +12,8 @@ import kotlinx.coroutines.*
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 class CoroutineWeb3Client(
-    network: Web3Network,
-) : Web3Client(network) {
+    vararg endpoints: Web3Endpoint,
+) : Web3Client(*endpoints) {
     init {
         contracts.executor = CoroutineContractExecutor()
         contracts.parser = CoroutineContractParser()

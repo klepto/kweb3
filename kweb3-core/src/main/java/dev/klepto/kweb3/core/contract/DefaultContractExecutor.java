@@ -121,7 +121,7 @@ public class DefaultContractExecutor implements ContractExecutor {
                 message(
                         "No result for smart contract call. \nFunction: {}\nNetwork: {}",
                         call,
-                        call.proxy().getClient().getNetwork()
+                        call.proxy().getClient().getChain()
                 );
         require(result != null, noResultMessage);
         val descriptor = function.returnTuple()

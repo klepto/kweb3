@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.rpc.protocol;
+package dev.klepto.kweb3.core.ethereum.rpc.protocol;
 
 /**
  * Marker interface for JSON protocol message, implemented by {@link RpcResponse} and {@link RpcRequest}.

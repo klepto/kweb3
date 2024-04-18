@@ -1,8 +1,8 @@
-package dev.klepto.kweb3.core.rpc.protocol;
+package dev.klepto.kweb3.core.ethereum.rpc.protocol;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dev.klepto.kweb3.core.rpc.protocol.api.*;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.api.*;
 import lombok.val;
 
 public interface RpcProtocol extends

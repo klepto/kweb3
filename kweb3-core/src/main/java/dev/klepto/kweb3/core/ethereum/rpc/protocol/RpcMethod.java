@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.rpc.protocol;
+package dev.klepto.kweb3.core.ethereum.rpc.protocol;
 
 import dev.klepto.kweb3.core.Web3Result;
 import org.jetbrains.annotations.NotNull;

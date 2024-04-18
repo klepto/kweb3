@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Client;
-import dev.klepto.kweb3.core.config.Web3Network;
+import dev.klepto.kweb3.core.chain.Web3Chain;
 import dev.klepto.kweb3.core.type.EthAddress;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,12 +22,12 @@ public interface Web3Contract {
     Web3Client getClient();
 
     /**
-     * Returns the network that this smart contract is deployed on.
+     * Returns the chain that this smart contract is deployed on.
      *
-     * @return the network that this smart contract is deployed on
+     * @return the chain that this smart contract is deployed on
      */
-    default Web3Network getNetwork() {
-        return getClient().getNetwork();
+    default Web3Chain getChain() {
+        return getClient().getChain();
     }
 
     /**

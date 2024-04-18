@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.rpc.protocol;
+package dev.klepto.kweb3.core.ethereum.rpc.protocol;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

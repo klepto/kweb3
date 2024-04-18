@@ -87,7 +87,7 @@ public class ContractProxy implements InvocationHandler {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(client.getNetwork(), type, address);
+        return Objects.hash(client.getChain(), type, address);
     }
 
     /**
@@ -109,7 +109,7 @@ public class ContractProxy implements InvocationHandler {
 
         return Objects.equals(type, contract.getContractClass())
                 && Objects.equals(address, contract.getAddress())
-                && Objects.equals(client.getNetwork(), contract.getClient().getNetwork());
+                && Objects.equals(client.getChain(), contract.getClient().getChain());
     }
 
 }

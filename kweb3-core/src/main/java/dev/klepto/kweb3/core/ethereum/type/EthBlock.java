@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.blockchain;
+package dev.klepto.kweb3.core.ethereum.type;
 
 import dev.klepto.kweb3.core.type.EthAddress;
 import dev.klepto.kweb3.core.type.EthBytes;

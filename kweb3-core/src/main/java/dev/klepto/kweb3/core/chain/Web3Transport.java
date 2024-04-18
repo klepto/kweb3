@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.core.config;
+package dev.klepto.kweb3.core.chain;
 
 /**
  * Represents a transport type for web3 connections.
@@ -7,6 +7,6 @@ package dev.klepto.kweb3.core.config;
  */
 public enum Web3Transport {
 
-    WEBSOCKET, HTTP, IPC
+    HTTP, WEBSOCKET, IPC
 
 }

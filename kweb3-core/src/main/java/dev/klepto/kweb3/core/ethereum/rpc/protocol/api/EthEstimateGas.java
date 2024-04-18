@@ -1,22 +1,22 @@
-package dev.klepto.kweb3.core.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.rpc.protocol.RpcResponse;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Implementation of Ethereum RPC API <code>eth_call</code> method.
+ * Implementation of Ethereum RPC API <code>eth_estimateGas</code> method.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthCall extends RpcMethod {
+public interface EthEstimateGas extends RpcMethod {
 
     /**
-     * Executes a new message call immediately without creating a transaction on the blockchain.
+     * Returns an estimation of gas for a given transaction.
      *
      * @param from        the address from which the transaction is sent or null
      * @param to          the address to which the transaction is addressed
@@ -30,17 +30,17 @@ public interface EthCall extends RpcMethod {
      * @return the return value of the executed contract method
      */
     @NotNull
-    default Web3Result<String> ethCall(@Nullable String from,
-                                       @NotNull String to,
-                                       @Nullable Integer gas,
-                                       @Nullable String gasPrice,
-                                       @Nullable String value,
-                                       @NotNull String data,
-                                       @Nullable String blockNumber) {
+    default Web3Result<String> ethEstimateGas(@Nullable String from,
+                                              @NotNull String to,
+                                              @Nullable Integer gas,
+                                              @Nullable String gasPrice,
+                                              @Nullable String value,
+                                              @NotNull String data,
+                                              @Nullable String blockNumber) {
         blockNumber = blockNumber == null ? "latest" : blockNumber;
         val transaction = new TransactionParameter(from, to, gas, gasPrice, value, data);
         val request = new RpcRequest()
-                .withMethod("eth_call")
+                .withMethod("eth_estimateGas")
                 .withParams(transaction, blockNumber);
 
         return request(request)

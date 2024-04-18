@@ -1,10 +1,11 @@
-package dev.klepto.kweb3.core.blockchain;
+package dev.klepto.kweb3.core.ethereum;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.rpc.RpcClient;
-import dev.klepto.kweb3.core.rpc.protocol.RpcMessage;
-import dev.klepto.kweb3.core.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.rpc.protocol.api.EthGetBlock;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.api.EthGetBlock;
+import dev.klepto.kweb3.core.ethereum.type.EthBlock;
 import dev.klepto.kweb3.core.type.EthUint;
 import lombok.val;
 
@@ -23,7 +24,7 @@ import static dev.klepto.kweb3.core.type.EthUint.uint256;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class BlockchainClient {
+public class EthereumClient {
 
     private final RpcClient rpc;
     private final Map<String, Consumer> subscribers = new ConcurrentHashMap<>();
@@ -33,7 +34,7 @@ public class BlockchainClient {
      *
      * @param rpc the RPC client
      */
-    public BlockchainClient(RpcClient rpc) {
+    public EthereumClient(RpcClient rpc) {
         this.rpc = rpc;
         rpc.addCallback(this::onMessage);
     }
@@ -73,7 +74,7 @@ public class BlockchainClient {
         }
 
         val blockNumber = uint256(result.get("number").getAsString());
-        block(blockNumber).get(subscriber);
+        blockByNumber(blockNumber).get(subscriber);
     }
 
     /**
@@ -126,9 +127,9 @@ public class BlockchainClient {
      * @param blockNumber the block number
      * @return the block
      */
-    public Web3Result<EthBlock> block(EthUint blockNumber) {
+    public Web3Result<EthBlock> blockByNumber(EthUint blockNumber) {
         return rpc.ethGetBlockByNumber(blockNumber.toHex())
-                .map(BlockchainClient::parseBlockResponse);
+                .map(EthereumClient::parseBlockResponse);
     }
 
     /**
@@ -137,9 +138,9 @@ public class BlockchainClient {
      * @param blockHash the block hash
      * @return the block
      */
-    public Web3Result<EthBlock> block(String blockHash) {
+    public Web3Result<EthBlock> blockByHash(String blockHash) {
         return rpc.ethGetBlockByHash(blockHash)
-                .map(BlockchainClient::parseBlockResponse);
+                .map(EthereumClient::parseBlockResponse);
     }
 
     /**

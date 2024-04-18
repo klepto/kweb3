@@ -1,17 +1,16 @@
-package dev.klepto.kweb3.core.rpc;
+package dev.klepto.kweb3.core.ethereum.rpc;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.config.Web3Endpoint;
-import dev.klepto.kweb3.core.config.Web3Network;
-import dev.klepto.kweb3.core.config.Web3Transport;
-import dev.klepto.kweb3.core.rpc.io.RpcConnection;
-import dev.klepto.kweb3.core.rpc.io.WebsocketConnection;
-import dev.klepto.kweb3.core.rpc.protocol.RpcMessage;
-import dev.klepto.kweb3.core.rpc.protocol.RpcProtocol;
-import dev.klepto.kweb3.core.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.rpc.protocol.RpcResponse;
+import dev.klepto.kweb3.core.chain.Web3Endpoint;
+import dev.klepto.kweb3.core.chain.Web3Transport;
+import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
+import dev.klepto.kweb3.core.ethereum.rpc.io.WebsocketConnection;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcProtocol;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -38,7 +38,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
 @RequiredArgsConstructor
 public class RpcClient implements Closeable, RpcProtocol {
 
-    private final Web3Network network;
+    private final List<Web3Endpoint> endpoints;
     private final AtomicReference<Web3Endpoint> endpoint = new AtomicReference<>();
     private final AtomicReference<RpcConnection> connection = new AtomicReference<>();
 
@@ -100,7 +100,6 @@ public class RpcClient implements Closeable, RpcProtocol {
      */
     @Synchronized
     public void selectNextEndpoint() {
-        val endpoints = network.endpoints();
         require(!endpoints.isEmpty(), "No endpoints available");
 
         val index = endpoints.indexOf(endpoint.get());
@@ -119,7 +118,7 @@ public class RpcClient implements Closeable, RpcProtocol {
      */
     @Synchronized
     public void send(RpcRequest request) {
-        val cooldown = endpoint().requestCooldown();
+        val cooldown = endpoint().settings().requestCooldown();
         executor.submit(() -> {
             try {
                 connection().send(request.serialize());
