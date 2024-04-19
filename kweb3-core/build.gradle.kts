@@ -8,6 +8,7 @@ dependencies {
     implementation(libs.headlong)
     implementation(libs.java.websocket)
     implementation(libs.bundles.slf4j)
+    implementation(libs.okhttp3)
     implementation(libs.resilience4j)
 
     testImplementation(platform(libs.junit.bom))
