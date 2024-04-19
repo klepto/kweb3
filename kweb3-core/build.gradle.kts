@@ -8,8 +8,8 @@ dependencies {
     implementation(libs.headlong)
     implementation(libs.java.websocket)
     implementation(libs.bundles.slf4j)
-    implementation(libs.okhttp3)
-    implementation(libs.resilience4j)
+    implementation(libs.unirest.core)
+    implementation(libs.unirest.gson)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

@@ -4,6 +4,8 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
+import dev.klepto.kweb3.core.chain.Web3Transport;
+import dev.klepto.kweb3.core.ethereum.rpc.io.HttpConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.WebsocketConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
@@ -24,6 +26,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
  * Implementation of Ethereum RPC API client.
@@ -71,7 +75,16 @@ public class RpcClient implements Closeable, RpcProtocol {
             return current;
         }
 
-        val next = new WebsocketConnection(endpoint().url());
+        val endpoint = endpoint();
+        require(endpoint != null, "No available endpoints to connect to.");
+        val transport = endpoint.transport();
+        require(transport == Web3Transport.HTTP || transport == Web3Transport.WEBSOCKET,
+                "Unsupported transport type: {}", transport);
+        
+        val next = transport == Web3Transport.WEBSOCKET
+                ? new WebsocketConnection(endpoint.url())
+                : new HttpConnection(endpoint.url());
+
         next.setMessageCallback(this::onMessage);
         next.setErrorCallback(this::onError);
         next.setCloseCallback(this::onClose);

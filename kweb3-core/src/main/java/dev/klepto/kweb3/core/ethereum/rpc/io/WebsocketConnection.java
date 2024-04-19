@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.function.Consumer;
 
 /**
- * Implementation of single-use {@link WebSocketClient}.
+ * Implementation of single-use {@link WebSocketClient} for RPC communications.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
