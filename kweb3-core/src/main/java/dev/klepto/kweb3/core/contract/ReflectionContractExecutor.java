@@ -1,11 +1,11 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Result;
+import dev.klepto.kweb3.core.contract.annotation.Cost;
+import dev.klepto.kweb3.core.contract.type.EthVoid;
 import dev.klepto.kweb3.core.ethereum.abi.AbiCodec;
 import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
-import dev.klepto.kweb3.core.contract.annotation.Cost;
-import dev.klepto.kweb3.core.contract.type.EthVoid;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.val;
 import one.util.streamex.StreamEx;
@@ -24,7 +24,7 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class DefaultContractExecutor implements ContractExecutor {
+public class ReflectionContractExecutor implements ContractExecutor {
 
     /**
      * The default codec implementation.
@@ -93,13 +93,9 @@ public class DefaultContractExecutor implements ContractExecutor {
      */
     @Override
     public @NotNull Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result) {
-        // For asynchronous signature, map future web3 result for decoding.
-        if (call.function().method().type().matchesExact(Web3Result.class)) {
-            return result.map(value -> decodeResult(call, value)).error(Throwable::printStackTrace);
-        }
-
-        // For blocking signature, wait for result and decode.
-        return decodeResult(call, result.get());
+        return result
+                .map(value -> decodeResult(call, value))
+                .error(Throwable::printStackTrace);
     }
 
     /**

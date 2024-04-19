@@ -1,10 +1,10 @@
 package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
 import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
-import dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.val;
 

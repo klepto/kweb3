@@ -23,9 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class ContractProxy implements InvocationHandler {
 
-    private final ContractProxies contracts;
-    private final Class<? extends Web3Contract> type;
     private final Web3Client client;
+    private final Class<? extends Web3Contract> type;
     private final EthAddress address;
     private final Map<Object, Object> attributes = new ConcurrentHashMap<>();
 
@@ -70,10 +69,10 @@ public class ContractProxy implements InvocationHandler {
             case "getProxy":
                 return this;
             default:
-                val function = contracts.getParser().parseFunction(method);
+                val function = client.getContracts().getParser().parseFunction(method);
                 val call = new ContractCall(this, function, args);
                 try {
-                    return contracts.getExecutor().execute(call);
+                    return client.getContracts().getExecutor().execute(call);
                 } catch (Throwable throwable) {
                     throw Web3Error.unwrap(throwable);
                 }

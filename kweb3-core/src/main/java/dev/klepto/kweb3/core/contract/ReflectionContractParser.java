@@ -1,12 +1,12 @@
 package dev.klepto.kweb3.core.contract;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.core.contract.annotation.Cost;
 import dev.klepto.kweb3.core.contract.annotation.Transaction;
 import dev.klepto.kweb3.core.contract.annotation.View;
 import dev.klepto.kweb3.core.contract.type.EthStructContainer;
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.unreflect.MethodAccess;
 import dev.klepto.unreflect.Unreflect;
@@ -29,7 +29,7 @@ import static dev.klepto.unreflect.Unreflect.reflect;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class DefaultContractParser implements ContractParser {
+public class ReflectionContractParser implements ContractParser {
 
     private final Map<Method, ContractFunction> cache = new ConcurrentHashMap<>();
 
@@ -103,12 +103,10 @@ public class DefaultContractParser implements ContractParser {
     @Override
     public @NotNull UnreflectType parseReturnType(@NotNull Method method) {
         val type = UnreflectType.of(method);
-        if (type.matchesExact(Web3Result.class)) {
-            val genericType = type.genericType();
-            require(genericType != null, "Could not infer generic type of Web3Result.");
-            return genericType;
-        }
-        return type;
+        require(type.matchesExact(Web3Result.class), "Contract method must return Web3Result.");
+        val genericType = type.genericType();
+        require(genericType != null, "Could not infer generic type of Web3Result.");
+        return genericType;
     }
 
     /**

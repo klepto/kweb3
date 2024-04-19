@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a contract executor. This interface is used to enable different implementations of contract proxy
  * execution to fit API user's needs, such as implementing asynchronous execution with virtual threads or coroutines,
- * custom error handling, request logging, etc. For default implementation, see {@link DefaultContractExecutor}.
+ * custom error handling, request logging, etc. For default implementation, see {@link ReflectionContractExecutor}.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */

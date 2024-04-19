@@ -1,9 +1,9 @@
 package dev.klepto.kweb3.core.contract.annotation;
 
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthInt;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
-import dev.klepto.kweb3.core.ethereum.type.EthValue;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

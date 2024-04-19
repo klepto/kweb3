@@ -1,9 +1,9 @@
 package dev.klepto.kweb3.core.contract.type;
 
-import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.contract.ContractCodec;
-import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
+import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
 import lombok.val;
 
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;

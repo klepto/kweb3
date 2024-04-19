@@ -1,14 +1,17 @@
 package dev.klepto.kweb3.core.ethereum;
 
 import dev.klepto.kweb3.core.Web3Result;
+import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
 import dev.klepto.kweb3.core.ethereum.rpc.protocol.api.EthGetBlock;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
+import lombok.Getter;
 import lombok.val;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,18 +27,18 @@ import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class EthereumClient {
+public class EthereumClient implements Closeable {
 
-    private final RpcClient rpc;
+    private final @Getter RpcClient rpc;
     private final Map<String, Consumer> subscribers = new ConcurrentHashMap<>();
 
     /**
-     * Creates a new BlockchainClient instance for a given RPC client.
+     * Creates a new ethereum client that connects to given RPC endpoints.
      *
-     * @param rpc the RPC client
+     * @param endpoints the RPC endpoints
      */
-    public EthereumClient(RpcClient rpc) {
-        this.rpc = rpc;
+    public EthereumClient(Web3Endpoint... endpoints) {
+        this.rpc = new RpcClient(endpoints);
         rpc.addCallback(this::onMessage);
     }
 
@@ -173,6 +176,14 @@ public class EthereumClient {
                 response.transactionsRoot(),
                 Arrays.asList(response.uncles())
         );
+    }
+
+    /**
+     * Closes the ethereum client and releases all resources.
+     */
+    @Override
+    public void close() {
+        rpc.close();
     }
 
 }

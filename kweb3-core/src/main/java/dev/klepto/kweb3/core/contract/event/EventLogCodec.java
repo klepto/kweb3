@@ -1,8 +1,8 @@
 package dev.klepto.kweb3.core.contract.event;
 
+import dev.klepto.kweb3.core.contract.ContractCodec;
 import dev.klepto.kweb3.core.ethereum.abi.AbiCodec;
 import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
-import dev.klepto.kweb3.core.contract.ContractCodec;
 import dev.klepto.unreflect.ClassAccess;
 import dev.klepto.unreflect.Unreflect;
 import lombok.val;

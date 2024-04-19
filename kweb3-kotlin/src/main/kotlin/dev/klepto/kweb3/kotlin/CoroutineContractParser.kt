@@ -1,10 +1,10 @@
 package dev.klepto.kweb3.kotlin
 
-import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor
 import dev.klepto.kweb3.core.contract.ContractCodec
-import dev.klepto.kweb3.core.contract.DefaultContractParser
+import dev.klepto.kweb3.core.contract.ReflectionContractParser
 import dev.klepto.kweb3.core.contract.annotation.ArraySize
 import dev.klepto.kweb3.core.contract.annotation.ValueSize
+import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor
 import dev.klepto.unreflect.UnreflectType
 import java.lang.reflect.Method
 import kotlin.reflect.full.findAnnotations
@@ -17,7 +17,7 @@ import kotlin.reflect.jvm.kotlinFunction
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class CoroutineContractParser : DefaultContractParser() {
+class CoroutineContractParser : ReflectionContractParser() {
 
     /**
      * Parse return type using kotlin reflection. Using JVM reflection

@@ -2,9 +2,9 @@ package dev.klepto.kweb3.kotlin.multicall
 
 import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.contract.type.EthStructContainer
+import dev.klepto.kweb3.core.ethereum.type.EthValue
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
-import dev.klepto.kweb3.core.ethereum.type.EthValue
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 
 /**

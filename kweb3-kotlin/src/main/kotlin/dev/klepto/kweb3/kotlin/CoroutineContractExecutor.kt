@@ -4,12 +4,12 @@ import dev.klepto.kweb3.core.Web3Error
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
 import dev.klepto.kweb3.core.contract.ContractExecutor
-import dev.klepto.kweb3.core.contract.DefaultContractExecutor
+import dev.klepto.kweb3.core.contract.ReflectionContractExecutor
 import dev.klepto.kweb3.core.contract.log.LoggingContractExecutor
 import dev.klepto.kweb3.kotlin.ContractCallExtensions.continuation
 import dev.klepto.kweb3.kotlin.ContractCallExtensions.isSuspending
-import dev.klepto.kweb3.kotlin.Web3ResultExtensions.await
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.atomic.AtomicReference
@@ -21,7 +21,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class CoroutineContractExecutor : DefaultContractExecutor() {
+class CoroutineContractExecutor : ReflectionContractExecutor() {
     val mutex = Mutex(false)
     val mutexContext = AtomicReference<Any>()
     val interceptor = AtomicReference<ContractExecutor>()

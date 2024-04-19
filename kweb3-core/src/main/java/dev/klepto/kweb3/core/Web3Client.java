@@ -2,12 +2,12 @@ package dev.klepto.kweb3.core;
 
 import dev.klepto.kweb3.core.chain.Web3Chain;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
-import dev.klepto.kweb3.core.contract.ContractProxies;
+import dev.klepto.kweb3.core.contract.ContractProxyProvider;
 import dev.klepto.kweb3.core.contract.Web3Contract;
 import dev.klepto.kweb3.core.ethereum.EthereumClient;
-import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import lombok.Getter;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
@@ -22,10 +22,9 @@ import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 @Getter
 public class Web3Client implements Closeable {
 
-    private final RpcClient rpc;
-    private final EthereumClient ethereum;
-    private final ContractProxies contracts;
     private final EthAddress address;
+    private final @Delegate EthereumClient ethereum;
+    private final ContractProxyProvider contracts = new ContractProxyProvider(this);
 
     /**
      * Creates a new client instance for the given endpoints.
@@ -33,10 +32,8 @@ public class Web3Client implements Closeable {
      * @param endpoints the endpoints this client connects to
      */
     public Web3Client(@NotNull Web3Endpoint... endpoints) {
-        this.rpc = new RpcClient(endpoints);
-        this.ethereum = new EthereumClient(rpc);
-        this.contracts = new ContractProxies(this);
         this.address = EthAddress.ZERO;
+        this.ethereum = new EthereumClient(endpoints);
     }
 
     /**
@@ -45,7 +42,7 @@ public class Web3Client implements Closeable {
      * @return the current endpoint of the client
      */
     public Web3Endpoint getEndpoint() {
-        return rpc.endpoint();
+        return ethereum.getRpc().endpoint();
     }
 
     /**
@@ -86,7 +83,8 @@ public class Web3Client implements Closeable {
      */
     @Override
     public void close() {
-        rpc.close();
+        ethereum.close();
     }
+
 
 }

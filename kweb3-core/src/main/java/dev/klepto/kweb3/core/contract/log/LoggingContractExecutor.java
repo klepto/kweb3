@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.contract.ContractCall;
 import dev.klepto.kweb3.core.contract.ContractExecutor;
-import dev.klepto.kweb3.core.contract.DefaultContractExecutor;
+import dev.klepto.kweb3.core.contract.ReflectionContractExecutor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +20,7 @@ import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class LoggingContractExecutor extends DefaultContractExecutor {
+public class LoggingContractExecutor extends ReflectionContractExecutor {
 
     private final Queue<ContractCallLog> logs = new ConcurrentLinkedQueue<>();
 

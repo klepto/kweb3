@@ -1,9 +1,9 @@
 package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
+import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBool;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthString;
-import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.With;
 import lombok.val;
