@@ -50,7 +50,7 @@ public final class PublicNode {
     /**
      * BNB smart chain.
      */
-    public static final Web3Endpoint BSC = publicNodeEndpoint("ethereum",
+    public static final Web3Endpoint BSC = publicNodeEndpoint("bsc",
             Web3Chain.builder()
                     .name("BNB Smart Chain")
                     .chainId(56)
