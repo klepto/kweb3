@@ -3,6 +3,7 @@ package dev.klepto.kweb3.core.ethereum.type.primitive;
 import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.With;
+import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @With
-public class EthString implements EthValue {
+public class EthString implements EthValue, CharSequence {
 
     /**
      * Empty <code>ethereum string</code> constant.
@@ -23,7 +24,7 @@ public class EthString implements EthValue {
     public static final EthString EMPTY = string("");
 
     @NotNull
-    private final String value;
+    private final @Delegate String value;
 
     /**
      * Constructs new <code>ethereum string</code> with the specified value.
