@@ -32,6 +32,16 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
     T withValue(@NotNull BigInteger value);
 
     /**
+     * Returns true if this numeric value is equal to the specified number.
+     *
+     * @param number the number to compare
+     * @return true if this numeric value is equal to the specified number
+     */
+    default boolean equals(Number number) {
+        return compareTo(number) == 0;
+    }
+
+    /**
      * Compares this numeric value with another number value.
      *
      * @param other the other number value

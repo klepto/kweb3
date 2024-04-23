@@ -6,6 +6,7 @@ import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.util.Hex;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.Objects;
@@ -142,13 +143,25 @@ public class EthUint extends Number implements EthValue, EthNumericValue<EthUint
     }
 
     /**
+     * Arithmetic equals method for <code>ethereum uint</code> values.
+     *
+     * @param object the object to compare with
+     * @return true if the objects have the same value; false otherwise
+     */
+    public boolean equals(@Nullable Object object) {
+        if (object instanceof Number number) {
+            return equals(number);
+        }
+        return false;
+    }
+
+    /**
      * Compares this <code>ethereum uint</code> to the specified object.
      *
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    @Override
-    public boolean equals(Object object) {
+    public boolean matches(Object object) {
         if (object == null) {
             return false;
         }

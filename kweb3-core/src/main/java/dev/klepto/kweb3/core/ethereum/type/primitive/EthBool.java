@@ -89,12 +89,25 @@ public class EthBool implements EthValue, EthNumericValue<EthBool> {
     }
 
     /**
+     * Arithmetic equals method for <code>ethereum boolean</code> values.
+     *
+     * @param object the object to compare with
+     * @return true if the objects have the same value; false otherwise
+     */
+    public boolean equals(@Nullable Object object) {
+        if (object instanceof Number number) {
+            return equals(number);
+        }
+        return false;
+    }
+
+    /**
      * Compares this <code>ethereum bool</code> to the specified object.
      *
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    public boolean equals(@Nullable Object object) {
+    public boolean matches(@Nullable Object object) {
         if (object == null) {
             return false;
         }

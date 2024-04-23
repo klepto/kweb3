@@ -143,13 +143,25 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
     }
 
     /**
+     * Arithmetic equals method for <code>ethereum int</code> values.
+     *
+     * @param object the object to compare with
+     * @return true if the objects have the same value; false otherwise
+     */
+    public boolean equals(@Nullable Object object) {
+        if (object instanceof Number number) {
+            return equals(number);
+        }
+        return false;
+    }
+
+    /**
      * Compares this <code>ethereum int</code> to the specified object.
      *
      * @param object the object to compare with
      * @return true if the objects are the same; false otherwise
      */
-    @Override
-    public boolean equals(@Nullable Object object) {
+    public boolean matches(@Nullable Object object) {
         if (object == null) {
             return false;
         }
