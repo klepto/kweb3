@@ -1,12 +1,18 @@
 package dev.klepto.kweb3.core.ethereum.type.data;
 
+import dev.klepto.kweb3.core.ethereum.rpc.api.EthGetBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
+
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
 
 /**
  * A representation of a parsed <code>ethereum block</code> from one of the RPC endpoint methods.
@@ -60,4 +66,37 @@ public record EthBlock(
         @NotNull String transactionsRoot,
         @NotNull List<String> uncles
 ) {
+
+    /**
+     * Parses a {@link EthGetBlock.BlockResponse} into a {@link EthBlock}.
+     *
+     * @param response the block response to parse
+     * @return the parsed block
+     */
+    public static EthBlock parse(EthGetBlock.BlockResponse response) {
+        return new EthBlock(
+                uint256(response.baseFeePerGas()),
+                uint256(response.difficulty()),
+                bytes(response.extraData()),
+                uint256(response.gasLimit()),
+                uint256(response.gasUsed()),
+                response.hash(),
+                bytes(response.logsBloom()),
+                response.miner() == null ? null : address(response.miner()),
+                response.mixHash(),
+                response.nonce() == null ? null : uint256(response.nonce()),
+                uint256(response.number()),
+                response.parentHash(),
+                response.receiptsRoot(),
+                response.sha3Uncles(),
+                uint256(response.size()),
+                response.stateRoot(),
+                uint256(response.timestamp()),
+                uint256(response.totalDifficulty()),
+                Arrays.asList(response.transactions()),
+                response.transactionsRoot(),
+                Arrays.asList(response.uncles())
+        );
+    }
+
 }

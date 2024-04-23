@@ -90,7 +90,7 @@ public class Web3Result<T> implements CompletionStage<T> {
      * @param consumer the result consumer
      */
     @NotNull
-    public Web3Result<T> get(@NotNull Consumer<T> consumer) {
+    public Web3Result<@NotNull T> get(@NotNull Consumer<T> consumer) {
         val newStage = stage.whenComplete((result, error) -> {
             if (result != null) {
                 consumer.accept(result);
@@ -105,7 +105,7 @@ public class Web3Result<T> implements CompletionStage<T> {
      * @param consumer the result consumer
      */
     @NotNull
-    public Web3Result<T> error(@NotNull Consumer<Throwable> consumer) {
+    public Web3Result<@NotNull T> error(@NotNull Consumer<Throwable> consumer) {
         val newStage = stage.whenComplete((result, error) -> {
             if (error != null) {
                 consumer.accept(error);
@@ -121,7 +121,7 @@ public class Web3Result<T> implements CompletionStage<T> {
      * @return new Web3Result that will produce remapped result
      */
     @NotNull
-    public <R> Web3Result<R> map(@NotNull Function<T, R> mapper) {
+    public <R> Web3Result<@NotNull R> map(@NotNull Function<@NotNull T, @NotNull R> mapper) {
         val newStage = stage.thenApply(mapper);
         return new Web3Result<>(newStage);
     }
