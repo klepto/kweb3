@@ -41,7 +41,7 @@ public record Web3Endpoint(@NotNull Web3Chain chain,
         } else if (url.startsWith("ws://") || url.startsWith("wss://")) {
             return Web3Transport.WEBSOCKET;
         }
-        throw new Web3Error("Could infer transport type from URL: {}", url);
+        throw new Web3Error("Could not infer transport type from URL: {}", url);
     }
 
     /**
