@@ -44,7 +44,7 @@ public class RpcWsConnection extends RpcConnection {
      * @param message the message
      */
     @Override
-    public void send(String message) {
+    public void sendDirect(String message) {
         ensureOpen();
         client.send(message);
     }

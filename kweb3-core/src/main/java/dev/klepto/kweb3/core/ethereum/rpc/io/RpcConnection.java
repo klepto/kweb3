@@ -1,8 +1,10 @@
 package dev.klepto.kweb3.core.ethereum.rpc.io;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 
 import java.io.Closeable;
 import java.util.concurrent.Executors;
@@ -36,11 +38,27 @@ public abstract class RpcConnection implements Closeable {
     }
 
     /**
-     * Sends a message to the remote server.
+     * Asynchronously sends a message to the remote server.
      *
      * @param message the message
      */
-    abstract public void send(String message);
+    public void send(String message) {
+        getExecutor().submit(() -> {
+            sendDirect(message);
+            val cooldown = getEndpoint().settings().requestCooldown();
+            if (cooldown != null) {
+                Uninterruptibles.sleepUninterruptibly(cooldown);
+            }
+        });
+    }
+
+    /**
+     * Sends a message directly to the remote server, bypassing the internal executor. This method will not respect
+     * endpoint throttling constrains and may be blocking depending on the underlying implementation of the connection.
+     *
+     * @param message the message
+     */
+    public abstract void sendDirect(String message);
 
     /**
      * Closes the connection.

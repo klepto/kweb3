@@ -1,6 +1,5 @@
 package dev.klepto.kweb3.core.ethereum.rpc.io;
 
-import com.google.common.util.concurrent.Uninterruptibles;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import kong.unirest.core.Config;
 import kong.unirest.core.ContentType;
@@ -26,27 +25,12 @@ public class RpcHttpConnection extends RpcConnection {
     }
 
     /**
-     * Sends the message to the endpoint.
-     *
-     * @param message the message
-     */
-    @Override
-    public void send(String message) {
-        getExecutor().submit(() -> {
-            sendUnirest(message);
-            val cooldown = getEndpoint().settings().requestCooldown();
-            if (cooldown != null) {
-                Uninterruptibles.sleepUninterruptibly(cooldown);
-            }
-        });
-    }
-
-    /**
      * Sends the message to the endpoint using asynchronous {@link kong.unirest.core.Unirest} client.
      *
      * @param message the message
      */
-    private void sendUnirest(String message) {
+    @Override
+    public void sendDirect(String message) {
         val endpoint = getAuthorizedEndpoint();
         var request = unirest.post(endpoint.url())
                 .contentType(ContentType.APPLICATION_JSON)
