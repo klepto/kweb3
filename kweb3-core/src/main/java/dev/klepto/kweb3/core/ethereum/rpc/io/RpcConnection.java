@@ -1,5 +1,12 @@
 package dev.klepto.kweb3.core.ethereum.rpc.io;
 
+import dev.klepto.kweb3.core.chain.Web3Endpoint;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Closeable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -7,56 +14,73 @@ import java.util.function.Consumer;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface RpcConnection {
+public abstract class RpcConnection implements Closeable {
+
+    private final @Getter Web3Endpoint endpoint;
+    private final @Getter Web3Endpoint authorizedEndpoint;
+    private final @Getter ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private @Setter Consumer<String> messageCallback;
+    private @Setter Consumer<Throwable> errorCallback;
+    private @Setter Runnable closeCallback;
 
     /**
-     * Gets the URL of the remote server.
+     * Constructs a new {@link RpcConnection} for the specified endpoint.
      *
-     * @return the url
+     * @param endpoint the endpoint
      */
-    String url();
-
-    /**
-     * Connects to the remote server.
-     */
-    void open();
-
-    /**
-     * Closes the connection to the remote server.
-     */
-    void close();
-
-    /**
-     * Checks if the connection is currently open.
-     */
-    boolean isOpen();
+    public RpcConnection(Web3Endpoint endpoint) {
+        this.endpoint = endpoint;
+        this.authorizedEndpoint = endpoint.authorization() != null
+                ? endpoint.authorization().authorize(endpoint)
+                : endpoint;
+    }
 
     /**
      * Sends a message to the remote server.
      *
      * @param message the message
      */
-    void send(String message);
+    abstract public void send(String message);
 
     /**
-     * Sets the callback that gets called when a message is received from the remote server.
-     *
-     * @param messageCallback the message callback
+     * Closes the connection.
      */
-    void setMessageCallback(Consumer<String> messageCallback);
+    @Override
+    public void close() {
+        executor.shutdownNow();
+        onClose();
+    }
 
     /**
-     * Sets the callback that gets called when an error occurs.
-     *
-     * @param errorCallback the error callback
+     * Invoked when the connection is closed.
      */
-    void setErrorCallback(Consumer<Throwable> errorCallback);
+    public void onClose() {
+        if (closeCallback != null) {
+            closeCallback.run();
+        }
+    }
 
     /**
-     * Sets the callback that gets called after the connection is closed.
+     * Invoked when a message is received.
      *
-     * @param closeCallback the close callback
+     * @param message the message
      */
-    void setCloseCallback(Runnable closeCallback);
+    public void onMessage(String message) {
+        if (messageCallback != null) {
+            messageCallback.accept(message);
+        }
+    }
+
+    /**
+     * Invoked when an error occurs.
+     *
+     * @param error the error
+     */
+    public void onError(Throwable error) {
+        if (errorCallback != null) {
+            errorCallback.accept(error);
+        }
+    }
+
 
 }

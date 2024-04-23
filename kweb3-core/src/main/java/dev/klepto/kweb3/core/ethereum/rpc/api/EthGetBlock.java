@@ -1,8 +1,7 @@
-package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthGetBlock extends RpcMethod {
+public interface EthGetBlock extends RpcApi {
 
     /**
      * Returns information about a block by block number.
@@ -22,7 +21,7 @@ public interface EthGetBlock extends RpcMethod {
      */
     @NotNull
     default Web3Result<BlockResponse> ethGetBlockByNumber(String blockNumber) {
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_getBlockByNumber")
                 .withParams(blockNumber, false);
         return request(request)
@@ -37,7 +36,7 @@ public interface EthGetBlock extends RpcMethod {
      */
     @NotNull
     default Web3Result<BlockResponse> ethGetBlockByHash(@NotNull String blockHash) {
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_getBlockByHash")
                 .withParams(blockHash, false);
         return request(request)

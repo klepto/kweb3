@@ -1,9 +1,7 @@
-package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthGasPrice extends RpcMethod {
+public interface EthGasPrice extends RpcApi {
 
     /**
      * Returns the current gas price in wei.
@@ -21,10 +19,10 @@ public interface EthGasPrice extends RpcMethod {
      */
     @NotNull
     default Web3Result<String> ethGasPrice() {
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_gasPrice");
         return request(request)
-                .map(RpcResponse::resultAsString);
+                .map(RpcMessage.ResponseMessage::resultAsString);
     }
 
 }

@@ -3,9 +3,8 @@ package dev.klepto.kweb3.core.ethereum;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMessage;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.api.EthGetBlock;
+import dev.klepto.kweb3.core.ethereum.rpc.api.EthGetBlock;
+import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.Getter;
@@ -38,46 +37,7 @@ public class EthereumClient implements Closeable {
      * @param endpoints the RPC endpoints
      */
     public EthereumClient(Web3Endpoint... endpoints) {
-        this.rpc = new RpcClient(endpoints);
-        rpc.addCallback(this::onMessage);
-    }
-
-    /**
-     * Listens to received messages from RPC client and processes them notifying the appropriate subscribers.
-     *
-     * @param message the RPC message
-     */
-    private void onMessage(RpcMessage message) {
-        if (!(message instanceof RpcRequest request)) {
-            return;
-        }
-
-        if (!"eth_subscription".equals(request.method())) {
-            return;
-        }
-
-        if (!request.params().isJsonObject()) {
-            return;
-        }
-
-        val params = request.params().getAsJsonObject();
-        if (!params.has("subscription") || !params.has("result")) {
-            return;
-        }
-
-        val subscription = params.get("subscription").getAsString();
-        val subscriber = subscribers.get(subscription);
-        if (subscriber == null) {
-            return;
-        }
-
-        val result = params.get("result").getAsJsonObject();
-        if (!result.has("number")) {
-            return;
-        }
-
-        val blockNumber = uint256(result.get("number").getAsString());
-        blockByNumber(blockNumber).get(subscriber);
+        this.rpc = new RpcClient(new RpcConnectionProvider(Arrays.asList(endpoints)));
     }
 
     /**

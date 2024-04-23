@@ -1,9 +1,8 @@
-package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import com.google.common.reflect.TypeToken;
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +16,7 @@ import java.util.List;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthGetLogs extends RpcMethod {
+public interface EthGetLogs extends RpcApi {
 
     /**
      * Returns an array of all the logs matching the given filters. Note that available filters are endpoint dependent
@@ -37,7 +36,7 @@ public interface EthGetLogs extends RpcMethod {
                                                      @Nullable String[] topics,
                                                      @Nullable String blockHash) {
         val parameters = new Parameters(addresses, fromBlock, toBlock, topics, blockHash);
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_getLogs")
                 .withParams(parameters);
         return request(request)

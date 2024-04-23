@@ -1,9 +1,7 @@
-package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthCall extends RpcMethod {
+public interface EthCall extends RpcApi {
 
     /**
      * Executes a new message call immediately without creating a transaction on the blockchain.
@@ -39,12 +37,12 @@ public interface EthCall extends RpcMethod {
                                        @Nullable String blockNumber) {
         blockNumber = blockNumber == null ? "latest" : blockNumber;
         val transaction = new TransactionParameter(from, to, gas, gasPrice, value, data);
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_call")
                 .withParams(transaction, blockNumber);
 
         return request(request)
-                .map(RpcResponse::resultAsString);
+                .map(RpcMessage.ResponseMessage::resultAsString);
     }
 
     /**

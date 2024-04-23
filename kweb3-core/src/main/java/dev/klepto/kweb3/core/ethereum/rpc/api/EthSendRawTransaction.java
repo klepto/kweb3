@@ -1,9 +1,7 @@
-package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthSendRawTransaction extends RpcMethod {
+public interface EthSendRawTransaction extends RpcApi {
 
     /**
      * Submits a pre-signed transaction for broadcast to the Ethereum network.
@@ -22,12 +20,12 @@ public interface EthSendRawTransaction extends RpcMethod {
      */
     @NotNull
     default Web3Result<String> ethSendRawTransaction(@NotNull String data) {
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_sendRawTransaction")
                 .withParams(new TransactionParameter(data));
 
         return request(request)
-                .map(RpcResponse::resultAsString);
+                .map(RpcMessage.ResponseMessage::resultAsString);
     }
 
     /**

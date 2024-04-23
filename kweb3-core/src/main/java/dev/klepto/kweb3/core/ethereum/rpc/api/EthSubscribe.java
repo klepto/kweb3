@@ -1,9 +1,7 @@
-package dev.klepto.kweb3.core.ethereum.rpc.protocol.api;
+package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcMethod;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcRequest;
-import dev.klepto.kweb3.core.ethereum.rpc.protocol.RpcResponse;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +13,7 @@ import java.util.List;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthSubscribe extends RpcMethod {
+public interface EthSubscribe extends RpcApi {
 
     /**
      * Subscribes to specific events on the Ethereum network, such as new blocks, new pending transactions, or changes
@@ -35,11 +33,11 @@ public interface EthSubscribe extends RpcMethod {
                                             @Nullable String[] topics) {
         val hasParameters = address != null || topics != null;
         val parameters = hasParameters ? List.of(method, new Parameters(address, topics)) : method;
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_subscribe")
                 .withParams(parameters);
         return request(request)
-                .map(RpcResponse::resultAsString);
+                .map(RpcMessage.ResponseMessage::resultAsString);
     }
 
     /**
@@ -52,7 +50,7 @@ public interface EthSubscribe extends RpcMethod {
      */
     @NotNull
     default Web3Result<Boolean> ethUnsubscribe(@NotNull String subscriptionId) {
-        val request = new RpcRequest()
+        val request = new RpcMessage.RequestMessage()
                 .withMethod("eth_unsubscribe");
         return request(request)
                 .map(response -> response.resultAs(boolean.class));
