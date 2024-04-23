@@ -2,7 +2,6 @@ package dev.klepto.kweb3.kotlin.multicall
 
 import dev.klepto.kweb3.core.Web3Result
 import dev.klepto.kweb3.core.contract.ContractCall
-import dev.klepto.kweb3.core.contract.ReflectionContractExecutor
 import dev.klepto.kweb3.core.ethereum.type.EthValue
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
 import dev.klepto.kweb3.core.util.Hex
@@ -131,7 +130,7 @@ class MulticallDispatcher<T : EthValue>(
      *
      * @param value the value to be returned as a result
      */
-    private class ConstantResultInterceptor(private val value: String) : ReflectionContractExecutor() {
+    private class ConstantResultInterceptor(private val value: String) : CoroutineContractExecutor() {
         override fun request(call: ContractCall, data: String): Web3Result<String> {
             val result = Web3Result<String>()
             result.complete(value)

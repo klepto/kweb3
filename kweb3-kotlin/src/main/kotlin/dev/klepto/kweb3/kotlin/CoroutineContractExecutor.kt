@@ -21,7 +21,7 @@ import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class CoroutineContractExecutor : ReflectionContractExecutor() {
+open class CoroutineContractExecutor : ReflectionContractExecutor() {
     val mutex = Mutex(false)
     val mutexContext = AtomicReference<Any>()
     val interceptor = AtomicReference<ContractExecutor>()

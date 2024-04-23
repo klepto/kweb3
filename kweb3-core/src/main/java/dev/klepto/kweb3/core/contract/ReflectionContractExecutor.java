@@ -93,9 +93,7 @@ public class ReflectionContractExecutor implements ContractExecutor {
      */
     @Override
     public @NotNull Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result) {
-        return result
-                .map(value -> decodeResult(call, value))
-                .error(Throwable::printStackTrace);
+        return result.map(value -> decodeResult(call, value));
     }
 
     /**

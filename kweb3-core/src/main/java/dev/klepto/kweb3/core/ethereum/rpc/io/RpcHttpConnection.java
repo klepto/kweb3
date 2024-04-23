@@ -40,7 +40,7 @@ public class RpcHttpConnection extends RpcConnection {
         if (timeout != null) {
             request = request.connectTimeout((int) timeout.toMillis());
         }
-
+        
         request.asStringAsync().whenComplete((response, throwable) -> {
             if (response != null) {
                 onMessage(response.getBody());
