@@ -62,7 +62,7 @@ public class RpcConnectionProvider {
      * @param endpoint the endpoint
      * @return the connection
      */
-    private ScheduledRpcConnection createConnection(Web3Endpoint endpoint) {
+    private RpcConnection createConnection(Web3Endpoint endpoint) {
         val transport = endpoint.transport();
         require(transport == Web3Transport.WEBSOCKET
                         || transport == Web3Transport.HTTP,
