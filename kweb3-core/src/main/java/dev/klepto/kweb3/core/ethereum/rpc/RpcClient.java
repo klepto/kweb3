@@ -81,6 +81,7 @@ public class RpcClient implements Closeable, RpcProtocol {
      * @param throwable the error that occurred during the connection
      */
     private void onError(@NotNull Throwable throwable) {
+        requests.removeIf(request -> request.onError(this, throwable));
         connectionProvider.next();
     }
 

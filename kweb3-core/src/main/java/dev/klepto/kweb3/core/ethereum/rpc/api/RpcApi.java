@@ -87,6 +87,23 @@ public interface RpcApi {
             return true;
         }
 
+        /**
+         * Called when an error occurs while processing this request. Returns true if the request should be marked as
+         * completed.
+         *
+         * @param client the client that received the error
+         * @param error  the error that occurred
+         * @return true if error was a Web3Error, false otherwise
+         */
+        @Override
+        public boolean onError(@NotNull RpcClient client, @NotNull Throwable error) {
+            if (error instanceof Web3Error) {
+                result.completeExceptionally(error);
+                return true;
+            }
+            return false;
+        }
+
     }
 
 }

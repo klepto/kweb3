@@ -28,5 +28,14 @@ public interface RpcRequest {
      */
     boolean isComplete(@NotNull RpcClient client, @NotNull RpcMessage message);
 
+    /**
+     * Called when an error occurs while processing this request. Returns true if the request should be marked as
+     * completed.
+     *
+     * @param client the client that received the error
+     * @param error  the error that occurred
+     * @return true if this request should be marked as completed
+     */
+    boolean onError(@NotNull RpcClient client, @NotNull Throwable error);
 
 }
