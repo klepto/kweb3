@@ -152,6 +152,9 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
         if (object instanceof Number number) {
             return equals(number);
         }
+        if (object instanceof EthNumericValue<?> numeric) {
+            return equals(numeric.value());
+        }
         return false;
     }
 

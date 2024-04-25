@@ -99,6 +99,9 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
         if (object instanceof Number number) {
             return equals(number);
         }
+        if (object instanceof EthNumericValue<?> numeric) {
+            return equals(numeric.value());
+        }
         return false;
     }
 

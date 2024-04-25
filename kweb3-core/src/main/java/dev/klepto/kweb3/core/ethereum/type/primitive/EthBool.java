@@ -98,6 +98,9 @@ public class EthBool implements EthValue, EthNumericValue<EthBool> {
         if (object instanceof Number number) {
             return equals(number);
         }
+        if (object instanceof EthNumericValue<?> numeric) {
+            return equals(numeric.value());
+        }
         return false;
     }
 
