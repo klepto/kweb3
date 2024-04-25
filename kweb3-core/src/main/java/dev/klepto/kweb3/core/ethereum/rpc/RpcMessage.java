@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
+import static dev.klepto.kweb3.core.util.Conditions.require;
+
 /**
  * Marker interface for JSON protocol message, implemented by {@link RequestMessage} and {@link ResponseMessage}.
  *
@@ -55,7 +57,7 @@ public interface RpcMessage {
     }
 
     /**
-     * Encodes a JSON message into a string.
+     * Encodes a message into a string.
      *
      * @param request the request message to encode
      * @return a string representation of the request message
@@ -65,17 +67,47 @@ public interface RpcMessage {
     }
 
     /**
-     * Decodes a JSON message from a string.
+     * Encodes an array of messages into a string.
+     *
+     * @param requests the request messages to encode
+     * @return a string representation of the request messages
+     */
+    static String encode(RpcMessage[] requests) {
+        return GSON.toJson(requests);
+    }
+
+    /**
+     * Decodes an array of messages from a string.
      *
      * @param response the response string to decode
-     * @return a JSON message object
+     * @return a messages array
      */
-    static RpcMessage decode(String response) {
-        val object = GSON.fromJson(response, JsonObject.class);
-        if (object.has("method")) {
-            return GSON.fromJson(response, RequestMessage.class);
+    static RpcMessage[] decode(String response) {
+        val element = GSON.fromJson(response, JsonElement.class);
+        if (element.isJsonObject()) {
+            return new RpcMessage[]{decode(element.getAsJsonObject())};
         }
-        return GSON.fromJson(response, ResponseMessage.class);
+
+        require(element.isJsonArray(), "Response is not a valid JSON array.");
+        val array = element.getAsJsonArray();
+        val messages = new RpcMessage[array.size()];
+        for (int i = 0; i < array.size(); i++) {
+            messages[i] = decode(array.get(i).getAsJsonObject());
+        }
+        return messages;
+    }
+
+    /**
+     * Decodes a message from a JSON object.
+     *
+     * @param object the response object to decode
+     * @return an RPC message object
+     */
+    static RpcMessage decode(JsonObject object) {
+        if (object.has("method")) {
+            return GSON.fromJson(object, RequestMessage.class);
+        }
+        return GSON.fromJson(object, ResponseMessage.class);
     }
 
     /**

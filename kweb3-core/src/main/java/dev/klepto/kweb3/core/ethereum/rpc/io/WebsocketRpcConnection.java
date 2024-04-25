@@ -7,20 +7,20 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 
 /**
- * Implementation of {@link RpcConnection} for WebSocket connections.
+ * Implementation of {@link ScheduledRpcConnection} for WebSocket connections.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class RpcWsConnection extends RpcConnection {
+public class WebsocketRpcConnection extends ScheduledRpcConnection {
 
     private final Client client = new Client();
 
     /**
-     * Constructs new {@link RpcWsConnection} for the specified endpoint.
+     * Constructs new {@link WebsocketRpcConnection} for the specified endpoint.
      *
      * @param endpoint the endpoint
      */
-    public RpcWsConnection(Web3Endpoint endpoint) {
+    public WebsocketRpcConnection(Web3Endpoint endpoint) {
         super(endpoint);
     }
 
@@ -34,7 +34,7 @@ public class RpcWsConnection extends RpcConnection {
         try {
             client.connectBlocking();
         } catch (Throwable cause) {
-            onError(cause);
+            errorCallback(cause);
         }
     }
 
@@ -44,9 +44,14 @@ public class RpcWsConnection extends RpcConnection {
      * @param message the message
      */
     @Override
-    public void sendDirect(String message) {
+    public void send(String message) {
         ensureOpen();
-        client.send(message);
+
+        try {
+            client.send(message);
+        } catch (Throwable cause) {
+            errorCallback(cause);
+        }
     }
 
     /**
@@ -54,7 +59,7 @@ public class RpcWsConnection extends RpcConnection {
      */
     private class Client extends WebSocketClient {
         public Client() {
-            super(URI.create(getAuthorizedEndpoint().url()));
+            super(URI.create(authorizedEndpoint().url()));
         }
 
         /**
@@ -73,7 +78,17 @@ public class RpcWsConnection extends RpcConnection {
          */
         @Override
         public void onMessage(String message) {
-            RpcWsConnection.super.onMessage(message);
+            WebsocketRpcConnection.super.receive(message);
+        }
+
+        /**
+         * Invoked when an error occurs.
+         *
+         * @param ex the exception
+         */
+        @Override
+        public void onError(Exception ex) {
+            WebsocketRpcConnection.super.errorCallback(ex);
         }
 
         /**
@@ -85,17 +100,7 @@ public class RpcWsConnection extends RpcConnection {
          */
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            RpcWsConnection.super.onClose();
-        }
-
-        /**
-         * Invoked when an error occurs.
-         *
-         * @param ex the exception
-         */
-        @Override
-        public void onError(Exception ex) {
-            RpcWsConnection.super.onError(ex);
+            WebsocketRpcConnection.super.closeCallback();
         }
     }
 }

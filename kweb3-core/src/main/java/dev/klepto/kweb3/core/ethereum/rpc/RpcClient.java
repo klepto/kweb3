@@ -31,7 +31,17 @@ public class RpcClient implements Closeable, RpcProtocol {
      * @return the current endpoint
      */
     public Web3Endpoint endpoint() {
-        return connectionProvider.connection().getEndpoint();
+        return connect().endpoint();
+    }
+
+    /**
+     * Sets the batch mode. When in batch mode, messages are not sent immediately, but are queued and sent in batches at
+     * a later time.
+     *
+     * @param batch true if batch mode should be enabled
+     */
+    public void batch(boolean batch) {
+        connect().batch(batch);
     }
 
     /**
@@ -40,32 +50,28 @@ public class RpcClient implements Closeable, RpcProtocol {
      * @param request the request to send
      */
     public void request(@NotNull RpcRequest request) {
-        if (request.send(this)) {
-            requests.add(request);
+        requests.add(request);
+        if (!request.send(this)) {
+            requests.remove(request);
         }
     }
 
     /**
-     * Sends the specified message to the connected node.
+     * Adds the specified message to the message queue.
      *
      * @param message the message to send
      */
     public boolean send(@NotNull RpcMessage message) {
-        connect().send(message.serialize());
+        connect().send(message);
         return true;
     }
 
     /**
      * Processes the response message from the connected node.
      *
-     * @param response the message received from the connected node
+     * @param message the message received from the connected node
      */
-    private void onMessage(@NotNull String response) {
-        if (requests.isEmpty()) {
-            return;
-        }
-
-        val message = RpcMessage.decode(response);
+    private void onMessage(@NotNull RpcMessage message) {
         requests.removeIf(request -> request.isComplete(this, message));
     }
 
@@ -91,15 +97,20 @@ public class RpcClient implements Closeable, RpcProtocol {
      * @return the connection to the next endpoint
      */
     private RpcConnection connect() {
-        if (connectionProvider.connection() != connection.get()) {
-            val nextConnection = connectionProvider.connection();
-            nextConnection.setMessageCallback(this::onMessage);
-            nextConnection.setErrorCallback(this::onError);
-            nextConnection.setCloseCallback(this::onClose);
-            connection.set(nextConnection);
-            replay();
+        val current = connection.get();
+        val next = connectionProvider.connection();
+        if (next != current) {
+            next.onMessage(this::onMessage);
+            next.onError(this::onError);
+            next.onClose(this::onClose);
+            connection.set(next);
+            if (current != null) {
+                next.batch(current.isBatching());
+                replay();
+            }
+            return next;
         }
-        return connection.get();
+        return current;
     }
 
     /**
@@ -108,7 +119,6 @@ public class RpcClient implements Closeable, RpcProtocol {
     private void replay() {
         requests.forEach(request -> request.send(this));
     }
-
 
     @Override
     public void close() {

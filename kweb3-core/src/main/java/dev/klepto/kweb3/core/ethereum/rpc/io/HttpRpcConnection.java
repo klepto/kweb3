@@ -7,20 +7,20 @@ import kong.unirest.core.UnirestInstance;
 import lombok.val;
 
 /**
- * Implementation of {@link RpcConnection} for HTTP connections.
+ * Implementation of {@link ScheduledRpcConnection} for HTTP connections.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class RpcHttpConnection extends RpcConnection {
+public class HttpRpcConnection extends ScheduledRpcConnection {
 
     private final UnirestInstance unirest = new UnirestInstance(new Config());
 
     /**
-     * Constructs new {@link RpcHttpConnection} for the specified endpoint.
+     * Constructs new {@link HttpRpcConnection} for the specified endpoint.
      *
      * @param endpoint the endpoint
      */
-    public RpcHttpConnection(Web3Endpoint endpoint) {
+    public HttpRpcConnection(Web3Endpoint endpoint) {
         super(endpoint);
     }
 
@@ -30,8 +30,8 @@ public class RpcHttpConnection extends RpcConnection {
      * @param message the message
      */
     @Override
-    public void sendDirect(String message) {
-        val endpoint = getAuthorizedEndpoint();
+    public void send(String message) {
+        val endpoint = authorizedEndpoint();
         var request = unirest.post(endpoint.url())
                 .contentType(ContentType.APPLICATION_JSON)
                 .body(message);
@@ -40,13 +40,13 @@ public class RpcHttpConnection extends RpcConnection {
         if (timeout != null) {
             request = request.connectTimeout((int) timeout.toMillis());
         }
-        
+
         request.asStringAsync().whenComplete((response, throwable) -> {
             if (response != null) {
-                onMessage(response.getBody());
+                receive(response.getBody());
             }
             if (throwable != null) {
-                onError(throwable);
+                errorCallback(throwable);
             }
         });
     }

@@ -50,7 +50,7 @@ public class RpcConnectionProvider {
      */
     @Synchronized
     public RpcConnection next() {
-        val index = connection.get() == null ? -1 : endpoints.indexOf(connection.get().getEndpoint());
+        val index = connection.get() == null ? -1 : endpoints.indexOf(connection.get().endpoint());
         val nextIndex = (index + 1) % endpoints.size();
         connection.set(createConnection(endpoints.get(nextIndex)));
         return connection.get();
@@ -62,15 +62,15 @@ public class RpcConnectionProvider {
      * @param endpoint the endpoint
      * @return the connection
      */
-    private RpcConnection createConnection(Web3Endpoint endpoint) {
+    private ScheduledRpcConnection createConnection(Web3Endpoint endpoint) {
         val transport = endpoint.transport();
         require(transport == Web3Transport.WEBSOCKET
                         || transport == Web3Transport.HTTP,
                 "Unsupported transport: {}", transport
         );
         return transport == Web3Transport.WEBSOCKET
-                ? new RpcWsConnection(endpoint)
-                : new RpcHttpConnection(endpoint);
+                ? new WebsocketRpcConnection(endpoint)
+                : new HttpRpcConnection(endpoint);
     }
 
 }
