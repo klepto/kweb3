@@ -281,7 +281,7 @@ public final class ContractCodec {
             val array = (EthArray<?>) value;
             val result = new ArrayList<EthValue>();
             for (var i = 0; i < array.size(); i++) {
-                result.add(decodeReturnValue(genericType, (EthTuple) array.get(i)));
+                result.add(decodeReturnValue(genericType, array.get(i)));
             }
 
             return array(result);
