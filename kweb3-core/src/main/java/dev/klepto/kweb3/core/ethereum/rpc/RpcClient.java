@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.core.ethereum.rpc;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
-import dev.klepto.kweb3.core.ethereum.rpc.api.RpcProtocol;
+import dev.klepto.kweb3.core.ethereum.rpc.api.EthProtocol;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @RequiredArgsConstructor
-public class RpcClient implements Closeable, RpcProtocol {
+public class RpcClient implements Closeable, EthProtocol {
 
     private final RpcConnectionProvider connectionProvider;
     private final AtomicReference<RpcConnection> connection = new AtomicReference<>();

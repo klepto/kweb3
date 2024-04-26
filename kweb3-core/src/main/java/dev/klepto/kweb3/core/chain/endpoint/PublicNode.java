@@ -28,10 +28,10 @@ public final class PublicNode {
     private static Web3Endpoint publicNodeEndpoint(String name, Web3Chain chain) {
         return Web3Endpoint.builder()
                 .chain(chain)
-//                .transport(Web3Transport.WEBSOCKET)
-//                .url("wss://" + name + "-rpc.publicnode.com")
-                .transport(Web3Transport.HTTP)
-                .url("https://" + name + "-rpc.publicnode.com")
+                .transport(Web3Transport.WEBSOCKET)
+                .url("wss://" + name + "-rpc.publicnode.com")
+//                .transport(Web3Transport.HTTP)
+//                .url("https://" + name + "-rpc.publicnode.com")
                 .settings(new Settings(null, null, Duration.ofMillis(200), null))
                 .build();
     }

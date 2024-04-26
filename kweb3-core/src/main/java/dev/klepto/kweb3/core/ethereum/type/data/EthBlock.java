@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.ethereum.type.data;
 
-import dev.klepto.kweb3.core.ethereum.rpc.api.EthGetBlock;
+import dev.klepto.kweb3.core.ethereum.rpc.api.EthBlockRequest;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
@@ -68,12 +68,12 @@ public record EthBlock(
 ) {
 
     /**
-     * Parses a {@link EthGetBlock.BlockResponse} into a {@link EthBlock}.
+     * Parses a {@link EthBlockRequest.BlockResponse} into a {@link EthBlock}.
      *
      * @param response the block response to parse
      * @return the parsed block
      */
-    public static EthBlock parse(EthGetBlock.BlockResponse response) {
+    public static EthBlock parse(EthBlockRequest.BlockResponse response) {
         return new EthBlock(
                 uint256(response.baseFeePerGas()),
                 uint256(response.difficulty()),

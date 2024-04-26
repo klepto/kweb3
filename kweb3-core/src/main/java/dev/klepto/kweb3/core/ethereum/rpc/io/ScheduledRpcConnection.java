@@ -2,10 +2,10 @@ package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
+import dev.klepto.kweb3.core.ethereum.rpc.api.RpcApiMessage;
 import lombok.val;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -83,6 +83,15 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
     }
 
     /**
+     * Returns the executor service used by this connection.
+     *
+     * @return the executor service
+     */
+    public ScheduledExecutorService executor() {
+        return executor;
+    }
+
+    /**
      * Asynchronously sends a message to the remote server.
      *
      * @param message the message
@@ -105,10 +114,15 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
      * Encodes the message queue and sends all the messages to the remote host.
      */
     public void commit() {
-        val messageArray = messageQueue.toArray(RpcMessage[]::new);
-        messageQueue.removeAll(Arrays.asList(messageArray));
+        val allMessages = messageQueue.stream().toList();
+        messageQueue.removeAll(allMessages);
 
-        val request = RpcMessage.encode(messageArray);
+        val apiMessages = allMessages.stream()
+                .filter(message -> message instanceof RpcApiMessage)
+                .map(message -> (RpcApiMessage) message)
+                .toList();
+
+        val request = RpcApiMessage.encode(apiMessages);
         val cooldown = endpoint().settings().requestCooldown();
         val elapsed = System.currentTimeMillis() - commitTimestamp.get();
         val target = cooldown != null ? cooldown.toMillis() - elapsed : 0;
@@ -136,10 +150,8 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
      * @param response the response
      */
     public void receive(String response) {
-        val messages = RpcMessage.decode(response);
-        for (val message : messages) {
-            messageCallback(message);
-        }
+        RpcApiMessage.decode(response)
+                .forEach(this::messageCallback);
     }
 
     /**

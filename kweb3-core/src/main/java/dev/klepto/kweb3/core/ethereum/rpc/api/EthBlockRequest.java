@@ -1,8 +1,8 @@
 package dev.klepto.kweb3.core.ethereum.rpc.api;
 
 import dev.klepto.kweb3.core.Web3Result;
-import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
-import lombok.val;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,36 +11,66 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public interface EthGetBlock extends RpcApi {
+public interface EthBlockRequest {
 
     /**
-     * Returns information about a block by block number.
+     * Returns the result of this request.
      *
-     * @param blockNumber the block number in hexadecimal format
-     * @return information about a block by block number
+     * @return the result of this request
      */
-    @NotNull
-    default Web3Result<BlockResponse> ethGetBlockByNumber(String blockNumber) {
-        val request = new RpcMessage.RequestMessage()
-                .withMethod("eth_getBlockByNumber")
-                .withParams(blockNumber, false);
-        return request(request)
-                .map(result -> result.resultAs(BlockResponse.class));
+    Web3Result<RpcApiResponseMessage> result();
+
+    /**
+     * Decodes the result of this request into {@link BlockResponse} object.
+     *
+     * @return the result of this request as a {@link BlockResponse} object
+     */
+    default Web3Result<BlockResponse> decode() {
+        return result().map(result -> result.resultAs(BlockResponse.class));
     }
 
     /**
-     * Returns information about a block by block hash.
-     *
-     * @param blockHash the block hash
-     * @return information about a block by block hash
+     * Implementation of Ethereum RPC API <code>eth_getBlockByHash</code> method.
      */
-    @NotNull
-    default Web3Result<BlockResponse> ethGetBlockByHash(@NotNull String blockHash) {
-        val request = new RpcMessage.RequestMessage()
-                .withMethod("eth_getBlockByHash")
-                .withParams(blockHash, false);
-        return request(request)
-                .map(result -> result.resultAs(BlockResponse.class));
+    @Getter
+    @RequiredArgsConstructor
+    class ByHash extends RpcApiRequest implements EthBlockRequest {
+
+        private final String blockHash;
+
+        /**
+         * Encodes the request object into an API message.
+         *
+         * @return the api message
+         */
+        @Override
+        public RpcApiRequestMessage encode() {
+            return new RpcApiRequestMessage()
+                    .withMethod("eth_getBlockByHash")
+                    .withParams(blockHash, false);
+        }
+    }
+
+    /**
+     * Implementation of Ethereum RPC API <code>eth_getBlockByNumber</code> method.
+     */
+    @Getter
+    @RequiredArgsConstructor
+    class ByNumber extends RpcApiRequest implements EthBlockRequest {
+
+        private final String blockNumber;
+
+        /**
+         * Encodes the request object into an API message.
+         *
+         * @return the api message
+         */
+        @Override
+        public RpcApiRequestMessage encode() {
+            return new RpcApiRequestMessage()
+                    .withMethod("eth_getBlockByNumber")
+                    .withParams(blockNumber, false);
+        }
     }
 
     /**
@@ -95,6 +125,5 @@ public interface EthGetBlock extends RpcApi {
             @NotNull String[] uncles
     ) {
     }
-
 
 }
