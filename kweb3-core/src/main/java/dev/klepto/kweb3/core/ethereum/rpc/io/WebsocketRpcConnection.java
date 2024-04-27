@@ -55,6 +55,15 @@ public class WebsocketRpcConnection extends ScheduledRpcConnection {
     }
 
     /**
+     * Closes the connection.
+     */
+    @Override
+    public void close() {
+        super.close();
+        client.close();
+    }
+
+    /**
      * WebSocket client implementation.
      */
     private class Client extends WebSocketClient {

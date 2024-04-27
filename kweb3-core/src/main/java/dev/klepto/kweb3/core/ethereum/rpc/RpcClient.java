@@ -4,6 +4,7 @@ import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.api.EthProtocol;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
+@Getter
 @RequiredArgsConstructor
 public class RpcClient implements Closeable, EthProtocol {
 
@@ -32,6 +34,15 @@ public class RpcClient implements Closeable, EthProtocol {
      */
     public Web3Endpoint endpoint() {
         return connect().endpoint();
+    }
+
+    /**
+     * Returns the current connection.
+     *
+     * @return the current connection
+     */
+    public RpcConnection connection() {
+        return connection.get();
     }
 
     /**
@@ -106,6 +117,8 @@ public class RpcClient implements Closeable, EthProtocol {
             next.onClose(this::onClose);
             connection.set(next);
             if (current != null) {
+                current.onClose(null);
+                current.close();
                 next.batch(current.isBatching());
                 replay();
             }

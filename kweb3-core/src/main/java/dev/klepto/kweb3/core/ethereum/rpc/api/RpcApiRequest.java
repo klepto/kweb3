@@ -35,7 +35,7 @@ public abstract class RpcApiRequest implements RpcRequest {
                 : REQUEST_ID.getAndIncrement();
     }
 
-    private final long requestId = nextRequestId();
+    private final long id = nextRequestId();
     private final Web3Result<RpcApiResponseMessage> result = new Web3Result<>();
 
     /**
@@ -44,6 +44,15 @@ public abstract class RpcApiRequest implements RpcRequest {
      * @return the encoded message
      */
     public abstract RpcApiRequestMessage encode();
+
+    /**
+     * Returns the ID of this request.
+     *
+     * @return the ID of this request
+     */
+    public long id() {
+        return id;
+    }
 
     /**
      * Returns the result of this request.
@@ -72,7 +81,7 @@ public abstract class RpcApiRequest implements RpcRequest {
     @Override
     public boolean send(@NotNull RpcClient client) {
         val message = encode();
-        return client.send(message.withId(requestId));
+        return client.send(message.withId(id));
     }
 
     /**
@@ -89,7 +98,7 @@ public abstract class RpcApiRequest implements RpcRequest {
             return false;
         }
 
-        if (apiMessage.id() != requestId) {
+        if (apiMessage.id() != id) {
             return false;
         }
 

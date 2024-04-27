@@ -4,6 +4,8 @@ import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
+import dev.klepto.kweb3.core.ethereum.subscribe.EthereumSubscriber;
+import dev.klepto.kweb3.core.ethereum.subscribe.FallbackEthereumSubscriber;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.Getter;
@@ -29,8 +31,7 @@ public class EthereumClient implements Closeable {
      */
     public EthereumClient(Web3Endpoint... endpoints) {
         this.rpc = new RpcClient(new RpcConnectionProvider(Arrays.asList(endpoints)));
-        this.subscriber = new EthereumSubscriber(rpc);
-        subscriber.start();
+        this.subscriber = new FallbackEthereumSubscriber(rpc);
     }
 
     /**
@@ -38,8 +39,8 @@ public class EthereumClient implements Closeable {
      *
      * @param consumer the consumer to be called when a new block header is received
      */
-    public void blockSubscribe(Consumer<EthBlock> consumer) {
-        subscriber.subscribe(EthereumSubscriber.SubscriberType.NEW_BLOCKS, consumer);
+    public void onBlock(Consumer<EthBlock> consumer) {
+        subscriber.onBlock(consumer);
     }
 
     /**
@@ -65,7 +66,7 @@ public class EthereumClient implements Closeable {
      *
      * @return the latest block
      */
-    public Web3Result<EthBlock> blockLatest() {
+    public Web3Result<EthBlock> block() {
         return rpc.ethGetBlockByNumber("latest")
                 .map(EthBlock::parse);
     }
@@ -98,7 +99,6 @@ public class EthereumClient implements Closeable {
     @Override
     public void close() {
         rpc.close();
-        subscriber.close();
     }
 
 }
