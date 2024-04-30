@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-class CoroutineWeb3Client(vararg endpoints: Web3Endpoint) : Web3Client(*endpoints) {
+open class CoroutineWeb3Client(vararg endpoints: Web3Endpoint) : Web3Client(*endpoints) {
 
     init {
         contracts.executor = CoroutineContractExecutor()
