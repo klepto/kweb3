@@ -98,7 +98,8 @@ public abstract class RpcApiRequest implements RpcRequest {
             return false;
         }
 
-        if (apiMessage.id() != id) {
+        val id = apiMessage.id();
+        if (id == null || id != this.id) {
             return false;
         }
 
