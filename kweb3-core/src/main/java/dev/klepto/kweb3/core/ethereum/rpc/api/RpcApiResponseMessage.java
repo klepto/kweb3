@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
  */
 @With
 public record RpcApiResponseMessage(@NotNull String jsonrpc,
-                                    long id,
+                                    @Nullable Long id,
                                     @Nullable JsonElement result,
                                     @Nullable Error error) implements RpcApiMessage {
 

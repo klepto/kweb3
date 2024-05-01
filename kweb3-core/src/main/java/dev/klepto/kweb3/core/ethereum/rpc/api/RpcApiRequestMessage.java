@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents ethereum JSON RPC request body.
@@ -15,14 +16,14 @@ import org.jetbrains.annotations.NotNull;
  */
 @With
 public record RpcApiRequestMessage(@NotNull String jsonrpc,
-                                   long id,
+                                   @Nullable Long id,
                                    @NotNull String method,
                                    @NotNull JsonElement params) implements RpcApiMessage {
     /**
      * Creates a new rpc request using default values.
      */
     public RpcApiRequestMessage() {
-        this(JSON_VERSION, -1, "", new JsonArray());
+        this(JSON_VERSION, -1L, "", new JsonArray());
     }
 
     /**

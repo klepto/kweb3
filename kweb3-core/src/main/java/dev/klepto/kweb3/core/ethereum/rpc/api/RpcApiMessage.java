@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +33,15 @@ public interface RpcApiMessage extends RpcMessage {
      *
      * @return the message id or <code>-1</code>
      */
-    long id();
+    @Nullable
+    Long id();
 
     /**
      * Returns the JSON-RPC version.
      *
      * @return the JSON-RPC version
      */
+    @NotNull
     default String jsonrpc() {
         return JSON_VERSION;
 
@@ -48,6 +52,7 @@ public interface RpcApiMessage extends RpcMessage {
      *
      * @return the JSON string representation of the message
      */
+    @NotNull
     default String serialize() {
         return GSON.toJson(this);
     }
@@ -58,6 +63,7 @@ public interface RpcApiMessage extends RpcMessage {
      * @param request the request message to encode
      * @return a string representation of the request message
      */
+    @NotNull
     static String encode(RpcApiMessage request) {
         return GSON.toJson(request);
     }
@@ -68,6 +74,7 @@ public interface RpcApiMessage extends RpcMessage {
      * @param requests the request messages to encode
      * @return a string representation of the request messages
      */
+    @NotNull
     static String encode(List<RpcApiMessage> requests) {
         return GSON.toJson(requests);
     }
@@ -78,6 +85,7 @@ public interface RpcApiMessage extends RpcMessage {
      * @param response the response string to decode
      * @return a messages array
      */
+    @NotNull
     static List<RpcApiMessage> decode(String response) {
         val element = GSON.fromJson(response, JsonElement.class);
         if (element.isJsonObject()) {
@@ -99,6 +107,7 @@ public interface RpcApiMessage extends RpcMessage {
      * @param object the response object to decode
      * @return an RPC message object
      */
+    @NotNull
     static RpcApiMessage decode(JsonObject object) {
         if (object.has("method")) {
             return GSON.fromJson(object, RpcApiRequestMessage.class);
