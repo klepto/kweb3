@@ -6,6 +6,7 @@ import dev.klepto.kweb3.core.ethereum.rpc.api.RpcApiMessage;
 import lombok.val;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,7 +21,8 @@ import java.util.function.Consumer;
  */
 public abstract class ScheduledRpcConnection implements RpcConnection {
 
-    private static final Duration FLUSH_INTERVAL = Duration.ofMillis(20);
+    private static final Duration FLUSH_INTERVAL = Duration.ofMillis(50);
+    private static final int BATCH_SIZE_LIMIT = 8;
 
     private final Queue<RpcMessage> messageQueue = new ConcurrentLinkedQueue<>();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -100,10 +102,11 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
     public void send(RpcMessage message) {
         messageQueue.add(message);
 
-        if (batch.get()) {
-            if (commitTask.get() != null) {
-                commitTask.get().cancel(false);
-            }
+        if (commitTask.get() != null) {
+            commitTask.get().cancel(false);
+        }
+
+        if (batch.get() && messageQueue.size() < BATCH_SIZE_LIMIT) {
             commitTask.set(executor.schedule(this::commit, FLUSH_INTERVAL.toMillis(), TimeUnit.MILLISECONDS));
         } else {
             commit();
@@ -114,13 +117,23 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
      * Encodes the message queue and sends all the messages to the remote host.
      */
     public void commit() {
-        val allMessages = messageQueue.stream().toList();
-        messageQueue.removeAll(allMessages);
+        val messages = new ArrayList<RpcMessage>();
+        while (!messageQueue.isEmpty() && messages.size() < BATCH_SIZE_LIMIT) {
+            messages.add(messageQueue.poll());
+        }
 
-        val apiMessages = allMessages.stream()
+        val apiMessages = messages.stream()
                 .filter(message -> message instanceof RpcApiMessage)
                 .map(message -> (RpcApiMessage) message)
                 .toList();
+
+        if (!messageQueue.isEmpty()) {
+            commitTask.set(executor.schedule(this::commit, FLUSH_INTERVAL.toMillis(), TimeUnit.MILLISECONDS));
+        }
+
+        if (apiMessages.isEmpty()) {
+            return;
+        }
 
         val request = RpcApiMessage.encode(apiMessages);
         val cooldown = endpoint().settings().requestCooldown();
