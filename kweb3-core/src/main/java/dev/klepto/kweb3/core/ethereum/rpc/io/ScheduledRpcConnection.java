@@ -3,6 +3,7 @@ package dev.klepto.kweb3.core.ethereum.rpc.io;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import dev.klepto.kweb3.core.ethereum.rpc.api.RpcApiMessage;
+import lombok.Synchronized;
 import lombok.val;
 
 import java.time.Duration;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 public abstract class ScheduledRpcConnection implements RpcConnection {
 
     private static final Duration FLUSH_INTERVAL = Duration.ofMillis(50);
-    private static final int BATCH_SIZE_LIMIT = 8;
+    private static final int BATCH_SIZE_LIMIT = 64;
 
     private final Queue<RpcMessage> messageQueue = new ConcurrentLinkedQueue<>();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -73,6 +74,17 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
      */
     public void batch(boolean batch) {
         this.batch.set(batch);
+        if (commitTask.get() != null) {
+            commitTask.get().cancel(false);
+        }
+        if (batch) {
+            commitTask.set(executor.scheduleAtFixedRate(
+                    this::commit,
+                    0,
+                    FLUSH_INTERVAL.toMillis(),
+                    TimeUnit.MILLISECONDS
+            ));
+        }
     }
 
     /**
@@ -102,13 +114,7 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
     public void send(RpcMessage message) {
         messageQueue.add(message);
 
-        if (commitTask.get() != null) {
-            commitTask.get().cancel(false);
-        }
-
-        if (batch.get() && messageQueue.size() < BATCH_SIZE_LIMIT) {
-            commitTask.set(executor.schedule(this::commit, FLUSH_INTERVAL.toMillis(), TimeUnit.MILLISECONDS));
-        } else {
+        if (!isBatching()) {
             commit();
         }
     }
@@ -116,7 +122,12 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
     /**
      * Encodes the message queue and sends all the messages to the remote host.
      */
+    @Synchronized
     public void commit() {
+        if (messageQueue.isEmpty()) {
+            return;
+        }
+
         val messages = new ArrayList<RpcMessage>();
         while (!messageQueue.isEmpty() && messages.size() < BATCH_SIZE_LIMIT) {
             messages.add(messageQueue.poll());
@@ -126,10 +137,6 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
                 .filter(message -> message instanceof RpcApiMessage)
                 .map(message -> (RpcApiMessage) message)
                 .toList();
-
-        if (!messageQueue.isEmpty()) {
-            commitTask.set(executor.schedule(this::commit, FLUSH_INTERVAL.toMillis(), TimeUnit.MILLISECONDS));
-        }
 
         if (apiMessages.isEmpty()) {
             return;
@@ -172,7 +179,7 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
      */
     @Override
     public void close() {
-        executor.shutdownNow();
+        executor.shutdown();
         closeCallback();
     }
 
