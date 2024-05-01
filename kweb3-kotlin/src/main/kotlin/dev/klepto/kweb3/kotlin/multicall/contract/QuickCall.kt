@@ -7,7 +7,7 @@ import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint
-import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
+import dev.klepto.kweb3.kotlin.multicall.MulticallContract
 
 /**
  * Implementation of *QuickCall* smart contract executor.
@@ -15,9 +15,9 @@ import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @JvmDefaultWithoutCompatibility
-interface QuickCall : MulticallExecutor {
+interface QuickCall : MulticallContract {
 
-    override suspend fun execute(allowFailure: Boolean, calls: List<MulticallExecutor.Call>): List<EthBytes?> {
+    override suspend fun execute(allowFailure: Boolean, calls: List<MulticallContract.Call>): List<EthBytes?> {
         // TODO: Implement proper endpoint resolution.
         val gasLimit = client.endpoint.settings.gasLimit / calls.size
         val addrs = array(calls.map { it.address })

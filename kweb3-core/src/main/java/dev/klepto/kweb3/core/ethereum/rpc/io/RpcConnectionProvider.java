@@ -27,7 +27,6 @@ public class RpcConnectionProvider {
      * @param endpoints the list of endpoints
      */
     public RpcConnectionProvider(List<Web3Endpoint> endpoints) {
-        require(!endpoints.isEmpty(), "At least one endpoint must be provided");
         this.endpoints = new ArrayList<>(endpoints);
     }
 

@@ -1,45 +1,29 @@
 package dev.klepto.kweb3.kotlin.multicall
 
+import dev.klepto.kweb3.core.contract.Web3Contract
 import dev.klepto.kweb3.core.ethereum.type.EthValue
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address
+import kotlin.reflect.KClass
 
 /**
- * A type-bound builder for constructing a *multicall* request. This
- * builder enables individual call queueing via [call], [callRange] and
- * [callIndices], and allows to configure the *multicall* request with
- * various parameters such as executor, batch size and allow failure flag.
- *
- * @property executor the multicall executor
- * @property calls the list of calls
- * @property batchSize the maximum size of a single batch
- * @property allowFailure signifies whether to allow individual calls to
- *     fail
- * @author <a href="http://github.com/klepto">Augustinas R.</a>
+ * @author Augustinas R. <http://github.com/klepto>
  */
+@Suppress("UNCHECKED_CAST")
 class MulticallBuilder<T : EthValue>(
-    private var executor: MulticallExecutor,
-    private var calls: MutableList<suspend () -> T> = mutableListOf(),
+    private var multicall: MulticallContract,
+    private var calls: MutableList<MulticallExecutor.Call<Web3Contract>> = mutableListOf(),
     private var batchSize: Int = 1024,
     private var allowFailure: Boolean = false
 ) {
 
     /**
-     * Sets the [executor] to be used with this *multicall* request.
+     * Sets the [multicall] contract to be used with this *multicall* request.
      *
-     * @param executor the multicall executor
+     * @param multicall the multicall executor
      */
-    fun executor(executor: MulticallExecutor): MulticallBuilder<T> {
-        this.executor = executor
-        return this
-    }
-
-    /**
-     * Replaces the list of [calls] to be used with this *multicall* request.
-     * Any previous calls in the [calls] queue will be discarded.
-     *
-     * @param calls the list of calls
-     */
-    fun calls(calls: List<suspend () -> T>): MulticallBuilder<T> {
-        this.calls = calls.toMutableList()
+    fun multicall(multicall: MulticallContract): MulticallBuilder<T> {
+        this.multicall = multicall
         return this
     }
 
@@ -69,62 +53,92 @@ class MulticallBuilder<T : EthValue>(
     }
 
     /**
-     * Appends a new call to the list of calls associated with this builder.
-     *
-     * @param call the call code
+     * Creates a new [CallBuilder] for appending calls associated with a single
+     * smart contract.
      */
-    fun call(call: suspend () -> T): MulticallBuilder<T> {
-        calls.add(call)
+    inline fun <reified C : Web3Contract> contract(
+        address: String,
+        noinline block: CallBuilder<C, T>.() -> Unit
+    ): MulticallBuilder<T> {
+        return contract(address(address), block)
+    }
+
+    /**
+     * Creates a new [CallBuilder] for appending calls associated with a single
+     * smart contract.
+     */
+    inline fun <reified C : Web3Contract> contract(
+        address: EthAddress,
+        noinline block: CallBuilder<C, T>.() -> Unit
+    ): MulticallBuilder<T> {
+        return contract(C::class, address, block)
+    }
+
+    /**
+     * Creates a new [CallBuilder] for appending calls associated with a single
+     * smart contract.
+     */
+    fun <C : Web3Contract> contract(
+        contractType: KClass<C>,
+        address: EthAddress,
+        block: CallBuilder<C, T>.() -> Unit
+    ): MulticallBuilder<T> {
+        val builder = CallBuilder<C, T>(contractType::java.get(), address)
+        block(builder)
+        calls.addAll(builder.build().map { it as MulticallExecutor.Call<Web3Contract> })
         return this
     }
 
     /**
-     * Appends a new calls to the list by supplying range indices to a call
-     * function.
+     * Builds a new [MulticallExecutor] for list of calls associated with this
+     * builder.
      *
-     * @param range the range of indices
-     * @param call the call function
+     * @return a new multicall executor
      */
-    fun callRange(range: IntRange, call: suspend (index: Int) -> T): MulticallBuilder<T> {
-        for (i in range) {
-            calls.add(suspend { call(i) })
-        }
-        return this
+    fun build(): MulticallExecutor<T> {
+        return MulticallExecutor(multicall, calls, batchSize, allowFailure)
     }
 
     /**
-     * Appends a new calls to the list by supplying a list of indices to a call
-     * function.
-     *
-     * @param indices the list of indices
-     * @param call the call function
-     */
-    fun callIndices(indices: List<Int>, call: suspend (index: Int) -> T): MulticallBuilder<T> {
-        for (i in indices) {
-            calls.add(suspend { call(i) })
-        }
-        return this
-    }
-
-    /**
-     * Builds a new [MulticallDispatcher] for list of calls associated with
-     * this builder.
-     *
-     * @return a new multicall dispatcher
-     */
-    fun build(): MulticallDispatcher<T> {
-        return MulticallDispatcher(executor, calls, batchSize, allowFailure)
-    }
-
-    /**
-     * Dispatches all calls in the queue and returns a list of their results.
-     * The results are ordered in the same way as the calls. If [allowFailure]
-     * is set `true`, results may contain `null`, indicating a failed call.
+     * Executes all calls in the queue and returns a list of their results. The
+     * results are ordered in the same way as the calls. If [allowFailure] is
+     * set `true`, results may contain `null`, indicating a failed call.
      *
      * @return a list of results from each call
      */
     suspend fun execute(): List<T?> {
         return build().execute()
+    }
+
+
+    /**
+     * A builder for constructing a list of calls associated with a single
+     * smart contract.
+     */
+    class CallBuilder<C : Web3Contract, T : EthValue>(
+        private val contractType: Class<C>,
+        private val contractAddress: EthAddress,
+        private var calls: MutableList<suspend C.() -> T> = mutableListOf()
+    ) {
+        /**
+         * Appends a new call to the list of calls associated with this contract
+         * builder.
+         *
+         * @param block the call code
+         */
+        fun call(block: suspend C.() -> T) {
+            calls.add(block)
+        }
+
+        /**
+         * Builds a list of [MulticallExecutor.Call] objects from the list of calls
+         * within this builder.
+         */
+        fun build(): List<MulticallExecutor.Call<C>> {
+            return calls.map {
+                MulticallExecutor.Call(contractType, contractAddress, it)
+            }
+        }
     }
 
 }

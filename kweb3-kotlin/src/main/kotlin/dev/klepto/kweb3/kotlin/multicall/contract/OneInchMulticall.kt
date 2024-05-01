@@ -9,7 +9,7 @@ import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256
-import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
+import dev.klepto.kweb3.kotlin.multicall.MulticallContract
 
 /**
  * Implementation of [1inch Multicall](https://github.com/1inch/multicall)
@@ -18,9 +18,9 @@ import dev.klepto.kweb3.kotlin.multicall.MulticallExecutor
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @JvmDefaultWithoutCompatibility
-interface OneInchMulticall : MulticallExecutor {
+interface OneInchMulticall : MulticallContract {
 
-    override suspend fun execute(allowFailure: Boolean, calls: List<MulticallExecutor.Call>): List<EthBytes?> {
+    override suspend fun execute(allowFailure: Boolean, calls: List<MulticallContract.Call>): List<EthBytes?> {
         val encodedCalls = array(calls.map { Call(it.address, it.data) })
         val response = multicallWithGasLimitation(encodedCalls)
         return response.results.values()
