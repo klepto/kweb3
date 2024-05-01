@@ -3,8 +3,11 @@ package dev.klepto.kweb3.core.ethereum.rpc.io;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import kong.unirest.core.Config;
 import kong.unirest.core.ContentType;
+import kong.unirest.core.FailedResponse;
 import kong.unirest.core.UnirestInstance;
 import lombok.val;
+
+import java.io.IOException;
 
 /**
  * Implementation of {@link ScheduledRpcConnection} for HTTP connections.
@@ -13,6 +16,7 @@ import lombok.val;
  */
 public class HttpRpcConnection extends ScheduledRpcConnection {
 
+    private static final int DEFAULT_TIMEOUT = 60_000_000;
     private final UnirestInstance unirest = new UnirestInstance(new Config());
 
     /**
@@ -39,16 +43,21 @@ public class HttpRpcConnection extends ScheduledRpcConnection {
         val timeout = endpoint.settings().requestTimeout();
         if (timeout != null) {
             request = request.connectTimeout((int) timeout.toMillis());
+        } else {
+            request = request.connectTimeout(DEFAULT_TIMEOUT);
         }
 
         request.asStringAsync().whenComplete((response, throwable) -> {
-            if (response != null) {
+            if (response instanceof FailedResponse<String> failure) {
+                errorCallback(new IOException(failure.getStatusText()));
+            } else if (throwable != null) {
+                errorCallback(throwable);
+            } else if (response != null) {
                 receive(response.getBody());
             }
-            if (throwable != null) {
-                errorCallback(throwable);
-            }
         });
+
+
     }
 
 }
