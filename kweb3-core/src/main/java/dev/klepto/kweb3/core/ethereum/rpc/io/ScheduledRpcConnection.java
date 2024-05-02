@@ -143,16 +143,7 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
         }
 
         val request = RpcApiMessage.encode(apiMessages);
-        val cooldown = endpoint().settings().requestCooldown();
-        val elapsed = System.currentTimeMillis() - commitTimestamp.get();
-        val target = cooldown != null ? cooldown.toMillis() - elapsed : 0;
-
-        if (target <= 0) {
-            send(request);
-        } else {
-            commitTimestamp.set(target);
-            executor.schedule(() -> send(request), target, TimeUnit.MILLISECONDS);
-        }
+        send(request);
     }
 
     /**
