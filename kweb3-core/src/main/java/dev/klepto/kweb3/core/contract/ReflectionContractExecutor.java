@@ -40,7 +40,7 @@ public class ReflectionContractExecutor implements ContractExecutor {
      * @return the contract function execution result, the type must match return type of the interface method
      */
     @Override
-    public @NotNull Object execute(@NotNull ContractCall call) {
+    public @Nullable Object execute(@NotNull ContractCall call) {
         return ContractExecutor.super.execute(call);
     }
 
@@ -92,7 +92,7 @@ public class ReflectionContractExecutor implements ContractExecutor {
      * @return the already decoded, or to be decoded in the future contract result
      */
     @Override
-    public @NotNull Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result) {
+    public @Nullable Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result) {
         return result.map(value -> decodeResult(call, value));
     }
 
@@ -103,7 +103,7 @@ public class ReflectionContractExecutor implements ContractExecutor {
      * @param result the result string of the RPC call
      * @return the decoded contract result
      */
-    @NotNull
+    @Nullable
     public Object decodeResult(@NotNull ContractCall call, @Nullable String result) {
         val function = call.function();
         val type = function.returnType();

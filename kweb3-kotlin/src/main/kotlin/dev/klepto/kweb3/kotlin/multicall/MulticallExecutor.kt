@@ -10,8 +10,6 @@ import dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes
 import dev.klepto.kweb3.core.util.Hex
 import dev.klepto.kweb3.kotlin.CoroutineContractExecutor
 import dev.klepto.kweb3.kotlin.CoroutineWeb3Client
-import kotlinx.coroutines.*
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 
 /**
  * @author Augustinas R. <http://github.com/klepto>
@@ -21,9 +19,8 @@ class MulticallExecutor<T : EthValue>(
     private val multicall: MulticallContract,
     private val calls: List<Call<Web3Contract>>,
     private val batchSize: Int,
-    private var allowFailure: Boolean
+    private var allowFailure: Boolean,
 ) {
-
     /**
      * Executes all calls in the queue and returns a list of their results. The
      * results are ordered in the same way as the calls. If [allowFailure] is
@@ -33,12 +30,7 @@ class MulticallExecutor<T : EthValue>(
      */
     suspend fun execute(): List<T?> {
         require(batchSize > 0) { "Batch size must be positive." }
-        val results = mutableListOf<Deferred<List<T?>>>()
-        val scope = CoroutineScope(Dispatchers.IO)
-        calls.chunked(batchSize).forEach { batch ->
-            results += scope.async { executeBatch(batch) }
-        }
-        return results.awaitAll().flatten()
+        return calls.chunked(batchSize).flatMap { executeBatch(it) }
     }
 
     /**
@@ -62,16 +54,12 @@ class MulticallExecutor<T : EthValue>(
      */
     private suspend fun encodeCalls(calls: List<Call<Web3Contract>>): List<MulticallContract.Call> {
         val client = CoroutineWeb3Client()
-        val scope = CoroutineScope(Dispatchers.Unconfined)
         val logger = LoggingInterceptor()
         client.contracts.executor = logger
         calls.forEach { call ->
             val contract = client.contract(call.contractType, call.contractAddress)
-            scope.launch {
-                call.call(contract)
-            }
+            call.call(contract)
         }
-        scope.cancel()
         return logger.logs.map {
             MulticallContract.Call(it.transaction.to, it.transaction.data)
         }
@@ -87,7 +75,7 @@ class MulticallExecutor<T : EthValue>(
      */
     private suspend fun decodeResults(
         calls: List<Call<Web3Contract>>,
-        results: List<EthBytes?>
+        results: List<EthBytes?>,
     ): List<T?> {
         val client = CoroutineWeb3Client()
         val result = mutableListOf<T?>()
@@ -102,7 +90,6 @@ class MulticallExecutor<T : EthValue>(
                 result.add(null)
                 return@forEachIndexed
             }
-
 
             val call = calls[index]
             val value = Hex.toHex(byteArray)
@@ -129,7 +116,7 @@ class MulticallExecutor<T : EthValue>(
     data class Call<C : Web3Contract>(
         val contractType: Class<C>,
         val contractAddress: EthAddress,
-        val call: suspend C.() -> EthValue
+        val call: suspend C.() -> EthValue,
     )
 
     /**
@@ -148,8 +135,8 @@ class MulticallExecutor<T : EthValue>(
         override fun decode(
             call: ContractCall,
             result: Web3Result<String>,
-        ): Any {
-            return COROUTINE_SUSPENDED
+        ): Any? {
+            return null
         }
     }
 
@@ -159,8 +146,13 @@ class MulticallExecutor<T : EthValue>(
      *
      * @param value the value to be returned as a result
      */
-    private class ConstantResultInterceptor(private val value: String) : CoroutineContractExecutor() {
-        override fun request(call: ContractCall, data: String): Web3Result<String> {
+    private class ConstantResultInterceptor(
+        private val value: String,
+    ) : CoroutineContractExecutor() {
+        override fun request(
+            call: ContractCall,
+            data: String,
+        ): Web3Result<String> {
             val result = Web3Result<String>()
             result.complete(value)
             return result

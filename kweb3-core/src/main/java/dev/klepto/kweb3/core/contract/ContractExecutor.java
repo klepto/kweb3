@@ -3,6 +3,7 @@ package dev.klepto.kweb3.core.contract;
 import dev.klepto.kweb3.core.Web3Result;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a contract executor. This interface is used to enable different implementations of contract proxy
@@ -20,7 +21,7 @@ public interface ContractExecutor {
      * @param call the contract interface method call
      * @return the contract function execution result, the type must match return type of the interface method
      */
-    @NotNull
+    @Nullable
     default Object execute(@NotNull ContractCall call) {
         val data = encode(call);
         val result = request(call, data);
@@ -56,7 +57,7 @@ public interface ContractExecutor {
      * @param result the result of the RPC call
      * @return the decoded object that matches the contract interface method
      */
-    @NotNull
+    @Nullable
     Object decode(@NotNull ContractCall call, @NotNull Web3Result<String> result);
 
 }

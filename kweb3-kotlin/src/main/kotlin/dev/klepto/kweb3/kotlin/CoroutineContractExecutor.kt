@@ -14,7 +14,6 @@ import kotlinx.coroutines.future.await
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 open class CoroutineContractExecutor : ReflectionContractExecutor() {
-
     /**
      * Executes a contract function from start to finish with a lock provided
      * by [CoroutineWeb3Client] mutex.
@@ -23,7 +22,7 @@ open class CoroutineContractExecutor : ReflectionContractExecutor() {
      * @return the contract function execution result, the type must match
      *     return type of the interface method
      */
-    override fun execute(call: ContractCall): Any {
+    override fun execute(call: ContractCall): Any? {
         try {
             if (call.isSuspending()) {
                 return ::executeSuspending.call(call, call.continuation())
@@ -41,10 +40,9 @@ open class CoroutineContractExecutor : ReflectionContractExecutor() {
      * @param call the contract interface method call
      * @return the decoded smart contract result
      */
-    suspend fun executeSuspending(call: ContractCall): Any {
+    suspend fun executeSuspending(call: ContractCall): Any? {
         val data = encode(call)
         val result = request(call, data).await()
         return decodeResult(call, result)
     }
-
 }
