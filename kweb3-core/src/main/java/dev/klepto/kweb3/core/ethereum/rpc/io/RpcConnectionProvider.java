@@ -2,7 +2,6 @@ package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.chain.Web3Transport;
-import lombok.Synchronized;
 import lombok.val;
 
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ public class RpcConnectionProvider {
      * Selects the next endpoint in the list. If the current endpoint is the last one, the first endpoint is selected in
      * order to repeat the cycle.
      */
-    @Synchronized
     public RpcConnection next() {
         val index = connection.get() == null ? -1 : endpoints.indexOf(connection.get().endpoint());
         val nextIndex = (index + 1) % endpoints.size();

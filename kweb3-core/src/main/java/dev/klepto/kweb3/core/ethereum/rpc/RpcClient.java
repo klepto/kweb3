@@ -6,7 +6,6 @@ import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Synchronized;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +61,6 @@ public class RpcClient implements Closeable, EthProtocol {
      *
      * @param request the request to send
      */
-    @Synchronized
     public void request(@NotNull RpcRequest request) {
         requests.add(request);
         if (!request.send(this)) {
@@ -113,7 +111,6 @@ public class RpcClient implements Closeable, EthProtocol {
      *
      * @return the connection to the next endpoint
      */
-    @Synchronized
     private RpcConnection connect() {
         val current = connection.get();
         val next = connectionProvider.connection();
