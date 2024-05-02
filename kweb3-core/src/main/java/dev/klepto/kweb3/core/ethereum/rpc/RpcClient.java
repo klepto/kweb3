@@ -6,10 +6,12 @@ import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,6 +62,7 @@ public class RpcClient implements Closeable, EthProtocol {
      *
      * @param request the request to send
      */
+    @Synchronized
     public void request(@NotNull RpcRequest request) {
         requests.add(request);
         if (!request.send(this)) {
@@ -94,6 +97,7 @@ public class RpcClient implements Closeable, EthProtocol {
     private void onError(@NotNull Throwable throwable) {
         requests.removeIf(request -> request.onError(this, throwable));
         connectionProvider.next();
+        replay();
     }
 
     /**
@@ -101,6 +105,7 @@ public class RpcClient implements Closeable, EthProtocol {
      */
     private void onClose() {
         connectionProvider.next();
+        replay();
     }
 
     /**
@@ -108,6 +113,7 @@ public class RpcClient implements Closeable, EthProtocol {
      *
      * @return the connection to the next endpoint
      */
+    @Synchronized
     private RpcConnection connect() {
         val current = connection.get();
         val next = connectionProvider.connection();
@@ -115,13 +121,12 @@ public class RpcClient implements Closeable, EthProtocol {
             next.onMessage(this::onMessage);
             next.onError(this::onError);
             next.onClose(this::onClose);
-            connection.set(next);
             if (current != null) {
+                next.batch(current.isBatching());
                 current.onClose(null);
                 current.close();
-                next.batch(current.isBatching());
-                replay();
             }
+            connection.set(next);
             return next;
         }
         return current;
@@ -131,7 +136,13 @@ public class RpcClient implements Closeable, EthProtocol {
      * Replays the requests that were not completed.
      */
     private void replay() {
-        requests.forEach(request -> request.send(this));
+        if (requests.isEmpty()) {
+            return;
+        }
+
+        val requests = new ArrayList<>(this.requests);
+        this.requests.removeAll(requests);
+        requests.forEach(this::request);
     }
 
     @Override
