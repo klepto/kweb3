@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class HttpRpcConnection extends ScheduledRpcConnection {
 
-    private static final int DEFAULT_TIMEOUT = 60_000_000;
+    private static final int DEFAULT_TIMEOUT = 3_000;
     private final UnirestInstance unirest = new UnirestInstance(new Config());
 
     /**
@@ -56,8 +56,6 @@ public class HttpRpcConnection extends ScheduledRpcConnection {
                 receive(response.getBody());
             }
         });
-
-
     }
 
 }
