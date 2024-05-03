@@ -15,8 +15,8 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static dev.klepto.kweb3.core.util.Conditions.require;
@@ -31,7 +31,7 @@ import static dev.klepto.unreflect.Unreflect.reflect;
  */
 public class ReflectionContractParser implements ContractParser {
 
-    private final Map<Method, ContractFunction> cache = new ConcurrentHashMap<>();
+    private final Map<Method, ContractFunction> cache = new HashMap<>();
 
     /**
      * Parses contract function using {@link Unreflect} API and caches it for future use.

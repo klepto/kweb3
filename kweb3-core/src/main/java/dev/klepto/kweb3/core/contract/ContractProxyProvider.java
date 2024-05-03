@@ -7,8 +7,8 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ContractProxyProvider {
 
     private final Web3Client client;
-    private final Map<Class<?>, Map<EthAddress, Web3Contract>> contracts = new ConcurrentHashMap<>();
-    private AtomicReference<ContractExecutor> executor = new AtomicReference<>(new ReflectionContractExecutor());
-    private AtomicReference<ContractParser> parser = new AtomicReference<>(new ReflectionContractParser());
+    private final Map<Class<?>, Map<EthAddress, Web3Contract>> contracts = new HashMap<>();
+    private final AtomicReference<ContractExecutor> executor = new AtomicReference<>(new ReflectionContractExecutor());
+    private final AtomicReference<ContractParser> parser = new AtomicReference<>(new ReflectionContractParser());
 
     /**
      * Sets the default contract executor to be used with all future contract calls.
@@ -71,7 +71,7 @@ public class ContractProxyProvider {
      */
     @NotNull
     public <T extends Web3Contract> T createProxy(@NotNull Class<T> type, @NotNull EthAddress address) {
-        val cache = contracts.computeIfAbsent(type, key -> new ConcurrentHashMap<>());
+        val cache = contracts.computeIfAbsent(type, key -> new HashMap<>());
         val contract = cache.computeIfAbsent(address, key ->
                 (Web3Contract) Proxy.newProxyInstance(
                         ContractProxyProvider.class.getClassLoader(),

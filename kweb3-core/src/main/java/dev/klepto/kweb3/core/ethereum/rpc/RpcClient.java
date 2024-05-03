@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -26,7 +26,7 @@ public class RpcClient implements Closeable, EthProtocol {
 
     private final RpcConnectionProvider connectionProvider;
     private final AtomicReference<RpcConnection> connection = new AtomicReference<>();
-    private final Queue<RpcRequest> requests = new ConcurrentLinkedQueue<>();
+    private final Queue<RpcRequest> requests = new LinkedList<>();
 
     /**
      * Returns the current endpoint.

@@ -8,8 +8,12 @@ import lombok.val;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,7 +29,7 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
     private static final Duration FLUSH_INTERVAL = Duration.ofMillis(50);
     private static final int BATCH_SIZE_LIMIT = 64;
 
-    private final Queue<RpcMessage> messageQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<RpcMessage> messageQueue = new LinkedList<>();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private final AtomicBoolean batch = new AtomicBoolean();
     private final AtomicReference<ScheduledFuture<?>> commitTask = new AtomicReference<>();

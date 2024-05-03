@@ -12,8 +12,8 @@ import lombok.Synchronized;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,7 +30,7 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
     private final RpcClient client;
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final AtomicReference<EthUint> blockNumber = new AtomicReference<>(EthUint.ZERO);
-    private final Queue<Consumer<EthBlock>> subscribers = new ConcurrentLinkedQueue<>();
+    private final Queue<Consumer<EthBlock>> subscribers = new LinkedList<>();
 
     /**
      * Subscribes given consumer to new block headers.

@@ -8,9 +8,9 @@ import dev.klepto.kweb3.core.contract.ReflectionContractExecutor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
 
@@ -22,7 +22,7 @@ import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
  */
 public class LoggingContractExecutor extends ReflectionContractExecutor {
 
-    private final Queue<ContractCallLog> logs = new ConcurrentLinkedQueue<>();
+    private final Queue<ContractCallLog> logs = new LinkedList<>();
 
     /**
      * Logs the contract call and throws a {@link LoggingException}.
