@@ -92,7 +92,7 @@ public class Web3Result<T> implements CompletionStage<T> {
     @NotNull
     public Web3Result<@NotNull T> get(@NotNull Consumer<T> consumer) {
         val newStage = stage.whenComplete((result, error) -> {
-            if (result != null) {
+            if (error == null) {
                 consumer.accept(result);
             }
         });
