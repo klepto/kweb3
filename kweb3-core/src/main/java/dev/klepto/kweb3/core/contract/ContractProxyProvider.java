@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ContractProxyProvider {
 
     private final Web3Client client;
-    private final Map<Class<?>, Map<EthAddress, Web3Contract>> contracts = new HashMap<>();
+    private final Map<EthAddress, Web3Contract> contracts = new HashMap<>();
     private final AtomicReference<ContractExecutor> executor = new AtomicReference<>(new ReflectionContractExecutor());
     private final AtomicReference<ContractParser> parser = new AtomicReference<>(new ReflectionContractParser());
 
@@ -71,8 +71,7 @@ public class ContractProxyProvider {
      */
     @NotNull
     public <T extends Web3Contract> T createProxy(@NotNull Class<T> type, @NotNull EthAddress address) {
-        val cache = contracts.computeIfAbsent(type, key -> new HashMap<>());
-        val contract = cache.computeIfAbsent(address, key ->
+        val contract = contracts.computeIfAbsent(address, key ->
                 (Web3Contract) Proxy.newProxyInstance(
                         ContractProxyProvider.class.getClassLoader(),
                         new Class[]{type},
