@@ -3,7 +3,6 @@ package dev.klepto.kweb3.core.ethereum.rpc.io;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import dev.klepto.kweb3.core.ethereum.rpc.api.RpcApiMessage;
-import lombok.Synchronized;
 import lombok.val;
 
 import java.time.Duration;
@@ -126,7 +125,6 @@ public abstract class ScheduledRpcConnection implements RpcConnection {
     /**
      * Encodes the message queue and sends all the messages to the remote host.
      */
-    @Synchronized
     public void commit() {
         if (messageQueue.isEmpty()) {
             return;

@@ -8,7 +8,6 @@ import dev.klepto.kweb3.core.ethereum.rpc.io.ScheduledRpcConnection;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.RequiredArgsConstructor;
-import lombok.Synchronized;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +49,6 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
      *
      * @param blockNumber the block number to fetch and emit
      */
-    @Synchronized
     public void emitNewBlock(EthUint blockNumber) {
         if (blockNumber.compareTo(this.blockNumber.get()) <= 0) {
             return;
