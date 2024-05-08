@@ -2,8 +2,7 @@ package dev.klepto.kweb3.core;
 
 import dev.klepto.kweb3.core.chain.Web3Chain;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
-import dev.klepto.kweb3.core.contract.ContractProxyProvider;
-import dev.klepto.kweb3.core.contract.Web3Contract;
+import dev.klepto.kweb3.core.contract.*;
 import dev.klepto.kweb3.core.ethereum.EthereumClient;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import lombok.Getter;
@@ -22,18 +21,43 @@ import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 @Getter
 public class Web3Client implements Closeable {
 
-    private final EthAddress address;
+    private final @NotNull ContractProvider contractProvider;
+    private final @NotNull ContractExecutor contractExecutor;
+    private final @NotNull ContractParser contractParser;
+
+    private final @NotNull EthAddress address;
     private final @Delegate EthereumClient ethereum;
-    private final ContractProxyProvider contracts = new ContractProxyProvider(this);
+
+    /**
+     * Creates a new client instance
+     *
+     * @param contractProvider the contract provider
+     * @param contractExecutor the contract executor
+     * @param contractParser   the contract parser
+     * @param endpoint         the endpoints this client connects to
+     */
+    public Web3Client(@NotNull ContractProvider contractProvider,
+                      @NotNull ContractExecutor contractExecutor,
+                      @NotNull ContractParser contractParser,
+                      @NotNull Web3Endpoint endpoint) {
+        this.contractProvider = contractProvider;
+        this.contractExecutor = contractExecutor;
+        this.contractParser = contractParser;
+        this.address = EthAddress.ZERO;
+        this.ethereum = new EthereumClient(endpoint);
+    }
 
     /**
      * Creates a new client instance for the given endpoints.
      *
-     * @param endpoints the endpoints this client connects to
+     * @param endpoint the endpoints this client connects to
      */
-    public Web3Client(@NotNull Web3Endpoint... endpoints) {
+    public Web3Client(@NotNull Web3Endpoint endpoint) {
+        this.contractProvider = new ContractProxyProvider();
+        this.contractExecutor = new ReflectionContractExecutor();
+        this.contractParser = new ReflectionContractParser();
         this.address = EthAddress.ZERO;
-        this.ethereum = new EthereumClient(endpoints);
+        this.ethereum = new EthereumClient(endpoint);
     }
 
     /**
@@ -63,7 +87,7 @@ public class Web3Client implements Closeable {
      */
     @NotNull
     public <T extends Web3Contract> T contract(@NotNull Class<T> type, @NotNull EthAddress address) {
-        return contracts.createProxy(type, address);
+        return contractProvider.provide(this, type, address);
     }
 
     /**

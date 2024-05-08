@@ -77,9 +77,9 @@ public class ReflectionContractExecutor implements ContractExecutor {
      */
     @Override
     public @NotNull Web3Result<String> request(@NotNull ContractCall call, @NotNull String data) {
-        val client = call.proxy().getClient();
+        val client = call.proxy().client();
         val clientAddress = client.getAddress() != null ? client.getAddress().toHex() : null;
-        val contractAddress = call.proxy().getAddress().toHex();
+        val contractAddress = call.proxy().address().toHex();
         val callData = call.function().signature() + data;
         return client.getRpc().ethCall(clientAddress, contractAddress, null, null, null, callData, null);
     }
@@ -115,7 +115,7 @@ public class ReflectionContractExecutor implements ContractExecutor {
                 message(
                         "No result for smart contract call. \nFunction: {}\nNetwork: {}",
                         call,
-                        call.proxy().getClient().getChain()
+                        call.proxy().client().getChain()
                 );
         require(result != null, noResultMessage);
         val descriptor = function.returnTuple()

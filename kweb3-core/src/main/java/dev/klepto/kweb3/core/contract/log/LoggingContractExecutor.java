@@ -56,8 +56,8 @@ public class LoggingContractExecutor extends ReflectionContractExecutor {
      * @return the resulting contract call log
      */
     public @NotNull ContractCallLog createLog(@NotNull ContractCall call, @NotNull String data) {
-        val clientAddress = call.proxy().getClient().getAddress();
-        val contractAddress = call.proxy().getAddress();
+        val clientAddress = call.proxy().client().getAddress();
+        val contractAddress = call.proxy().address();
         val calldata = bytes(call.function().signature() + data);
         val transaction = new ContractCallLog.Transaction(
                 contractAddress, clientAddress, null, null, null, null, calldata

@@ -1,31 +1,40 @@
 package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import kong.unirest.core.Config;
 import kong.unirest.core.ContentType;
 import kong.unirest.core.FailedResponse;
 import kong.unirest.core.UnirestInstance;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
- * Implementation of {@link ScheduledRpcConnection} for HTTP connections.
+ * Implementation of {@link AuthorizedRpcConnection} for HTTP connections.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class HttpRpcConnection extends ScheduledRpcConnection {
+public class HttpRpcConnection extends AuthorizedRpcConnection {
 
-    private static final int DEFAULT_TIMEOUT = 3_000;
     private final UnirestInstance unirest = new UnirestInstance(new Config());
 
     /**
-     * Constructs new {@link HttpRpcConnection} for the specified endpoint.
+     * Constructs a new {@link HttpRpcConnection} for the specified endpoint.
      *
-     * @param endpoint the endpoint
+     * @param endpoint        the endpoint
+     * @param messageCallback the message callback
+     * @param errorCallback   the error callback
+     * @param closeCallback   the close callback
      */
-    public HttpRpcConnection(Web3Endpoint endpoint) {
-        super(endpoint);
+    public HttpRpcConnection(@NotNull Web3Endpoint endpoint,
+                             @Nullable Consumer<RpcMessage> messageCallback,
+                             @Nullable Consumer<Throwable> errorCallback,
+                             @Nullable Runnable closeCallback) {
+        super(endpoint, messageCallback, errorCallback, closeCallback);
     }
 
     /**
@@ -43,8 +52,6 @@ public class HttpRpcConnection extends ScheduledRpcConnection {
         val timeout = endpoint.settings().requestTimeout();
         if (timeout != null) {
             request = request.connectTimeout((int) timeout.toMillis());
-        } else {
-            request = request.connectTimeout(DEFAULT_TIMEOUT);
         }
 
         request.asStringAsync().whenComplete((response, throwable) -> {

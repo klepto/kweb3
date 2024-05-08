@@ -1,10 +1,16 @@
 package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
+import dev.klepto.kweb3.core.chain.Web3Transport;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.util.function.Consumer;
+
+import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
  * Represents a connection to a remote RPC server.
@@ -14,6 +20,27 @@ import java.util.function.Consumer;
 public interface RpcConnection extends Closeable {
 
     /**
+     * Creates a new connection from the given endpoint.
+     *
+     * @param endpoint the endpoint
+     * @return the connection
+     */
+    static RpcConnection create(@NotNull Web3Endpoint endpoint,
+                                @Nullable Consumer<RpcMessage> messageCallback,
+                                @Nullable Consumer<Throwable> errorCallback,
+                                @Nullable Runnable closeCallback) {
+        val transport = endpoint.transport();
+        require(transport == Web3Transport.WEBSOCKET
+                        || transport == Web3Transport.HTTP,
+                "Unsupported transport: {}", transport
+        );
+
+        return transport == Web3Transport.WEBSOCKET
+                ? new WebsocketRpcConnection(endpoint, messageCallback, errorCallback, closeCallback)
+                : new HttpRpcConnection(endpoint, messageCallback, errorCallback, closeCallback);
+    }
+
+    /**
      * Returns the endpoint of the connection.
      *
      * @return the endpoint
@@ -21,48 +48,11 @@ public interface RpcConnection extends Closeable {
     Web3Endpoint endpoint();
 
     /**
-     * Sets the batch mode. When in batch mode, messages are not sent immediately, but are queued and sent in batches at
-     * a later time.
-     *
-     * @param batch whether to enable batch mode
-     */
-    void batch(boolean batch);
-
-    /**
-     * Returns whether the connection is in batch mode.
-     *
-     * @return whether the connection is in batch mode
-     */
-    boolean isBatching();
-
-    /**
      * Sends a message to the remote server.
      *
      * @param message the message
      */
     void send(RpcMessage message);
-
-    /**
-     * Sets the message callback. Invoked when a response is received from the remote server.
-     *
-     * @param messageCallback the message callback
-     */
-    void onMessage(Consumer<RpcMessage> messageCallback);
-
-    /**
-     * Sets the error callback. Invoked when error occurs during communication with the remote server.
-     *
-     * @param errorCallback the error callback
-     */
-    void onError(Consumer<Throwable> errorCallback);
-
-    /**
-     * Sets the close callback. Invoked when the connection is closed, only applicable to transport protocols that
-     * maintain an open connection.
-     *
-     * @param closeCallback the close callback
-     */
-    void onClose(Runnable closeCallback);
 
     /**
      * Closes the connection.

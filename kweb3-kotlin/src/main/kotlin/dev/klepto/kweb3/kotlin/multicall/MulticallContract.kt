@@ -49,7 +49,7 @@ interface MulticallContract : Web3Contract {
          * *multicall* transactions.
          */
         fun MulticallContract.contractExecutor(): CoroutineContractExecutor {
-            val contractExecutor = client.contracts.executor
+            val contractExecutor = client.contractExecutor
             require(contractExecutor is CoroutineContractExecutor) {
                 "${this::class.simpleName} requires a ${CoroutineContractExecutor::class.simpleName}."
             }

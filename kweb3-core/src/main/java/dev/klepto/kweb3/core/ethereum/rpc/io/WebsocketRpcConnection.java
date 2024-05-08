@@ -1,27 +1,37 @@
 package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
+import java.util.function.Consumer;
 
 /**
- * Implementation of {@link ScheduledRpcConnection} for WebSocket connections.
+ * Implementation of {@link AuthorizedRpcConnection} for WebSocket connections.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class WebsocketRpcConnection extends ScheduledRpcConnection {
+public class WebsocketRpcConnection extends AuthorizedRpcConnection {
 
     private final Client client = new Client();
 
     /**
      * Constructs new {@link WebsocketRpcConnection} for the specified endpoint.
      *
-     * @param endpoint the endpoint
+     * @param endpoint        the endpoint
+     * @param messageCallback the message callback
+     * @param errorCallback   the error callback
+     * @param closeCallback   the close callback
      */
-    public WebsocketRpcConnection(Web3Endpoint endpoint) {
-        super(endpoint);
+    public WebsocketRpcConnection(@NotNull Web3Endpoint endpoint,
+                                  @Nullable Consumer<RpcMessage> messageCallback,
+                                  @Nullable Consumer<Throwable> errorCallback,
+                                  @Nullable Runnable closeCallback) {
+        super(endpoint, messageCallback, errorCallback, closeCallback);
     }
 
     /**

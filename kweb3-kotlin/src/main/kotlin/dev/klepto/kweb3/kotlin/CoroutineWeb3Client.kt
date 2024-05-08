@@ -2,7 +2,7 @@ package dev.klepto.kweb3.kotlin
 
 import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.chain.Web3Endpoint
-import dev.klepto.kweb3.core.contract.Web3Contract
+import dev.klepto.kweb3.core.contract.*
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
 
 /**
@@ -11,12 +11,18 @@ import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-open class CoroutineWeb3Client(vararg endpoints: Web3Endpoint) : Web3Client(*endpoints) {
-
-    init {
-        contracts.executor = CoroutineContractExecutor()
-        contracts.parser = CoroutineContractParser()
-    }
+open class CoroutineWeb3Client(
+    endpoint: Web3Endpoint,
+    contractProvider: ContractProvider = ContractProxyProvider(),
+    contractExecutor: ContractExecutor = CoroutineContractExecutor(),
+    contractParser: ContractParser = CoroutineContractParser(),
+) :
+    Web3Client(
+        contractProvider,
+        contractExecutor,
+        contractParser,
+        endpoint
+    ) {
 
     companion object {
         /**

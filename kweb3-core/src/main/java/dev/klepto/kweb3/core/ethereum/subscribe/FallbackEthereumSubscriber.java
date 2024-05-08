@@ -4,7 +4,6 @@ import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcRequest;
 import dev.klepto.kweb3.core.ethereum.rpc.api.RpcApiRequestMessage;
-import dev.klepto.kweb3.core.ethereum.rpc.io.ScheduledRpcConnection;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,6 +31,7 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final AtomicReference<EthUint> blockNumber = new AtomicReference<>(EthUint.ZERO);
     private final Queue<Consumer<EthBlock>> subscribers = new LinkedList<>();
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Subscribes given consumer to new block headers.
@@ -68,13 +70,7 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
      * mechanism that fetches the latest block number and emits it to all subscribers.
      */
     private void initFallback() {
-        val connection = client.connection();
-        if (!(connection instanceof ScheduledRpcConnection)) {
-            return;
-        }
-
-        val executor = ((ScheduledRpcConnection) connection).executor();
-        val pollingInterval = connection.endpoint().settings().pollingInterval();
+        val pollingInterval = client.endpoint().settings().pollingInterval();
         executor.scheduleAtFixedRate(() -> {
             client.ethBlockNumber()
                     .map(EthUint::uint256)
@@ -82,6 +78,12 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
         }, 0, pollingInterval.toMillis(), TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Closes the subscriber and stops all polling mechanisms.
+     */
+    public void close() {
+        executor.shutdownNow();
+    }
 
     /**
      * Subscription request for new block headers. This request never finishes, this ensures that for websocket

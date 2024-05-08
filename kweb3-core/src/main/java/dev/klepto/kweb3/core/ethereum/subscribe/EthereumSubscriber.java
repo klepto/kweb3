@@ -18,4 +18,9 @@ public interface EthereumSubscriber {
      */
     void onBlock(Consumer<EthBlock> subscriber);
 
+    /**
+     * Closes the subscriber and releases all resources.
+     */
+    void close();
+
 }

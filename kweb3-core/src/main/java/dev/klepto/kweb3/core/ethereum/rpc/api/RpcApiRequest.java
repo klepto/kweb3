@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
@@ -19,23 +17,6 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
 @RequiredArgsConstructor
 public abstract class RpcApiRequest implements RpcRequest {
 
-    /**
-     * Atomic counter for request IDs.
-     */
-    private static final AtomicLong REQUEST_ID = new AtomicLong(1);
-
-    /**
-     * Returns the next request ID.
-     *
-     * @return the next request ID
-     */
-    public static long nextRequestId() {
-        return REQUEST_ID.get() == Long.MAX_VALUE
-                ? REQUEST_ID.getAndSet(1)
-                : REQUEST_ID.getAndIncrement();
-    }
-
-    private final long id = nextRequestId();
     private final Web3Result<RpcApiResponseMessage> result = new Web3Result<>();
 
     /**
@@ -51,7 +32,7 @@ public abstract class RpcApiRequest implements RpcRequest {
      * @return the ID of this request
      */
     public long id() {
-        return id;
+        return hashCode();
     }
 
     /**
@@ -81,7 +62,7 @@ public abstract class RpcApiRequest implements RpcRequest {
     @Override
     public boolean send(@NotNull RpcClient client) {
         val message = encode();
-        return client.send(message.withId(id));
+        return client.send(message.withId(id()));
     }
 
     /**
@@ -99,7 +80,7 @@ public abstract class RpcApiRequest implements RpcRequest {
         }
 
         val id = apiMessage.id();
-        if (id == null || id != this.id) {
+        if (id == null || id != id()) {
             return false;
         }
 
@@ -124,11 +105,8 @@ public abstract class RpcApiRequest implements RpcRequest {
      */
     @Override
     public boolean onError(@NotNull RpcClient client, @NotNull Throwable error) {
-        if (error instanceof Web3Error) {
-            result.completeExceptionally(error);
-            return true;
-        }
-        return false;
+        result.completeExceptionally(error);
+        return true;
     }
 
 }

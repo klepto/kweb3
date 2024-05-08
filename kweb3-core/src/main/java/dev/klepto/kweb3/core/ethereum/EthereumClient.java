@@ -3,7 +3,6 @@ package dev.klepto.kweb3.core.ethereum;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
-import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
 import dev.klepto.kweb3.core.ethereum.subscribe.EthereumSubscriber;
 import dev.klepto.kweb3.core.ethereum.subscribe.FallbackEthereumSubscriber;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
@@ -11,7 +10,6 @@ import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.Getter;
 
 import java.io.Closeable;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -27,10 +25,10 @@ public class EthereumClient implements Closeable {
     /**
      * Creates a new ethereum client that connects to given RPC endpoints.
      *
-     * @param endpoints the RPC endpoints
+     * @param endpoint the RPC endpoints
      */
-    public EthereumClient(Web3Endpoint... endpoints) {
-        this.rpc = new RpcClient(new RpcConnectionProvider(Arrays.asList(endpoints)));
+    public EthereumClient(Web3Endpoint endpoint) {
+        this.rpc = new RpcClient(endpoint);
         this.subscriber = new FallbackEthereumSubscriber(rpc);
     }
 
@@ -99,6 +97,7 @@ public class EthereumClient implements Closeable {
     @Override
     public void close() {
         rpc.close();
+        subscriber.close();
     }
 
 }

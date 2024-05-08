@@ -45,6 +45,19 @@ public record Web3Endpoint(@NotNull Web3Chain chain,
     }
 
     /**
+     * Authorizes the endpoint using the authorization method. If endpoint has no authorization method, returns the
+     * endpoint as is.
+     *
+     * @return the authorized endpoint
+     */
+    public Web3Endpoint authorize() {
+        if (authorization == null) {
+            return this;
+        }
+        return authorization.authorize(this);
+    }
+
+    /**
      * Returns a new builder with the same properties as this endpoint.
      *
      * @return a new builder with the same properties as this endpoint

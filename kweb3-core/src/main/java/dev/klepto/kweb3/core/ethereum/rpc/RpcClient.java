@@ -3,17 +3,12 @@ package dev.klepto.kweb3.core.ethereum.rpc;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.api.EthProtocol;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
-import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnectionProvider;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Implementation of Ethereum RPC API client.
@@ -21,12 +16,19 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 @Getter
-@RequiredArgsConstructor
 public class RpcClient implements Closeable, EthProtocol {
 
-    private final RpcConnectionProvider connectionProvider;
-    private final AtomicReference<RpcConnection> connection = new AtomicReference<>();
-    private final Queue<RpcRequest> requests = new LinkedList<>();
+    private final RpcConnection connection;
+    private final Queue<RpcRequest> requests = new ConcurrentLinkedQueue<>();
+
+    /**
+     * Constructs a new {@link RpcClient} for the specified endpoint.
+     *
+     * @param endpoint the endpoint
+     */
+    public RpcClient(Web3Endpoint endpoint) {
+        this.connection = RpcConnection.create(endpoint, this::onMessage, this::onError, this::onClose);
+    }
 
     /**
      * Returns the current endpoint.
@@ -34,7 +36,7 @@ public class RpcClient implements Closeable, EthProtocol {
      * @return the current endpoint
      */
     public Web3Endpoint endpoint() {
-        return connect().endpoint();
+        return connection.endpoint();
     }
 
     /**
@@ -43,17 +45,7 @@ public class RpcClient implements Closeable, EthProtocol {
      * @return the current connection
      */
     public RpcConnection connection() {
-        return connection.get();
-    }
-
-    /**
-     * Sets the batch mode. When in batch mode, messages are not sent immediately, but are queued and sent in batches at
-     * a later time.
-     *
-     * @param batch true if batch mode should be enabled
-     */
-    public void batch(boolean batch) {
-        connect().batch(batch);
+        return connection;
     }
 
     /**
@@ -74,7 +66,7 @@ public class RpcClient implements Closeable, EthProtocol {
      * @param message the message to send
      */
     public boolean send(@NotNull RpcMessage message) {
-        connect().send(message);
+        connection.send(message);
         return true;
     }
 
@@ -88,64 +80,26 @@ public class RpcClient implements Closeable, EthProtocol {
     }
 
     /**
-     * Called upon IO error. Selects next endpoint in the list.
+     * Called upon IO error.
      *
      * @param throwable the error that occurred during the connection
      */
     private void onError(@NotNull Throwable throwable) {
         requests.removeIf(request -> request.onError(this, throwable));
-        connectionProvider.next();
-        replay();
     }
 
     /**
      * Called when connection is closed. Selects next endpoint in the list.
      */
     private void onClose() {
-        connectionProvider.next();
-        replay();
+
     }
 
     /**
-     * Selects next connection from {@link RpcConnectionProvider} and connects to it.
-     *
-     * @return the connection to the next endpoint
+     * Closes the connection.
      */
-    private RpcConnection connect() {
-        val current = connection.get();
-        val next = connectionProvider.connection();
-        if (next != current) {
-            next.onMessage(this::onMessage);
-            next.onError(this::onError);
-            next.onClose(this::onClose);
-            if (current != null) {
-                next.batch(current.isBatching());
-                current.onClose(null);
-                current.close();
-            }
-            connection.set(next);
-            return next;
-        }
-        return current;
-    }
-
-    /**
-     * Replays the requests that were not completed.
-     */
-    private void replay() {
-        if (requests.isEmpty()) {
-            return;
-        }
-
-        val requests = new ArrayList<>(this.requests);
-        this.requests.removeAll(requests);
-        requests.forEach(this::request);
-    }
-
     @Override
     public void close() {
-        if (connection.get() != null) {
-            connection.get().close();
-        }
+        connection.close();
     }
 }

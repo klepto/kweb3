@@ -3,9 +3,8 @@ package dev.klepto.kweb3.core.contract;
 import dev.klepto.kweb3.core.Web3Client;
 import dev.klepto.kweb3.core.Web3Error;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,13 +16,9 @@ import java.util.Objects;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@Getter
-@RequiredArgsConstructor
-public class ContractProxy implements InvocationHandler {
-
-    private final Web3Client client;
-    private final Class<? extends Web3Contract> type;
-    private final EthAddress address;
+public record ContractProxy(@NotNull Web3Client client,
+                            @NotNull Class<? extends Web3Contract> type,
+                            @NotNull EthAddress address) implements InvocationHandler {
 
     /**
      * Intercepts contract interface method call. Called automatically by JVM {@link java.lang.reflect.Proxy} via
@@ -66,10 +61,10 @@ public class ContractProxy implements InvocationHandler {
             case "getProxy":
                 return this;
             default:
-                val function = client.getContracts().getParser().parseFunction(method);
+                val function = client.getContractParser().parseFunction(method);
                 val call = new ContractCall(this, function, args);
                 try {
-                    return client.getContracts().getExecutor().execute(call);
+                    return client.getContractExecutor().execute(call);
                 } catch (Throwable throwable) {
                     throw Web3Error.unwrap(throwable);
                 }

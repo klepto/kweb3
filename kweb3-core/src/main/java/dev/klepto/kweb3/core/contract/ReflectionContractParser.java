@@ -15,8 +15,6 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static dev.klepto.kweb3.core.util.Conditions.require;
@@ -31,8 +29,6 @@ import static dev.klepto.unreflect.Unreflect.reflect;
  */
 public class ReflectionContractParser implements ContractParser {
 
-    private final Map<Method, ContractFunction> cache = new HashMap<>();
-
     /**
      * Parses contract function using {@link Unreflect} API and caches it for future use.
      *
@@ -41,30 +37,26 @@ public class ReflectionContractParser implements ContractParser {
      */
     @Override
     public @NotNull ContractFunction parseFunction(@NotNull Method method) {
-        cache.computeIfAbsent(method, key -> {
-            val methodAccess = reflect(method);
-            val name = parseFunctionName(methodAccess);
-            val parametersDescriptor = parseParametersTypeDescriptor(method);
-            val signature = name + parametersDescriptor.toAbiDescriptor();
-            val signatureHash = "0x" + keccak256(signature).substring(0, 8).toLowerCase();
-            val returnDescriptor = parseReturnTypeDescriptor(method);
-            val returnType = parseReturnType(method);
-            val returnTuple = returnType.matches(EthTupleContainer.class)
-                    && !returnType.matches(EthStructContainer.class);
+        val methodAccess = reflect(method);
+        val name = parseFunctionName(methodAccess);
+        val parametersDescriptor = parseParametersTypeDescriptor(method);
+        val signature = name + parametersDescriptor.toAbiDescriptor();
+        val signatureHash = "0x" + keccak256(signature).substring(0, 8).toLowerCase();
+        val returnDescriptor = parseReturnTypeDescriptor(method);
+        val returnType = parseReturnType(method);
+        val returnTuple = returnType.matches(EthTupleContainer.class)
+                && !returnType.matches(EthStructContainer.class);
 
-            return new ContractFunction(
-                    methodAccess,
-                    name,
-                    signatureHash,
-                    parametersDescriptor,
-                    returnDescriptor,
-                    returnType,
-                    returnTuple,
-                    -1
-            );
-        });
-
-        return cache.get(method);
+        return new ContractFunction(
+                methodAccess,
+                name,
+                signatureHash,
+                parametersDescriptor,
+                returnDescriptor,
+                returnType,
+                returnTuple,
+                -1
+        );
     }
 
     /**

@@ -53,13 +53,17 @@ class MulticallExecutor<T : EthValue>(
      * @return a list of encoded calls
      */
     private suspend fun encodeCalls(calls: List<Call<Web3Contract>>): List<MulticallContract.Call> {
-        val client = CoroutineWeb3Client()
         val logger = LoggingInterceptor()
-        client.contracts.executor = logger
+        val client = CoroutineWeb3Client(
+            endpoint = multicall.client.endpoint,
+            contractExecutor = logger
+        )
+
         calls.forEach { call ->
             val contract = client.contract(call.contractType, call.contractAddress)
             call.call(contract)
         }
+
         return logger.logs.map {
             MulticallContract.Call(it.transaction.to, it.transaction.data)
         }
@@ -77,7 +81,6 @@ class MulticallExecutor<T : EthValue>(
         calls: List<Call<Web3Contract>>,
         results: List<EthBytes?>,
     ): List<T?> {
-        val client = CoroutineWeb3Client()
         val result = mutableListOf<T?>()
         results.forEachIndexed { index, data ->
             if (data == null) {
@@ -94,7 +97,10 @@ class MulticallExecutor<T : EthValue>(
             val call = calls[index]
             val value = Hex.toHex(byteArray)
             val interceptor = ConstantResultInterceptor(value)
-            client.contracts.executor = interceptor
+            val client = CoroutineWeb3Client(
+                endpoint = multicall.client.endpoint,
+                contractExecutor = interceptor
+            )
             val contract = client.contract(call.contractType, call.contractAddress)
 
             if (allowFailure) {
