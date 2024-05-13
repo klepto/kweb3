@@ -15,6 +15,11 @@ import java.math.RoundingMode;
 public interface EthNumericValue<T extends EthValue> extends EthValue, Comparable<Number> {
 
     /**
+     * Default precision for numeric values.
+     */
+    int DEFAULT_PRECISION = 18;
+
+    /**
      * Returns numeric value as {@link BigInteger}.
      *
      * @return the numeric value as big integer
@@ -140,7 +145,7 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
      */
     @NotNull
     default BigDecimal toBigDecimal() {
-        return toBigDecimal(0).setScale(18, RoundingMode.FLOOR);
+        return toBigDecimal(0).setScale(DEFAULT_PRECISION, RoundingMode.FLOOR);
     }
 
     /**
@@ -205,7 +210,10 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
         } else if (number instanceof EthNumericValue<?> value) {
             result = new BigDecimal(value.value());
         }
-        return result.setScale(18, RoundingMode.FLOOR);
+        if (result.scale() < DEFAULT_PRECISION) {
+            return result.setScale(DEFAULT_PRECISION, RoundingMode.FLOOR);
+        }
+        return result;
     }
 
 
