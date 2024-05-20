@@ -31,6 +31,7 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private final AtomicReference<EthUint> blockNumber = new AtomicReference<>(EthUint.ZERO);
     private final Queue<Consumer<EthBlock>> subscribers = new LinkedList<>();
+    private final Queue<Consumer<Throwable>> errorSubscribers = new LinkedList<>();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     /**
@@ -47,6 +48,34 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
     }
 
     /**
+     * Subscribes given consumer to errors.
+     *
+     * @param error the consumer to be called when an error occurs
+     */
+    @Override
+    public void onError(Consumer<Throwable> error) {
+        errorSubscribers.add(error);
+    }
+
+    /**
+     * Notifies all subscribers about a new block.
+     *
+     * @param block the new block
+     */
+    private void notifyBlock(EthBlock block) {
+        subscribers.forEach(subscriber -> subscriber.accept(block));
+    }
+
+    /**
+     * Notifies all error subscribers about an error.
+     *
+     * @param error the error
+     */
+    private void notifyError(Throwable error) {
+        errorSubscribers.forEach(subscriber -> subscriber.accept(error));
+    }
+
+    /**
      * Fetches a new block and emits it to all subscribers.
      *
      * @param blockNumber the block number to fetch and emit
@@ -60,8 +89,9 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
                 .map(EthBlock::parse)
                 .get(block -> {
                     this.blockNumber.set(block.number());
-                    subscribers.forEach(subscriber -> subscriber.accept(block));
-                });
+                    notifyBlock(block);
+                })
+                .error(this::notifyError);
     }
 
     /**
@@ -74,7 +104,8 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
         executor.scheduleAtFixedRate(() -> {
             client.ethBlockNumber()
                     .map(EthUint::uint256)
-                    .get(this::emitNewBlock);
+                    .get(this::emitNewBlock)
+                    .error(this::notifyError);
         }, 0, pollingInterval.toMillis(), TimeUnit.MILLISECONDS);
     }
 
@@ -141,6 +172,7 @@ public class FallbackEthereumSubscriber implements EthereumSubscriber {
 
         @Override
         public boolean onError(@NotNull RpcClient client, @NotNull Throwable error) {
+            notifyError(error);
             return false;
         }
     }

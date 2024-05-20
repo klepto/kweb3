@@ -19,6 +19,13 @@ public interface EthereumSubscriber {
     void onBlock(Consumer<EthBlock> subscriber);
 
     /**
+     * Subscribes given consumer to errors.
+     *
+     * @param error the consumer to be called when an error occurs
+     */
+    void onError(Consumer<Throwable> error);
+
+    /**
      * Closes the subscriber and releases all resources.
      */
     void close();
