@@ -3,24 +3,21 @@ package dev.klepto.kweb3.core.ethereum;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
-import dev.klepto.kweb3.core.ethereum.subscribe.EthereumSubscriber;
-import dev.klepto.kweb3.core.ethereum.subscribe.FallbackEthereumSubscriber;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.Getter;
 
 import java.io.Closeable;
-import java.util.function.Consumer;
 
 /**
  * A client for interacting with a blockchain metadata related RPC methods.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
+@Getter
 public class EthereumClient implements Closeable {
 
-    private final @Getter RpcClient rpc;
-    private final EthereumSubscriber subscriber;
+    private final RpcClient rpc;
 
     /**
      * Creates a new ethereum client that connects to given RPC endpoints.
@@ -29,16 +26,6 @@ public class EthereumClient implements Closeable {
      */
     public EthereumClient(Web3Endpoint endpoint) {
         this.rpc = new RpcClient(endpoint);
-        this.subscriber = new FallbackEthereumSubscriber(rpc);
-    }
-
-    /**
-     * Subscribes to new block headers.
-     *
-     * @param consumer the consumer to be called when a new block header is received
-     */
-    public void onBlock(Consumer<EthBlock> consumer) {
-        subscriber.onBlock(consumer);
     }
 
     /**
@@ -97,7 +84,6 @@ public class EthereumClient implements Closeable {
     @Override
     public void close() {
         rpc.close();
-        subscriber.close();
     }
 
 }
