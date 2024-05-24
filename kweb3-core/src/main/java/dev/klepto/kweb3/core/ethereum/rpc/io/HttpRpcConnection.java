@@ -65,4 +65,10 @@ public class HttpRpcConnection extends AuthorizedRpcConnection {
         });
     }
 
+    @Override
+    public void close() {
+        unirest.close();
+        super.close();
+    }
+
 }
