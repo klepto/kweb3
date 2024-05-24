@@ -51,7 +51,7 @@ public class HttpRpcConnection extends AuthorizedRpcConnection {
 
         val timeout = endpoint.settings().requestTimeout();
         if (timeout != null) {
-            request = request.connectTimeout((int) timeout.toMillis());
+            request = request.requestTimeout((int) timeout.toMillis());
         }
 
         request.asStringAsync().whenComplete((response, throwable) -> {

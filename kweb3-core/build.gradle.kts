@@ -7,6 +7,8 @@ dependencies {
     implementation(libs.headlong)
     implementation(libs.java.websocket)
     implementation(libs.bundles.slf4j)
+
+    implementation(platform(libs.unirest.bom))
     implementation(libs.unirest.core)
     implementation(libs.unirest.gson)
 

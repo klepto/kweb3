@@ -89,7 +89,7 @@ public class RpcClient implements Closeable, EthProtocol {
     }
 
     /**
-     * Called when connection is closed. Selects next endpoint in the list.
+     * Called when connection is closed.
      */
     private void onClose() {
 
