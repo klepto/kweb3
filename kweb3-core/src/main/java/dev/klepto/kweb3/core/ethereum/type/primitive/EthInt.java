@@ -24,7 +24,22 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
     /**
      * Zero <code>ethereum int</code> constant.
      */
-    public static final EthInt ZERO = int256(0);
+    public static final EthInt ZERO = int256(BigInteger.ZERO);
+
+    /**
+     * One <code>ethereum int</code> constant.
+     */
+    public static final EthInt ONE = int256(BigInteger.ONE);
+
+    /**
+     * Two <code>ethereum int</code> constant.
+     */
+    public static final EthInt TWO = int256(BigInteger.TWO);
+
+    /**
+     * Ten <code>ethereum int</code> constant.
+     */
+    public static final EthInt TEN = int256(BigInteger.TEN);
 
     private final int size;
     private final BigInteger value;
