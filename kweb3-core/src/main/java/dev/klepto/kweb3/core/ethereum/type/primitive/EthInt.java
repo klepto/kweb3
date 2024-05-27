@@ -137,6 +137,24 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
     }
 
     /**
+     * Performs modular exponentiation on this {@link EthInt} instance with the specified exponent,
+     * using a modulus of <code>2^{@link EthInt#size}</code> This method is particularly useful for cryptographic
+     * operations where calculations need to wrap around at the boundary of <code>2^{@link EthInt#size}</code> to
+     * prevent integer overflow and ensure values remain within the {@link EthInt#size} bit limit.
+     *
+     * @param exponent The {@link EthUint} representing the exponent to which this value is raised.
+     * @return A new {@link EthUint} object representing <code>this^exponent % 2^{@link EthInt#size}</code>.
+     * @throws ArithmeticException If the <code>exponent</code> is negative and this EthInt is not relatively prime to
+     *                             <code>2^{@link EthInt#size}</code>
+     */
+    public @NotNull EthInt pow(@NotNull EthUint exponent) {
+        // BigInteger.ONE.shiftLeft(size) computes 2^size, providing the modulus for the operation.
+        BigInteger modulus = BigInteger.ONE.shiftLeft(size);
+        return withValue(value.modPow(exponent.value(), modulus));
+    }
+
+
+    /**
      * Returns string representation of this <code>ethereum int</code>.
      *
      * @return string representation of this <code>ethereum int</code>
