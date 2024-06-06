@@ -2,10 +2,7 @@ package dev.klepto.kweb3.core.ethereum.rpc.io;
 
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcMessage;
-import kong.unirest.core.Config;
-import kong.unirest.core.ContentType;
-import kong.unirest.core.FailedResponse;
-import kong.unirest.core.UnirestInstance;
+import kong.unirest.core.*;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,8 +16,6 @@ import java.util.function.Consumer;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public class HttpRpcConnection extends AuthorizedRpcConnection {
-
-    private final UnirestInstance unirest = new UnirestInstance(new Config());
 
     /**
      * Constructs a new {@link HttpRpcConnection} for the specified endpoint.
@@ -45,13 +40,13 @@ public class HttpRpcConnection extends AuthorizedRpcConnection {
     @Override
     public void send(String message) {
         val endpoint = authorizedEndpoint();
-        var request = unirest.post(endpoint.url())
+        var request = Unirest.post(endpoint.url())
                 .contentType(ContentType.APPLICATION_JSON)
                 .body(message);
 
         val timeout = endpoint.settings().requestTimeout();
         if (timeout != null) {
-            request = request.connectTimeout((int) timeout.toMillis());
+            request = request.requestTimeout((int) timeout.toMillis());
         }
 
         request.asStringAsync().whenComplete((response, throwable) -> {

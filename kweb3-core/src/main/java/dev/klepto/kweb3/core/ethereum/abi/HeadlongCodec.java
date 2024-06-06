@@ -322,7 +322,7 @@ public class HeadlongCodec implements AbiCodec {
         for (var i = 0; i < values.length; i++) {
             values[i] = encodeValue(value.get(i));
         }
-        return Tuple.of(values);
+        return Tuple.from(values);
     }
 
 }
