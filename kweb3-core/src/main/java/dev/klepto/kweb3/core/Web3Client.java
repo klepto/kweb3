@@ -4,10 +4,12 @@ import dev.klepto.kweb3.core.chain.Web3Chain;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.contract.*;
 import dev.klepto.kweb3.core.ethereum.EthereumClient;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcClientListener;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 
@@ -35,29 +37,25 @@ public class Web3Client implements Closeable {
      * @param contractExecutor the contract executor
      * @param contractParser   the contract parser
      * @param endpoint         the endpoints this client connects to
+     * @param listener         the listener for the client
      */
     public Web3Client(@NotNull ContractProvider contractProvider,
                       @NotNull ContractExecutor contractExecutor,
                       @NotNull ContractParser contractParser,
-                      @NotNull Web3Endpoint endpoint) {
+                      @NotNull Web3Endpoint endpoint,
+                      @Nullable RpcClientListener listener) {
         this.contractProvider = contractProvider;
         this.contractExecutor = contractExecutor;
         this.contractParser = contractParser;
         this.address = EthAddress.ZERO;
-        this.ethereum = new EthereumClient(endpoint);
+        this.ethereum = new EthereumClient(endpoint, listener);
     }
 
-    /**
-     * Creates a new client instance for the given endpoints.
-     *
-     * @param endpoint the endpoints this client connects to
-     */
-    public Web3Client(@NotNull Web3Endpoint endpoint) {
-        this.contractProvider = new ContractProxyProvider();
-        this.contractExecutor = new ReflectionContractExecutor();
-        this.contractParser = new ReflectionContractParser();
-        this.address = EthAddress.ZERO;
-        this.ethereum = new EthereumClient(endpoint);
+    public Web3Client(@NotNull ContractProvider contractProvider,
+                      @NotNull ContractExecutor contractExecutor,
+                      @NotNull ContractParser contractParser,
+                      @NotNull Web3Endpoint endpoint) {
+        this(contractProvider, contractExecutor, contractParser, endpoint, null);
     }
 
     /**
