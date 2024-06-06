@@ -19,6 +19,8 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.7.3" }
 unirest-core = { module = "com.konghq:unirest-java-core", version.ref = "unirest" }
 unirest-gson = { module = "com.konghq:unirest-modules-gson", version.ref = "unirest" }
+ethers-bom = { module = "io.kriptal.ethers:ethers-bom", version = "0.5.0" }
+ethers-core = { module = "io.kriptal.ethers:ethers-core" }
 
 [bundles]
 slf4j = ["slf4j-api", "slf4j-simple"]
