@@ -102,8 +102,7 @@ public class EthBytes implements EthValue, EthNumericValue<EthBytes>, EthSizedVa
      */
     @Override
     public @NotNull EthBytes withValue(@NotNull BigInteger value) {
-        val arrayValue = Hex.toByteArray(Hex.toHex(value));
-        return new EthBytes(size, arrayValue);
+        return new EthBytes(size, value.toByteArray());
     }
 
     /**
@@ -359,7 +358,6 @@ public class EthBytes implements EthValue, EthNumericValue<EthBytes>, EthSizedVa
 
     @NotNull
     public static EthBytes bytes(@NotNull String hex) {
-        require(Hex.isValid(hex), "Malformed hex string: {}", hex);
         return bytes(Hex.toByteArray(hex));
     }
 

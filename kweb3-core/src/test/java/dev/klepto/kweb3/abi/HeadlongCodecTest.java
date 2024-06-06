@@ -126,6 +126,14 @@ public class HeadlongCodecTest {
                         new EthSizedTypeDescriptor(EthUint.class, 256)
                 ).get(0)
         );
+
+        assertEquals(
+                int256("F8A432EB"),
+                codec.decode(
+                        "fffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a432eb",
+                        new EthSizedTypeDescriptor(EthInt.class, 256)
+                ).get(0)
+        );
     }
 
     @Test

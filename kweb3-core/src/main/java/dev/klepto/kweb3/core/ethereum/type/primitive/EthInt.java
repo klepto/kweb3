@@ -218,8 +218,7 @@ public class EthInt extends Number implements EthValue, EthNumericValue<EthInt>,
 
     @NotNull
     public static EthInt int256(@NotNull String hex) {
-        require(Hex.isValid(hex), "Malformed hex string: {}", hex);
-        return int256(Hex.toBigInteger(hex));
+        return new EthInt(256, Hex.toBigInteger(hex));
     }
 
     /* Smaller size solidity int initializers */

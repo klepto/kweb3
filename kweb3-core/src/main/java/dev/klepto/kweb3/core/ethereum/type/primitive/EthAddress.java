@@ -1,21 +1,14 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
-import com.google.common.base.Strings;
+import com.esaulpaugh.headlong.abi.Address;
 import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
-import dev.klepto.kweb3.core.util.Hex;
-import dev.klepto.kweb3.core.util.hash.Keccak256;
 import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
-
-import static dev.klepto.kweb3.core.util.Conditions.require;
-import static dev.klepto.kweb3.core.util.Hex.stripPrefix;
-import static dev.klepto.kweb3.core.util.Hex.toBigInteger;
-import static dev.klepto.kweb3.core.util.hash.Keccak256.keccak256Checksum;
 
 /**
  * Container for <code>ethereum address</code> value.
@@ -34,16 +27,33 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
      * Address value.
      */
     @NotNull
-    private final BigInteger value;
+    private final Address address;
 
     /**
-     * Constructs new <code>ethereum address</code> from the specified big integer value.
-     *
-     * @param value the big integer value
+     * Checksum address value.
      */
-    public EthAddress(@NotNull BigInteger value) {
-        require(value.bitLength() <= 160, "Malformed address: {}", Hex.toHex(value));
-        this.value = value;
+    @NotNull
+    private final String checksumAddress;
+
+    /**
+     * Constructs new <code>ethereum address</code> from the specified {@link Address}.
+     *
+     * @param address the address
+     */
+    private EthAddress(@NotNull Address address, @NotNull String checksumAddress) {
+        this.address = address;
+        this.checksumAddress = checksumAddress;
+    }
+
+    /**
+     * Creates a new instance of numeric type with given value.
+     *
+     * @param value the value to set
+     * @return a new instance of numeric type with given value
+     */
+    @Override
+    public @NotNull EthAddress withValue(@NotNull BigInteger value) {
+        return address(value);
     }
 
     /**
@@ -53,19 +63,17 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
      */
     @Override
     public @NotNull BigInteger value() {
-        return value;
+        return address.value();
     }
 
     /**
-     * Generates a hex of this <code>ethereum address</code> with checksum.
+     * Returns the checksum hex of this <code>ethereum address</code> with checksum.
      *
      * @return a check-summed hex of this <code>ethereum address</code>
      */
     @Override
     public @NotNull String toHex() {
-        val hex = value().toString(16);
-        val paddedHex = Strings.padStart(hex, 40, '0');
-        return keccak256Checksum(paddedHex);
+        return checksumAddress;
     }
 
     /**
@@ -86,7 +94,7 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
      */
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return address.hashCode();
     }
 
     /**
@@ -121,19 +129,20 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
         if (!(object instanceof EthAddress other)) {
             return false;
         }
-        return value.equals(other.value);
+        return checksumAddress.equals(other.checksumAddress);
     }
 
     /* Solidity style static initializers */
     @NotNull
     public static EthAddress address(@NotNull Number value) {
-        return new EthAddress(EthNumericValue.parseBigInteger(value));
+        val checksumAddress = Address.toChecksumAddress(EthNumericValue.parseBigInteger(value));
+        return address(checksumAddress);
     }
 
     @NotNull
     public static EthAddress address(@NotNull String hex) {
-        hex = stripPrefix(Keccak256.keccak256Checksum(hex));
-        return address(toBigInteger(hex));
+        val address = Address.wrap(Address.toChecksumAddress(hex));
+        return new EthAddress(address, address.toString());
     }
 
 }

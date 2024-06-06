@@ -12,6 +12,9 @@ dependencies {
     implementation(libs.unirest.core)
     implementation(libs.unirest.gson)
 
+    implementation(platform(libs.ethers.bom))
+    implementation(libs.ethers.core)
+
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
 }

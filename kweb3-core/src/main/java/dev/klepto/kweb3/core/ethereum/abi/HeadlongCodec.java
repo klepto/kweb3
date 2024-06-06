@@ -3,7 +3,6 @@ package dev.klepto.kweb3.core.ethereum.abi;
 import com.esaulpaugh.headlong.abi.Address;
 import com.esaulpaugh.headlong.abi.Tuple;
 import com.esaulpaugh.headlong.abi.TupleType;
-import com.esaulpaugh.headlong.util.FastHex;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthArrayTypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthSizedTypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
@@ -12,6 +11,7 @@ import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
 import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.ethereum.type.primitive.*;
+import io.ethers.core.FastHex;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -210,7 +210,7 @@ public class HeadlongCodec implements AbiCodec {
     private String encode(EthTuple value, TypeDescriptor descriptor) {
         val tupleType = TupleType.parse(descriptor.toAbiDescriptor());
         val result = tupleType.encode((Tuple) encodeValue(value)).array();
-        return FastHex.encodeToString(result, 0, result.length);
+        return FastHex.encodeWithoutPrefix(result);
     }
 
     /**
