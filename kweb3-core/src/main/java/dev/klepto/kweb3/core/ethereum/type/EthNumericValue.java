@@ -139,7 +139,47 @@ public interface EthNumericValue<T extends EthValue> extends EthValue, Comparabl
     }
 
     /**
-     * Returns numeric value as {@link BigDecimal}> value with <code>18</code> decimals.
+     * Returns the value of this numeric value, throwing an exception if the value overflows a {@code long}.
+     *
+     * @return the argument as a {@code long}.
+     * @throws ArithmeticException if the {@code argument} overflows an long
+     */
+    default long longValueExact() {
+        return value().longValueExact();
+    }
+
+    /**
+     * Returns the value of this numeric value, throwing an exception if the value overflows an {@code int}.
+     *
+     * @return the argument as an {@code int}.
+     * @throws ArithmeticException if the {@code argument} overflows an int
+     */
+    default int intValueExact() {
+        return value().intValueExact();
+    }
+
+    /**
+     * Returns the value of this numeric value, throwing an exception if the value overflows a {@code short}.
+     *
+     * @return the argument as a {@code short}.
+     * @throws ArithmeticException if the {@code argument} overflows a short
+     */
+    default short shortValueExact() {
+        return value().shortValueExact();
+    }
+
+    /**
+     * Returns the value of this numeric value, throwing an exception if the value overflows a {@code byte}.
+     *
+     * @return the argument as a {@code byte}.
+     * @throws ArithmeticException if the {@code argument} overflows a byte
+     */
+    default byte byteValueExact() {
+        return value().byteValueExact();
+    }
+
+    /**
+     * Returns numeric value as {@link BigDecimal} value with <code>18</code> decimals.
      *
      * @return the numeric value as big decimal with 18 decimal places
      */

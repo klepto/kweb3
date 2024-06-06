@@ -24,7 +24,22 @@ public class EthUint extends Number implements EthValue, EthNumericValue<EthUint
     /**
      * Zero <code>uint</code> constant.
      */
-    public static final EthUint ZERO = uint256(0);
+    public static final EthUint ZERO = uint256(BigInteger.ZERO);
+
+    /**
+     * One <code>uint</code> constant.
+     */
+    public static final EthUint ONE = uint256(BigInteger.ONE);
+
+    /**
+     * Two <code>uint</code> constant.
+     */
+    public static final EthUint TWO = uint256(BigInteger.TWO);
+
+    /**
+     * Ten <code>uint</code> constant.
+     */
+    public static final EthUint TEN = uint256(BigInteger.TEN);
 
     private final int size;
 
@@ -120,6 +135,21 @@ public class EthUint extends Number implements EthValue, EthNumericValue<EthUint
     @Override
     public double doubleValue() {
         return toBigDecimal().doubleValue();
+    }
+
+    /**
+     * Performs modular exponentiation on this {@link EthUint} instance with the specified exponent,
+     * using a modulus of <code>2^{@link EthUint#size}</code> This method is particularly useful for cryptographic operations
+     * where calculations need to wrap around at the boundary of <code>2^{@link EthUint#size}</code> to prevent integer overflow
+     * and ensure values remain within the {@link EthUint#size} bit limit.
+     *
+     * @param exponent The {@link EthUint} representing the exponent to which this value is raised.
+     * @return A new {@link EthUint} object representing <code>this^exponent % 2^{@link EthUint#size}</code>.
+     */
+    public @NotNull EthUint pow(@NotNull EthUint exponent) {
+        // BigInteger.ONE.shiftLeft(size) computes 2^size, providing the modulus for the operation.
+        BigInteger modulus = BigInteger.ONE.shiftLeft(size);
+        return withValue(value.modPow(exponent.value(), modulus));
     }
 
     /**
