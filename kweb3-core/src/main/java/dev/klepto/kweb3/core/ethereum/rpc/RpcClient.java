@@ -5,6 +5,7 @@ import dev.klepto.kweb3.core.ethereum.rpc.api.EthProtocol;
 import dev.klepto.kweb3.core.ethereum.rpc.io.RpcConnection;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.util.Queue;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class RpcClient implements Closeable, EthProtocol {
 
     private final RpcConnection connection;
+    private final @Nullable RpcClientListener listener;
     private final Queue<RpcRequest> requests = new ConcurrentLinkedQueue<>();
 
     /**
@@ -26,8 +28,13 @@ public class RpcClient implements Closeable, EthProtocol {
      *
      * @param endpoint the endpoint
      */
-    public RpcClient(Web3Endpoint endpoint) {
+    public RpcClient(Web3Endpoint endpoint, @Nullable RpcClientListener listener) {
+        this.listener = listener;
         this.connection = RpcConnection.create(endpoint, this::onMessage, this::onError, this::onClose);
+    }
+
+    public RpcClient(Web3Endpoint endpoint) {
+        this(endpoint, null);
     }
 
     /**
@@ -77,6 +84,9 @@ public class RpcClient implements Closeable, EthProtocol {
      */
     private void onMessage(@NotNull RpcMessage message) {
         requests.removeIf(request -> request.isComplete(this, message));
+        if (listener != null) {
+            listener.onMessage(message);
+        }
     }
 
     /**
@@ -86,13 +96,18 @@ public class RpcClient implements Closeable, EthProtocol {
      */
     private void onError(@NotNull Throwable throwable) {
         requests.removeIf(request -> request.onError(this, throwable));
+        if (listener != null) {
+            listener.onError(throwable);
+        }
     }
 
     /**
      * Called when connection is closed.
      */
     private void onClose() {
-
+        if (listener != null) {
+            listener.onClose();
+        }
     }
 
     /**

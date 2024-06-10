@@ -3,6 +3,7 @@ package dev.klepto.kweb3.kotlin
 import dev.klepto.kweb3.core.Web3Client
 import dev.klepto.kweb3.core.chain.Web3Endpoint
 import dev.klepto.kweb3.core.contract.*
+import dev.klepto.kweb3.core.ethereum.rpc.RpcClientListener
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress
 
 /**
@@ -16,12 +17,14 @@ open class CoroutineWeb3Client(
     contractProvider: ContractProvider = ContractProxyProvider(),
     contractExecutor: ContractExecutor = CoroutineContractExecutor(),
     contractParser: ContractParser = CoroutineContractParser(),
+    listener: RpcClientListener? = null
 ) :
     Web3Client(
         contractProvider,
         contractExecutor,
         contractParser,
-        endpoint
+        endpoint,
+        listener
     ) {
 
     companion object {

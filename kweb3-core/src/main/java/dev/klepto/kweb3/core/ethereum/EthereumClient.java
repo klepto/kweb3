@@ -3,9 +3,11 @@ package dev.klepto.kweb3.core.ethereum;
 import dev.klepto.kweb3.core.Web3Result;
 import dev.klepto.kweb3.core.chain.Web3Endpoint;
 import dev.klepto.kweb3.core.ethereum.rpc.RpcClient;
+import dev.klepto.kweb3.core.ethereum.rpc.RpcClientListener;
 import dev.klepto.kweb3.core.ethereum.type.data.EthBlock;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthUint;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 
@@ -24,8 +26,12 @@ public class EthereumClient implements Closeable {
      *
      * @param endpoint the RPC endpoints
      */
+    public EthereumClient(Web3Endpoint endpoint, @Nullable RpcClientListener listener) {
+        this.rpc = new RpcClient(endpoint, listener);
+    }
+
     public EthereumClient(Web3Endpoint endpoint) {
-        this.rpc = new RpcClient(endpoint);
+        this(endpoint, null);
     }
 
     /**
