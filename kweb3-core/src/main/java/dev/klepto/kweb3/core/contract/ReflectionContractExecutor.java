@@ -8,10 +8,10 @@ import dev.klepto.kweb3.core.ethereum.abi.HeadlongCodec;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.val;
-import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static dev.klepto.kweb3.core.Web3Error.message;
@@ -57,7 +57,7 @@ public class ReflectionContractExecutor implements ContractExecutor {
         val argsWithoutCost = arrayRemove(call.args(), call.function().costParameterIndex());
 
         // Remove all non-ethereum type arguments, such as suspend method transformations.
-        val dataArgs = StreamEx.of(argsWithoutCost)
+        val dataArgs = Arrays.stream(argsWithoutCost)
                 .filter(EthValue.class::isInstance)
                 .map(EthValue.class::cast)
                 .toArray(EthValue[]::new);
