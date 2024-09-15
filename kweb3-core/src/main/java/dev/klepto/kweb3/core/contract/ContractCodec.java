@@ -9,7 +9,7 @@ import dev.klepto.kweb3.core.contract.type.EthStructContainer;
 import dev.klepto.kweb3.core.contract.type.EthTupleContainer;
 import dev.klepto.kweb3.core.contract.type.EthVoid;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.*;
-import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.ethereum.type.primitive.*;
 import dev.klepto.unreflect.MethodAccess;
@@ -101,7 +101,7 @@ public final class ContractCodec {
             return new EthVoidTypeDescriptor();
         }
 
-        if (type.matches(EthSizedValue.class)) {
+        if (type.matches(EthNumeric.class)) {
             // Hard-coded defaults, not a huge fan.
             if (valueSize == -1) {
                 if (type.matches(EthUint.class) || type.matches(EthInt.class)) {

@@ -17,7 +17,7 @@ import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthArray.array;
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBool.bool;
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthBytes.bytes;
-import static dev.klepto.kweb3.core.ethereum.type.primitive.EthInt.*;
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthInt.int256;
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthString.string;
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple.tuple;
 import static dev.klepto.kweb3.core.ethereum.type.primitive.EthUint.uint256;
@@ -259,7 +259,7 @@ public class HeadlongCodecTest {
         );
         assertEquals(
                 "1122334455000000000000000000000000000000000000000000000000000000",
-                codec.encode(value.withSize(5))
+                codec.encode(value.size(5))
         );
     }
 
@@ -271,11 +271,11 @@ public class HeadlongCodecTest {
         );
         assertEquals(
                 "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff85",
-                codec.encode(int32(-123))
+                codec.encode(int256(-123).size(32))
         );
         assertEquals(
                 "000000000000000000000000000000000000000000000000000000000000007b",
-                codec.encode(int64(123))
+                codec.encode(int256(123).size(64))
         );
     }
 

@@ -1,24 +1,21 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
-import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
-import dev.klepto.kweb3.core.ethereum.type.EthValue;
-import lombok.With;
+import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
+import dev.klepto.kweb3.core.ethereum.type.reference.ValueRef;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Objects;
-
-import static dev.klepto.kweb3.core.util.Conditions.require;
 
 /**
  * Container for <code>ethereum bool</code> value.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@With
-public class EthBool implements EthValue, EthNumericValue<EthBool> {
+public class EthBool extends EthUint {
 
     /**
      * True bool constant.
@@ -31,85 +28,85 @@ public class EthBool implements EthValue, EthNumericValue<EthBool> {
     public static final EthBool FALSE = bool(false);
 
     /**
-     * Boolean value.
-     */
-    @NotNull
-    private final BigInteger value;
-
-    /**
-     * Constructs new <code>ethereum bool</code> with the specified value.
+     * Creates a new instance of bool with given {@code boolean} value.
      *
      * @param value the boolean value
+     * @return a new instance of bool with given {@code boolean} value
      */
-    public EthBool(BigInteger value) {
-        val isTrue = value.equals(BigInteger.ONE);
-        val isFalse = value.equals(BigInteger.ZERO);
-        require(isTrue || isFalse, "BigInteger {} is not a boolean value.", value);
-        this.value = value;
+    public static EthBool bool(boolean value) {
+        return new EthBool(ValueRef.of(value ? 1 : 0));
     }
 
     /**
-     * Returns <code>true</code> if this <code>ethereum bool</code> is <code>true</code>, <code>false</code> otherwise.
+     * Creates a new instance of bool with given {@link Number} value.
      *
-     * @return <code>true</code> if this <code>ethereum bool</code> is <code>true</code>, <code>false</code> otherwise
+     * @param number the value
+     * @return a new instance of bool with given {@link Number} value
      */
+    public static EthBool bool(Number number) {
+        return new EthBool(ValueRef.of(number));
+    }
+
+    /**
+     * Creates a new instance of bool with given hexadecimal {@link String} value.
+     *
+     * @param hex the value
+     * @return a new instance of bool with given hexadecimal {@link String} value
+     */
+    public static EthBool bool(String hex) {
+        return new EthBool(ValueRef.of(hex));
+    }
+
+    /**
+     * Creates a new instance of bool with given {@link EthNumeric} value.
+     *
+     * @param numeric the value
+     * @return a new instance of bool with given {@link EthNumeric} value
+     */
+    public static EthBool bool(EthNumeric<?> numeric) {
+        return new EthBool(numeric);
+    }
+
+    /**
+     * Creates a new instance of bool with given {@link ByteBuffer} value.
+     *
+     * @param buffer the value
+     * @return a new instance of bool with given {@link ByteBuffer} value
+     */
+    public static EthBool bool(ByteBuffer buffer) {
+        return new EthBool(ValueRef.of(buffer));
+    }
+
+    private EthBool(ValueRef<?> valueRef) {
+        super(valueRef, 8);
+    }
+
     public boolean check() {
-        return value.equals(BigInteger.ONE);
+        return equals(1);
     }
 
-    /**
-     * Returns the value of this <code>ethereum bool</code>.
-     *
-     * @return the value of this <code>ethereum bool</code>
-     */
-    @NotNull
-    public BigInteger value() {
-        return value;
+    @Override
+    @Nullable
+    public InvalidValue validate() {
+        val value = toBigInteger();
+        if (!value.equals(BigInteger.ONE) && !value.equals(BigInteger.ZERO)) {
+            return InvalidValue.OUT_OF_RANGE;
+        }
+        return null;
     }
 
-    /**
-     * Returns string representation of this <code>ethereum bool</code>.
-     *
-     * @return the string representation of this <code>ethereum bool</code>.
-     */
     @Override
     @NotNull
     public String toString() {
         return "bool(" + check() + ")";
     }
 
-    /**
-     * Returns hash code of this <code>ethereum bool</code>.
-     *
-     * @return hash code of this <code>ethereum bool</code>
-     */
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hash(check());
     }
 
-    /**
-     * Arithmetic equals method for <code>ethereum boolean</code> values.
-     *
-     * @param object the object to compare with
-     * @return true if the objects have the same value; false otherwise
-     */
-    public boolean equals(@Nullable Object object) {
-        if (object instanceof Number number) {
-            return equals(number);
-        }
-        if (object instanceof EthNumericValue<?> numeric) {
-            return equals(numeric.value());
-        }
-        return false;
-    }
-
-    /**
-     * Compares this <code>ethereum bool</code> to the specified object.
-     *
-     * @param object the object to compare with
-     * @return true if the objects are the same; false otherwise
-     */
+    @Override
     public boolean matches(@Nullable Object object) {
         if (object == null) {
             return false;
@@ -121,18 +118,6 @@ public class EthBool implements EthValue, EthNumericValue<EthBool> {
             return false;
         }
         return check() == other.check();
-    }
-
-    /* Solidity style static initializers */
-    @NotNull
-    public static EthBool bool(@NotNull Number value) {
-        val intValue = EthNumericValue.parseBigInteger(value);
-        return new EthBool(intValue);
-    }
-
-    @NotNull
-    public static EthBool bool(boolean value) {
-        return bool(value ? BigInteger.ONE : BigInteger.ZERO);
     }
 
 }

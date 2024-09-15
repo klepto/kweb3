@@ -1,9 +1,9 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
+
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.ethereum.type.EthCollectionValue;
+import dev.klepto.kweb3.core.ethereum.type.EthCollection;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
-import lombok.With;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,13 +20,60 @@ import static dev.klepto.kweb3.core.util.Conditions.require;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@With
-public class EthArray<T extends EthValue> implements EthValue, EthCollectionValue<T> {
+public class EthArray<T extends EthValue> implements EthCollection<T> {
 
     /**
      * Constant indicating dynamic array size.
      */
     public static final int DYNAMIC_SIZE = -1;
+
+    /**
+     * Creates a fixed-size  <code>ethereum array</code> with given elements.
+     *
+     * @param size   the fixed array size
+     * @param values the array values
+     * @return a new fixed-sized <code>ethereum array</code> container
+     */
+    @NotNull
+    @SafeVarargs
+    public static <T extends EthValue> EthArray<T> array(int size, @NotNull T... values) {
+        return new EthArray<>(size, ImmutableList.copyOf(values));
+    }
+
+    /**
+     * Creates a fixed-size  <code>ethereum array</code> with given {@link Collection} <code>values</code>.
+     *
+     * @param size   the fixed array size
+     * @param values the collection containing values
+     * @return a new fixed-sized <code>ethereum array</code> container
+     */
+    @NotNull
+    public static <T extends EthValue> EthArray<T> array(int size, @NotNull Collection<T> values) {
+        return new EthArray<>(size, values);
+    }
+
+    /**
+     * Creates a dynamic-size  <code>ethereum array</code> with given elements.
+     *
+     * @param values the array values
+     * @return a new dynamic-size <code>ethereum array</code> container
+     */
+    @NotNull
+    @SafeVarargs
+    public static <T extends EthValue> EthArray<T> array(@NotNull T... values) {
+        return array(DYNAMIC_SIZE, values);
+    }
+
+    /**
+     * Creates a dynamic-size  <code>ethereum array</code> with given {@link Collection} <code>values</code>.
+     *
+     * @param values the collection containing values
+     * @return a new dynamic-size <code>ethereum array</code> container
+     */
+    @NotNull
+    public static <T extends EthValue> EthArray<T> array(@NotNull Collection<T> values) {
+        return array(DYNAMIC_SIZE, values);
+    }
 
     /**
      * Array capacity.
@@ -136,55 +183,5 @@ public class EthArray<T extends EthValue> implements EthValue, EthCollectionValu
         return values.equals(other.values);
     }
 
-    /* Solidity style static initializers */
-
-    /**
-     * Creates a fixed-size  <code>ethereum array</code> with given elements.
-     *
-     * @param size   the fixed array size
-     * @param values the array values
-     * @return a new fixed-sized <code>ethereum array</code> container
-     */
-    @NotNull
-    @SafeVarargs
-    public static <T extends EthValue> EthArray<T> array(int size, @NotNull T... values) {
-        return new EthArray<>(size, ImmutableList.copyOf(values));
-    }
-
-    /**
-     * Creates a fixed-size  <code>ethereum array</code> with given {@link Collection} <code>values</code>.
-     *
-     * @param size   the fixed array size
-     * @param values the collection containing values
-     * @return a new fixed-sized <code>ethereum array</code> container
-     */
-    @NotNull
-    public static <T extends EthValue> EthArray<T> array(int size, @NotNull Collection<T> values) {
-        return new EthArray<>(size, values);
-    }
-
-    /**
-     * Creates a dynamic-size  <code>ethereum array</code> with given elements.
-     *
-     * @param values the array values
-     * @return a new dynamic-size <code>ethereum array</code> container
-     */
-    @NotNull
-    @SafeVarargs
-    public static <T extends EthValue> EthArray<T> array(@NotNull T... values) {
-        return array(DYNAMIC_SIZE, values);
-    }
-
-    /**
-     * Creates a dynamic-size  <code>ethereum array</code> with given {@link Collection} <code>values</code>.
-     *
-     * @param values the collection containing values
-     * @return a new dynamic-size <code>ethereum array</code> container
-     */
-    @NotNull
-    public static <T extends EthValue> EthArray<T> array(@NotNull Collection<T> values) {
-        return array(DYNAMIC_SIZE, values);
-    }
-
-
 }
+

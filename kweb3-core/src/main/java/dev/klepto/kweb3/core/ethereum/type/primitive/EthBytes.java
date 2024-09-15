@@ -1,171 +1,146 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
-import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
-import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
-import dev.klepto.kweb3.core.ethereum.type.EthValue;
-import dev.klepto.kweb3.core.util.Hex;
+import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
+import dev.klepto.kweb3.core.ethereum.type.reference.ValueRef;
+import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigInteger;
-
-import static dev.klepto.kweb3.core.util.Conditions.require;
+import java.nio.ByteBuffer;
 
 /**
  * Container for <code>ethereum bytes</code> value.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class EthBytes implements EthValue, EthNumericValue<EthBytes>, EthSizedValue {
+public class EthBytes extends Number implements EthNumeric<EthBytes>, EthNumeric.Math<EthBytes> {
 
     /**
-     * Empty <code>ethereum bytes</code> constant.
+     * Maximum bytes size for ethereum <code>bytes</code> type.
      */
-    public static final EthBytes EMPTY = bytes(new byte[0]);
+    public static final int MAX_BYTE_SIZE = 32;
 
     /**
-     * Constant indicating dynamic byte size.
+     * Indicator constants for dynamic ethereum <code>bytes</code> type.
      */
-    public static final int DYNAMIC_SIZE = -1;
+    public static final int DYNAMIC_BYTE_SIZE = 0;
 
     /**
-     * The maximum amount of bytes.
+     * Creates a new instance of uint256 with given {@link Number} value.
+     *
+     * @param number the value
+     * @return a new instance of uint256 with given {@link Number} value
      */
-    private final int size;
+    public static @NotNull EthBytes bytes(@NotNull Number number) {
+        return new EthBytes(ValueRef.of(number), DYNAMIC_BYTE_SIZE);
+    }
 
     /**
-     * The bytes value represented as {@link BigInteger}.
+     * Creates a new instance of uint256 with given hexadecimal {@link String} value.
+     *
+     * @param hex the value
+     * @return a new instance of uint256 with given hexadecimal {@link String} value
      */
+    public static @NotNull EthBytes bytes(@NotNull String hex) {
+        return new EthBytes(ValueRef.of(hex), DYNAMIC_BYTE_SIZE);
+    }
+
+    /**
+     * Creates a new instance of uint256 with given {@link EthNumeric} value.
+     *
+     * @param numeric the value
+     * @return a new instance of uint256 with given {@link EthNumeric} value
+     */
+    public static @NotNull EthBytes bytes(@NotNull EthNumeric<?> numeric) {
+        return new EthBytes(numeric, DYNAMIC_BYTE_SIZE);
+    }
+
+    /**
+     * Creates a new instance of uint256 with given {@link ByteBuffer} value.
+     *
+     * @param buffer the value
+     * @return a new instance of uint256 with given {@link ByteBuffer} value
+     */
+    public static @NotNull EthBytes bytes(@NotNull ByteBuffer buffer) {
+        return new EthBytes(ValueRef.of(buffer), DYNAMIC_BYTE_SIZE);
+    }
+
+    /**
+     * Creates a new instance of uint256 with given {@code byte array}  value.
+     *
+     * @param buffer the value
+     * @return a new instance of uint256 with given {@code byte array} value
+     */
+    public static @NotNull EthBytes bytes(byte @NotNull [] buffer) {
+        return new EthBytes(ValueRef.of(ByteBuffer.wrap(buffer)), DYNAMIC_BYTE_SIZE);
+    }
+
+    @Delegate
     @NotNull
-    private final BigInteger value;
+    private final ValueRef<?> valueRef;
+    private final int byteSize;
 
-    /**
-     * The bytes value represented as <code>byte</code> array.
-     */
-    private final byte @NotNull [] arrayValue;
-
-    /**
-     * Constructs new <code>ethereum bytes</code> with the specified size and value.
-     *
-     * @param size   the size of the bytes, <code>-1</code> indicates dynamic size, any other positive value indicates a
-     *               fixed size bytes
-     * @param values the array containing byte values
-     */
-    public EthBytes(int size, byte @NotNull [] values) {
-        require(
-                size == DYNAMIC_SIZE || size >= values.length,
-                "bytes{} cannot contain {} bytes",
-                size, values.length
-        );
-
-        this.size = size;
-        this.value = Hex.toBigInteger(Hex.toHex(values));
-        this.arrayValue = values;
+    private EthBytes(@NotNull ValueRef<?> valueRef, int byteSize) {
+        this.valueRef = valueRef;
+        this.byteSize = byteSize;
     }
 
-    /**
-     * Returns the size of this <code>ethereum bytes</code>.
-     *
-     * @return the size of this <code>ethereum bytes</code>
-     */
+    @Override
     public int size() {
-        return size;
+        return byteSize;
     }
 
-    /**
-     * Returns string representation of this <code>ethereum bytes</code>.
-     *
-     * @return the string representation of this <code>ethereum bytes</code>.
-     */
+    @Override
+    public int bitSize() {
+        return byteSize * 8;
+    }
+
+    @Override
+    public int byteSize() {
+        return byteSize;
+    }
+
+    @Override
+    public @Nullable InvalidValue validate() {
+        if (byteSize > MAX_BYTE_SIZE || byteSize < DYNAMIC_BYTE_SIZE) {
+            return InvalidValue.UNSUPPORTED_SIZE;
+        } else if (byteSize != DYNAMIC_BYTE_SIZE && valueRef.toByteBuffer().remaining() > byteSize) {
+            return InvalidValue.OUT_OF_RANGE;
+        }
+        return null;
+    }
+
+    @Override
+    public EthBytes size(int size) {
+        return new EthBytes(valueRef, size);
+    }
+
+    @Override
+    public @NotNull EthBytes value(@NotNull ValueRef<?> valueRef) {
+        return new EthBytes(valueRef, byteSize);
+    }
+
     @Override
     @NotNull
     public String toString() {
-        val sizeString = size > 0 ? size : "";
-        return "bytes" + sizeString + "(" + toHex() + ")";
+        val sizeString = byteSize > DYNAMIC_BYTE_SIZE ? byteSize : "";
+        return "bytes" + sizeString + "(" + toHexString() + ")";
     }
 
-    /**
-     * Returns {@link BigInteger} value that represents this <code>ethereum bytes</code>.
-     *
-     * @return the big integer value of this <code>ethereum bytes</code>
-     */
-    @Override
-    public @NotNull BigInteger value() {
-        return value;
-    }
-
-    /**
-     * Creates a new instance of {@link EthBytes} with the specified value.
-     *
-     * @return a new instance of {@link EthBytes} with the specified value
-     */
-    @Override
-    public @NotNull EthBytes withValue(@NotNull BigInteger value) {
-        return new EthBytes(size, value.toByteArray());
-    }
-
-    /**
-     * Creates a new <code>ethereum bytes</code> container with the specified size. If specified <code>size</code> is
-     * larger than the current size, the new bytes will be padded with zeros.
-     *
-     * @param size the size of the new bytes
-     * @return a new <code>ethereum bytes</code> container with the specified size
-     */
-    @NotNull
-    public EthBytes withSize(int size) {
-        if (size() < size) {
-            val currentBytes = toByteArray();
-            val newBytes = new byte[size];
-            System.arraycopy(currentBytes, 0, newBytes, 0, currentBytes.length);
-            return new EthBytes(size, newBytes);
-        }
-        return new EthBytes(size, arrayValue);
-    }
-
-
-    /**
-     * Returns hex string representation of this <code>ethereum bytes</code>.
-     *
-     * @return the hex string representation of this <code>ethereum bytes</code>
-     */
-    @NotNull
-    public String toHex() {
-        return Hex.toHex(toByteArray());
-    }
-
-    /**
-     * Returns hash code of this <code>ethereum bytes</code>.
-     *
-     * @return hash code of this <code>ethereum bytes</code>
-     */
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return toBigInteger().hashCode();
     }
 
-    /**
-     * Arithmetic equals method for <code>ethereum bytes</code> values.
-     *
-     * @param object the object to compare with
-     * @return true if the objects have the same value; false otherwise
-     */
+    @Override
     public boolean equals(@Nullable Object object) {
         if (object instanceof Number number) {
             return equals(number);
         }
-        if (object instanceof EthNumericValue<?> numeric) {
-            return equals(numeric.value());
-        }
         return false;
     }
 
-    /**
-     * Compares this <code>ethereum bytes</code> to the specified object.
-     *
-     * @param object the object to compare with
-     * @return true if the objects are the same; false otherwise
-     */
     public boolean matches(@Nullable Object object) {
         if (object == null) {
             return false;
@@ -176,349 +151,26 @@ public class EthBytes implements EthValue, EthNumericValue<EthBytes>, EthSizedVa
         if (!(object instanceof EthBytes other)) {
             return false;
         }
-        return value.equals(other.value);
+        return toHexString().equals(other.toHexString());
     }
 
-    /**
-     * Returns <code>ethereum bytes</code> array value.
-     *
-     * @return an array of bytes
-     */
-    public byte @NotNull [] toByteArray() {
-        val result = new byte[arrayValue.length];
-        System.arraycopy(arrayValue, 0, result, 0, arrayValue.length);
-        return result;
+    @Override
+    public int intValue() {
+        return toInt();
     }
 
-    /* Solidity style static initializers */
-    @NotNull
-    public static EthBytes bytes(byte @NotNull [] value) {
-        return new EthBytes(DYNAMIC_SIZE, value);
+    @Override
+    public long longValue() {
+        return toLong();
     }
 
-    @NotNull
-    public static EthBytes bytes1(byte @NotNull [] value) {
-        return bytes(value).withSize(1);
+    @Override
+    public float floatValue() {
+        return toFloat();
     }
 
-    @NotNull
-    public static EthBytes bytes2(byte @NotNull [] value) {
-        return bytes(value).withSize(2);
+    @Override
+    public double doubleValue() {
+        return toDouble();
     }
-
-    @NotNull
-    public static EthBytes bytes3(byte @NotNull [] value) {
-        return bytes(value).withSize(3);
-    }
-
-    @NotNull
-    public static EthBytes bytes4(byte @NotNull [] value) {
-        return bytes(value).withSize(4);
-    }
-
-    @NotNull
-    public static EthBytes bytes5(byte @NotNull [] value) {
-        return bytes(value).withSize(5);
-    }
-
-    @NotNull
-    public static EthBytes bytes6(byte @NotNull [] value) {
-        return bytes(value).withSize(6);
-    }
-
-    @NotNull
-    public static EthBytes bytes7(byte @NotNull [] value) {
-        return bytes(value).withSize(7);
-    }
-
-    @NotNull
-    public static EthBytes bytes8(byte @NotNull [] value) {
-        return bytes(value).withSize(8);
-    }
-
-    @NotNull
-    public static EthBytes bytes9(byte @NotNull [] value) {
-        return bytes(value).withSize(9);
-    }
-
-    @NotNull
-    public static EthBytes bytes10(byte @NotNull [] value) {
-        return bytes(value).withSize(10);
-    }
-
-    @NotNull
-    public static EthBytes bytes11(byte @NotNull [] value) {
-        return bytes(value).withSize(11);
-    }
-
-    @NotNull
-    public static EthBytes bytes12(byte @NotNull [] value) {
-        return bytes(value).withSize(12);
-    }
-
-    @NotNull
-    public static EthBytes bytes13(byte @NotNull [] value) {
-        return bytes(value).withSize(13);
-    }
-
-    @NotNull
-    public static EthBytes bytes14(byte @NotNull [] value) {
-        return bytes(value).withSize(14);
-    }
-
-    @NotNull
-    public static EthBytes bytes15(byte @NotNull [] value) {
-        return bytes(value).withSize(15);
-    }
-
-    @NotNull
-    public static EthBytes bytes16(byte @NotNull [] value) {
-        return bytes(value).withSize(16);
-    }
-
-    @NotNull
-    public static EthBytes bytes17(byte @NotNull [] value) {
-        return bytes(value).withSize(17);
-    }
-
-    @NotNull
-    public static EthBytes bytes18(byte @NotNull [] value) {
-        return bytes(value).withSize(18);
-    }
-
-    @NotNull
-    public static EthBytes bytes19(byte @NotNull [] value) {
-        return bytes(value).withSize(19);
-    }
-
-    @NotNull
-    public static EthBytes bytes20(byte @NotNull [] value) {
-        return bytes(value).withSize(20);
-    }
-
-    @NotNull
-    public static EthBytes bytes21(byte @NotNull [] value) {
-        return bytes(value).withSize(21);
-    }
-
-    @NotNull
-    public static EthBytes bytes22(byte @NotNull [] value) {
-        return bytes(value).withSize(22);
-    }
-
-    @NotNull
-    public static EthBytes bytes23(byte @NotNull [] value) {
-        return bytes(value).withSize(23);
-    }
-
-    @NotNull
-    public static EthBytes bytes24(byte @NotNull [] value) {
-        return bytes(value).withSize(24);
-    }
-
-    @NotNull
-    public static EthBytes bytes25(byte @NotNull [] value) {
-        return bytes(value).withSize(25);
-    }
-
-    @NotNull
-    public static EthBytes bytes26(byte @NotNull [] value) {
-        return bytes(value).withSize(26);
-    }
-
-    @NotNull
-    public static EthBytes bytes27(byte @NotNull [] value) {
-        return bytes(value).withSize(27);
-    }
-
-    @NotNull
-    public static EthBytes bytes28(byte @NotNull [] value) {
-        return bytes(value).withSize(28);
-    }
-
-    @NotNull
-    public static EthBytes bytes29(byte @NotNull [] value) {
-        return bytes(value).withSize(29);
-    }
-
-    @NotNull
-    public static EthBytes bytes30(byte @NotNull [] value) {
-        return bytes(value).withSize(30);
-    }
-
-    @NotNull
-    public static EthBytes bytes31(byte @NotNull [] value) {
-        return bytes(value).withSize(31);
-    }
-
-    @NotNull
-    public static EthBytes bytes32(byte @NotNull [] value) {
-        return bytes(value).withSize(32);
-    }
-
-    @NotNull
-    public static EthBytes bytes(@NotNull String hex) {
-        return bytes(Hex.toByteArray(hex));
-    }
-
-    @NotNull
-    public static EthBytes bytes1(@NotNull String hex) {
-        return bytes(hex).withSize(1);
-    }
-
-    @NotNull
-    public static EthBytes bytes2(@NotNull String hex) {
-        return bytes(hex).withSize(2);
-    }
-
-    @NotNull
-    public static EthBytes bytes3(@NotNull String hex) {
-        return bytes(hex).withSize(3);
-    }
-
-    @NotNull
-    public static EthBytes bytes4(@NotNull String hex) {
-        return bytes(hex).withSize(4);
-    }
-
-    @NotNull
-    public static EthBytes bytes5(@NotNull String hex) {
-        return bytes(hex).withSize(5);
-    }
-
-    @NotNull
-    public static EthBytes bytes6(@NotNull String hex) {
-        return bytes(hex).withSize(6);
-    }
-
-    @NotNull
-    public static EthBytes bytes7(@NotNull String hex) {
-        return bytes(hex).withSize(7);
-    }
-
-    @NotNull
-    public static EthBytes bytes8(@NotNull String hex) {
-        return bytes(hex).withSize(8);
-    }
-
-    @NotNull
-    public static EthBytes bytes9(@NotNull String hex) {
-        return bytes(hex).withSize(9);
-    }
-
-    @NotNull
-    public static EthBytes bytes10(@NotNull String hex) {
-        return bytes(hex).withSize(10);
-    }
-
-    @NotNull
-    public static EthBytes bytes11(@NotNull String hex) {
-        return bytes(hex).withSize(11);
-    }
-
-    @NotNull
-    public static EthBytes bytes12(@NotNull String hex) {
-        return bytes(hex).withSize(12);
-    }
-
-    @NotNull
-    public static EthBytes bytes13(@NotNull String hex) {
-        return bytes(hex).withSize(13);
-    }
-
-    @NotNull
-    public static EthBytes bytes14(@NotNull String hex) {
-        return bytes(hex).withSize(14);
-    }
-
-    @NotNull
-    public static EthBytes bytes15(@NotNull String hex) {
-        return bytes(hex).withSize(15);
-    }
-
-    @NotNull
-    public static EthBytes bytes16(@NotNull String hex) {
-        return bytes(hex).withSize(16);
-    }
-
-    @NotNull
-    public static EthBytes bytes17(@NotNull String hex) {
-        return bytes(hex).withSize(17);
-    }
-
-    @NotNull
-    public static EthBytes bytes18(@NotNull String hex) {
-        return bytes(hex).withSize(18);
-    }
-
-    @NotNull
-    public static EthBytes bytes19(@NotNull String hex) {
-        return bytes(hex).withSize(19);
-    }
-
-    @NotNull
-    public static EthBytes bytes20(@NotNull String hex) {
-        return bytes(hex).withSize(20);
-    }
-
-    @NotNull
-    public static EthBytes bytes21(@NotNull String hex) {
-        return bytes(hex).withSize(21);
-    }
-
-    @NotNull
-    public static EthBytes bytes22(@NotNull String hex) {
-        return bytes(hex).withSize(22);
-    }
-
-    @NotNull
-    public static EthBytes bytes23(@NotNull String hex) {
-        return bytes(hex).withSize(23);
-    }
-
-    @NotNull
-    public static EthBytes bytes24(@NotNull String hex) {
-        return bytes(hex).withSize(24);
-    }
-
-    @NotNull
-    public static EthBytes bytes25(@NotNull String hex) {
-        return bytes(hex).withSize(25);
-    }
-
-    @NotNull
-    public static EthBytes bytes26(@NotNull String hex) {
-        return bytes(hex).withSize(26);
-    }
-
-    @NotNull
-    public static EthBytes bytes27(@NotNull String hex) {
-        return bytes(hex).withSize(27);
-    }
-
-    @NotNull
-    public static EthBytes bytes28(@NotNull String hex) {
-        return bytes(hex).withSize(28);
-    }
-
-    @NotNull
-    public static EthBytes bytes29(@NotNull String hex) {
-        return bytes(hex).withSize(29);
-    }
-
-    @NotNull
-    public static EthBytes bytes30(@NotNull String hex) {
-        return bytes(hex).withSize(30);
-    }
-
-    @NotNull
-    public static EthBytes bytes31(@NotNull String hex) {
-        return bytes(hex).withSize(31);
-    }
-
-    @NotNull
-    public static EthBytes bytes32(@NotNull String hex) {
-        return bytes(hex).withSize(32);
-    }
-
 }

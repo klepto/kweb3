@@ -1,7 +1,7 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.ethereum.type.EthCollectionValue;
+import dev.klepto.kweb3.core.ethereum.type.EthCollection;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,29 @@ import java.util.stream.Collectors;
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-public class EthTuple implements EthValue, EthCollectionValue<EthValue> {
+public class EthTuple implements EthValue, EthCollection<EthValue> {
+
+    /**
+     * Creates a new instance of {@code ethereum tuple} with given elements.
+     *
+     * @param values the tuple elements
+     * @return a new instance of tuple with given elements
+     */
+    @NotNull
+    public static EthTuple tuple(@NotNull EthValue... values) {
+        return new EthTuple(ImmutableList.copyOf(values));
+    }
+
+    /**
+     * Creates a new instance of {@code ethereum tuple} with elements from given collection.
+     *
+     * @param values the collection containing elements
+     * @return a new instance of tuple with elements from given collection
+     */
+    @NotNull
+    public static EthTuple tuple(@NotNull Collection<EthValue> values) {
+        return new EthTuple(ImmutableList.copyOf(values));
+    }
 
     @NotNull
     private final ImmutableList<EthValue> values;
@@ -81,17 +103,6 @@ public class EthTuple implements EthValue, EthCollectionValue<EthValue> {
             return values.equals(other.values);
         }
         return false;
-    }
-
-    /* Solidity style static initializers */
-    @NotNull
-    public static EthTuple tuple(@NotNull EthValue... values) {
-        return new EthTuple(ImmutableList.copyOf(values));
-    }
-
-    @NotNull
-    public static EthTuple tuple(@NotNull Collection<EthValue> values) {
-        return new EthTuple(ImmutableList.copyOf(values));
     }
 
 }

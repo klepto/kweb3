@@ -1,7 +1,5 @@
 package dev.klepto.kweb3.core.ethereum.type;
 
-import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
-import dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,13 +8,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Represents <code>ethereum</code> value that contains multiple values.
- *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
- * @see EthArray
- * @see EthTuple
  */
-public interface EthCollectionValue<T extends EthValue> extends EthValue, Iterable<T> {
+public interface EthCollection<T extends EthValue> extends EthValue, Iterable<T> {
 
     /**
      * Returns the values contained within this collection.

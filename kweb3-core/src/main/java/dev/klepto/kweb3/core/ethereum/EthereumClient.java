@@ -63,7 +63,7 @@ public class EthereumClient implements Closeable {
      * @return the block
      */
     public Web3Result<EthBlock> blockByNumber(EthUint blockNumber) {
-        return rpc.ethGetBlockByNumber(blockNumber.toHex())
+        return rpc.ethGetBlockByNumber(blockNumber.toHexString())
                 .map(EthBlock::parse);
     }
 

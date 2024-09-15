@@ -7,8 +7,7 @@ import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthArrayTypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthSizedTypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.EthTupleTypeDescriptor;
 import dev.klepto.kweb3.core.ethereum.abi.descriptor.TypeDescriptor;
-import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
-import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
 import dev.klepto.kweb3.core.ethereum.type.primitive.*;
 import io.ethers.core.FastHex;
@@ -110,24 +109,24 @@ public class HeadlongCodec implements AbiCodec {
      * @return the decoded ethereum bytes value
      */
     private EthBytes decodeBytes(byte[] value, EthSizedTypeDescriptor descriptor) {
-        return bytes(value).withSize(descriptor.valueSize());
+        return bytes(value).size(descriptor.valueSize());
     }
 
     /**
-     * Converts <code>Number</code> value into {@link EthNumericValue} value.
+     * Converts <code>Number</code> value into {@link EthNumeric} value.
      *
      * @param value      the number value
      * @param descriptor the type descriptor
      * @return the decoded ethereum numeric value
      */
-    private EthNumericValue decodeNumeric(Number value, EthSizedTypeDescriptor descriptor) {
+    private EthNumeric<?> decodeNumeric(Number value, EthSizedTypeDescriptor descriptor) {
         val integer = value instanceof BigInteger
                 ? (BigInteger) value
                 : BigInteger.valueOf(value.longValue());
 
         return descriptor.type().matches(EthInt.class)
-                ? int256(integer).withSize(descriptor.valueSize())
-                : uint256(integer).withSize(descriptor.valueSize());
+                ? int256(integer).size(descriptor.valueSize())
+                : uint256(integer).size(descriptor.valueSize());
     }
 
     /**
@@ -229,7 +228,7 @@ public class HeadlongCodec implements AbiCodec {
             return encodeBytes(bytes);
         } else if (value instanceof EthBool bool) {
             return encodeBool(bool);
-        } else if (value instanceof EthNumericValue numeric) {
+        } else if (value instanceof EthNumeric<?> numeric) {
             return encodeNumeric(numeric);
         } else if (value instanceof EthString string) {
             return encodeString(string);
@@ -260,7 +259,7 @@ public class HeadlongCodec implements AbiCodec {
      * @return the headlong-compatible address value
      */
     private Address encodeAddress(EthAddress value) {
-        return Address.wrap(value.toHex());
+        return Address.wrap(value.toHexString());
     }
 
     /**
@@ -270,21 +269,21 @@ public class HeadlongCodec implements AbiCodec {
      * @return the headlong-compatible byte array value
      */
     private byte[] encodeBytes(EthBytes value) {
-        return value.toByteArray();
+        return value.toByteBuffer().array();
     }
 
     /**
-     * Converts {@link EthNumericValue} value into {@link Number} value.
+     * Converts {@link EthNumeric} value into {@link Number} value.
      *
      * @param value the ethereum numeric value
      * @return the headlong-compatible number value
      */
-    private Number encodeNumeric(EthNumericValue value) {
-        val integer = (BigInteger) value.value();
-        if (value instanceof EthSizedValue sized) {
-            if (sized.size() <= 32) {
+    private Number encodeNumeric(EthNumeric<?> value) {
+        val integer = value.toBigInteger();
+        if (value instanceof EthInt || value instanceof EthUint) {
+            if (value.size() <= 32) {
                 return integer.intValue();
-            } else if (sized.size() <= 64) {
+            } else if (value.size() <= 64) {
                 return integer.longValue();
             }
         }

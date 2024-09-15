@@ -1,9 +1,11 @@
 package dev.klepto.kweb3.core.ethereum.abi.descriptor;
 
 import com.google.common.collect.ImmutableList;
-import dev.klepto.kweb3.core.ethereum.type.EthSizedValue;
+import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
 import dev.klepto.kweb3.core.ethereum.type.EthValue;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthArray;
+import dev.klepto.kweb3.core.ethereum.type.primitive.EthBool;
 import dev.klepto.kweb3.core.ethereum.type.primitive.EthTuple;
 import dev.klepto.unreflect.UnreflectType;
 import lombok.val;
@@ -53,22 +55,23 @@ public interface TypeDescriptor {
     static TypeDescriptor parse(EthValue value) {
         if (value instanceof EthArray<?> array) {
             return parseArray(array);
-        } else if (value instanceof EthSizedValue sized) {
-            return parseSized(sized);
+        } else if (value instanceof EthBool || value instanceof EthAddress) {
+            return new EthTypeDescriptor(UnreflectType.of(value));
+        } else if (value instanceof EthNumeric<?> numeric) {
+            return parseNumeric(numeric);
         } else if (value instanceof EthTuple tuple) {
             return parseTuple(tuple);
         }
-
         return new EthTypeDescriptor(UnreflectType.of(value));
     }
 
     /**
-     * Generates ABI type descriptor by parsing information in a given {@link EthSizedValue} value.
+     * Generates ABI type descriptor by parsing information in a given {@link EthNumeric} value.
      *
      * @param value the ethereum sized value
      * @return the ABI type descriptor
      */
-    static TypeDescriptor parseSized(EthSizedValue value) {
+    static TypeDescriptor parseNumeric(EthNumeric<?> value) {
         return new EthSizedTypeDescriptor(UnreflectType.of(value), value.size());
     }
 

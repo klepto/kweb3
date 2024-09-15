@@ -1,22 +1,19 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
 import com.esaulpaugh.headlong.abi.Address;
-import dev.klepto.kweb3.core.ethereum.type.EthNumericValue;
-import dev.klepto.kweb3.core.ethereum.type.EthValue;
-import lombok.With;
-import lombok.val;
+import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
+import dev.klepto.kweb3.core.ethereum.type.reference.ValueRef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 /**
  * Container for <code>ethereum address</code> value.
  *
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
-@With
-public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
+public class EthAddress extends EthUint {
 
     /**
      * Zero address constant.
@@ -24,101 +21,73 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
     public static final EthAddress ZERO = address(0);
 
     /**
-     * Address value.
-     */
-    @NotNull
-    private final Address address;
-
-    /**
-     * Checksum address value.
-     */
-    @NotNull
-    private final String checksumAddress;
-
-    /**
-     * Constructs new <code>ethereum address</code> from the specified {@link Address}.
+     * Creates a new instance of address with given {@link Number} value.
      *
-     * @param address the address
+     * @param number the value
+     * @return a new instance of address with given {@link Number} value
      */
-    private EthAddress(@NotNull Address address, @NotNull String checksumAddress) {
-        this.address = address;
-        this.checksumAddress = checksumAddress;
+    public static EthAddress address(Number number) {
+        return new EthAddress(ValueRef.of(number));
     }
 
     /**
-     * Creates a new instance of numeric type with given value.
+     * Creates a new instance of address with given hexadecimal {@link String} value.
      *
-     * @param value the value to set
-     * @return a new instance of numeric type with given value
+     * @param hex the value
+     * @return a new instance of address with given hexadecimal {@link String} value
      */
+    public static EthAddress address(String hex) {
+        return new EthAddress(ValueRef.of(hex));
+    }
+
+    /**
+     * Creates a new instance of address with given {@link EthNumeric} value.
+     *
+     * @param numeric the value
+     * @return a new instance of address with given {@link EthNumeric} value
+     */
+    public static EthAddress address(EthNumeric<?> numeric) {
+        return new EthAddress(numeric);
+    }
+
+    /**
+     * Creates a new instance of address with given {@link ByteBuffer} value.
+     *
+     * @param buffer the value
+     * @return a new instance of address with given {@link ByteBuffer} value
+     */
+    public static EthAddress address(ByteBuffer buffer) {
+        return new EthAddress(ValueRef.of(buffer));
+    }
+
+    private EthAddress(ValueRef<?> valueRef) {
+        super(valueRef, 160);
+    }
+
     @Override
-    public @NotNull EthAddress withValue(@NotNull BigInteger value) {
-        return address(value);
+    public String toHexString() {
+        return Address.toChecksumAddress(super.toHexString());
     }
 
-    /**
-     * Returns {@link BigInteger} value that represents this <code>ethereum address</code>.
-     *
-     * @return the big integer value of this <code>ethereum address</code>
-     */
-    @Override
-    public @NotNull BigInteger value() {
-        return address.value();
-    }
-
-    /**
-     * Returns the checksum hex of this <code>ethereum address</code> with checksum.
-     *
-     * @return a check-summed hex of this <code>ethereum address</code>
-     */
-    @Override
-    public @NotNull String toHex() {
-        return checksumAddress;
-    }
-
-    /**
-     * Returns string representation of this <code>ethereum address</code>.
-     *
-     * @return the string representation of this <code>ethereum address</code>.
-     */
     @Override
     @NotNull
     public String toString() {
-        return "address(" + toHex() + ")";
+        return "address(" + toHexString() + ")";
     }
 
-    /**
-     * Returns hash code of this <code>ethereum address</code>.
-     *
-     * @return hash code of this <code>ethereum address</code>
-     */
     @Override
     public int hashCode() {
-        return address.hashCode();
+        return toBigInteger().hashCode();
     }
 
-    /**
-     * Arithmetic equals method for <code>ethereum address</code> values.
-     *
-     * @param object the object to compare with
-     * @return true if the objects have the same value; false otherwise
-     */
+    @Override
     public boolean equals(@Nullable Object object) {
         if (object instanceof Number number) {
             return equals(number);
         }
-        if (object instanceof EthNumericValue<?> numeric) {
-            return equals(numeric.value());
-        }
         return false;
     }
 
-    /**
-     * Compares this <code>ethereum address</code> to the specified object.
-     *
-     * @param object the object to compare with
-     * @return true if the objects are the same; false otherwise
-     */
     public boolean matches(@Nullable Object object) {
         if (object == null) {
             return false;
@@ -129,20 +98,7 @@ public class EthAddress implements EthValue, EthNumericValue<EthAddress> {
         if (!(object instanceof EthAddress other)) {
             return false;
         }
-        return checksumAddress.equals(other.checksumAddress);
-    }
-
-    /* Solidity style static initializers */
-    @NotNull
-    public static EthAddress address(@NotNull Number value) {
-        val checksumAddress = Address.toChecksumAddress(EthNumericValue.parseBigInteger(value));
-        return address(checksumAddress);
-    }
-
-    @NotNull
-    public static EthAddress address(@NotNull String hex) {
-        val address = Address.wrap(Address.toChecksumAddress(hex));
-        return new EthAddress(address, address.toString());
+        return toHexString().equals(other.toHexString());
     }
 
 }
