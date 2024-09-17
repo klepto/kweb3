@@ -78,7 +78,7 @@ public class EthInt extends Number implements EthNumeric<EthInt>, EthNumeric.Mat
      * @param buffer the value
      * @return a new instance of int256 with given {@link ByteBuffer} value
      */
-    public static @NotNull EthInt uint256(@NotNull ByteBuffer buffer) {
+    public static @NotNull EthInt int256(@NotNull ByteBuffer buffer) {
         return new EthInt(ValueRef.of(buffer), MAX_BIT_SIZE);
     }
 
