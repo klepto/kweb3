@@ -31,46 +31,73 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public byte toByte() {
+        if (value.remaining() == 0) {
+            return 0;
+        }
         return value.get(0);
     }
 
     @Override
     public short toShort() {
+        if (value.remaining() == 0) {
+            return 0;
+        }
         return value.getShort(0);
     }
 
     @Override
     public int toInt() {
+        if (value.remaining() == 0) {
+            return 0;
+        }
         return value.getInt(0);
     }
 
     @Override
     public long toLong() {
+        if (value.remaining() == 0) {
+            return 0;
+        }
         return value.getLong(0);
     }
 
     @Override
     public float toFloat() {
-        return value.getFloat(0);
+        if (value.remaining() == 0) {
+            return 0;
+        }
+        return (float) toLong();
     }
 
     @Override
     public double toDouble() {
-        return value.getDouble(0);
+        if (value.remaining() == 0) {
+            return 0;
+        }
+        return (double) toLong();
     }
 
     @Override
     public BigInteger toBigInteger() {
+        if (value.remaining() == 0) {
+            return BigInteger.ZERO;
+        }
         return new BigInteger(toByteArray());
     }
 
     @Override
     public BigDecimal toBigDecimal() {
+        if (value.remaining() == 0) {
+            return BigDecimal.ZERO;
+        }
         return new BigDecimal(toBigInteger());
     }
 
     @Override
     public String toHexString() {
+        if (value.remaining() == 0) {
+            return "0x0";
+        }
         var hex = toBigInteger().toString(16);
         return "0x" + hex;
     }
@@ -82,6 +109,10 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public byte[] toByteArray() {
+        if (value.remaining() == 0) {
+            return new byte[0];
+        }
+
         byte[] array = new byte[value.remaining()];
         value.get(array);
         return array;
@@ -89,6 +120,9 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public String toPlainString() {
+        if (value.remaining() == 0) {
+            return "0";
+        }
         return toBigInteger().toString();
     }
 }

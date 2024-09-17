@@ -4,10 +4,11 @@ import dev.klepto.kweb3.core.ethereum.type.reference.ByteBufferRef;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link ByteBufferRef}.
@@ -26,7 +27,15 @@ public class ByteBufferRefTest {
     }
 
     @Test
-    public void testByteMaxValue() {
+    public void testBoolean() {
+        val refTrue = createRef(1);
+        val refFalse = createRef(0);
+        assertTrue(refTrue.toBoolean());
+        assertFalse(refFalse.toBoolean());
+    }
+
+    @Test
+    public void testByte() {
         val refA = createRef(Byte.MAX_VALUE);
         val refB = createRef(Byte.MAX_VALUE + 1);
         assertEquals(Byte.MAX_VALUE, refA.toByte());
@@ -35,7 +44,7 @@ public class ByteBufferRefTest {
     }
 
     @Test
-    public void testShortMaxValue() {
+    public void testShort() {
         val refA = createRef(Short.MAX_VALUE);
         val refB = createRef(Short.MAX_VALUE + 1);
         assertEquals(Short.MAX_VALUE, refA.toShort());
@@ -44,7 +53,7 @@ public class ByteBufferRefTest {
     }
 
     @Test
-    public void testIntegerMaxValue() {
+    public void testInt() {
         val refA = createRef(Integer.MAX_VALUE);
         val refB = createRef(Integer.MAX_VALUE + 1L);
         assertEquals(Integer.MAX_VALUE, refA.toInt());
@@ -53,12 +62,73 @@ public class ByteBufferRefTest {
     }
 
     @Test
-    public void testLongMaxValue() {
+    public void testLong() {
         val refA = createRef(Long.MAX_VALUE);
         val refB = createRef(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE));
         assertEquals(Long.MAX_VALUE, refA.toLong());
         assertEquals(36028797018963968L, refB.toLong());
         assertEquals(new BigInteger("9223372036854775808"), refB.toBigInteger());
+    }
+
+    @Test
+    public void testFloat() {
+        val ref = createRef(Float.MAX_VALUE);
+        assertEquals(9223372036854775807L, ref.toFloat());
+    }
+
+    @Test
+    public void testDouble() {
+        val ref = createRef(Float.MAX_VALUE);
+        assertEquals(9223372036854775807L, ref.toDouble());
+    }
+
+    @Test
+    public void testHex() {
+        val ref = createRef(new BigInteger("1208925819614629174706175"));
+        assertEquals("0xffffffffffffffffffff", ref.toHexString());
+    }
+
+    @Test
+    public void testBigInteger() {
+        val value = new BigInteger("1208925819614629174706175");
+        val ref = createRef(value);
+        assertEquals(value, ref.toBigInteger());
+    }
+
+    @Test
+    public void testBigDecimal() {
+        val value = new BigInteger("1208925819614629174706175");
+        val ref = createRef(value);
+        assertEquals(new BigDecimal(value), ref.toBigDecimal());
+    }
+
+    @Test
+    public void testByteArray() {
+        val array = new byte[]{0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+        val ref = createRef(new BigInteger("1208925819614629174706175"));
+        assertArrayEquals(array, ref.toByteArray());
+    }
+
+    @Test
+    public void testPlainString() {
+        val ref = createRef(new BigInteger("1208925819614629174706175"));
+        assertEquals("1208925819614629174706175", ref.toPlainString());
+    }
+
+    @Test
+    public void testEmpty() {
+        val ref = new ByteBufferRef(ByteBuffer.allocate(0));
+        assertEquals(0, ref.toByte());
+        assertEquals(0, ref.toShort());
+        assertEquals(0, ref.toInt());
+        assertEquals(0, ref.toLong());
+        assertEquals(0, ref.toFloat());
+        assertEquals(0, ref.toDouble());
+        assertEquals(BigInteger.ZERO, ref.toBigInteger());
+        assertEquals(BigDecimal.ZERO, ref.toBigDecimal());
+        assertEquals("0x0", ref.toHexString());
+        assertArrayEquals(new byte[0], ref.toByteArray());
+        assertEquals("0", ref.toPlainString());
     }
 
 }

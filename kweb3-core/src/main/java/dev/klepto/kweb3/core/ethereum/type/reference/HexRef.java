@@ -74,6 +74,9 @@ public class HexRef implements ValueRef<String> {
 
     @Override
     public BigInteger toBigInteger() {
+        if (valueNoPrefix().isEmpty()) {
+            return BigInteger.ZERO;
+        }
         return Hex.toBigInteger(valueNoPrefix());
     }
 
