@@ -1,4 +1,4 @@
-package dev.klepto.kweb3.abi;
+package dev.klepto.kweb3.ethereum.abi;
 
 import com.google.common.collect.ImmutableList;
 import dev.klepto.kweb3.core.ethereum.abi.AbiCodec;

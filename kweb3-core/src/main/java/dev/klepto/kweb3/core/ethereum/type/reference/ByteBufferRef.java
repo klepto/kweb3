@@ -31,32 +31,32 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public byte toByte() {
-        return toBigInteger().byteValue();
+        return value.get(0);
     }
 
     @Override
     public short toShort() {
-        return toBigInteger().shortValue();
+        return value.getShort(0);
     }
 
     @Override
     public int toInt() {
-        return toBigInteger().intValue();
+        return value.getInt(0);
     }
 
     @Override
     public long toLong() {
-        return toBigInteger().longValue();
+        return value.getLong(0);
     }
 
     @Override
     public float toFloat() {
-        return toBigInteger().floatValue();
+        return value.getFloat(0);
     }
 
     @Override
     public double toDouble() {
-        return toBigInteger().doubleValue();
+        return value.getDouble(0);
     }
 
     @Override
