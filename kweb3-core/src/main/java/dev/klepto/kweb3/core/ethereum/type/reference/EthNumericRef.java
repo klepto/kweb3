@@ -70,8 +70,8 @@ public class EthNumericRef implements ValueRef<EthNumeric<?>> {
     }
 
     @Override
-    public String toHexString() {
-        return value.toHexString();
+    public String toHex() {
+        return value.toHex();
     }
 
     @Override

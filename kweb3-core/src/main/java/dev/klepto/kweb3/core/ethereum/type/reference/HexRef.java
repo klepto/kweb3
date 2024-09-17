@@ -86,7 +86,7 @@ public class HexRef implements ValueRef<String> {
     }
 
     @Override
-    public String toHexString() {
+    public String toHex() {
         return value();
     }
 

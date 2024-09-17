@@ -85,7 +85,7 @@ public class ByteBufferRefTest {
     @Test
     public void testHex() {
         val ref = createRef(new BigInteger("1208925819614629174706175"));
-        assertEquals("0xffffffffffffffffffff", ref.toHexString());
+        assertEquals("0xffffffffffffffffffff", ref.toHex());
     }
 
     @Test
@@ -126,7 +126,7 @@ public class ByteBufferRefTest {
         assertEquals(0, ref.toDouble());
         assertEquals(BigInteger.ZERO, ref.toBigInteger());
         assertEquals(BigDecimal.ZERO, ref.toBigDecimal());
-        assertEquals("0x0", ref.toHexString());
+        assertEquals("0x0", ref.toHex());
         assertArrayEquals(new byte[0], ref.toByteArray());
         assertEquals("0", ref.toPlainString());
     }

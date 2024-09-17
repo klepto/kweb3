@@ -78,8 +78,8 @@ public class ReflectionContractExecutor implements ContractExecutor {
     @Override
     public @NotNull Web3Result<String> request(@NotNull ContractCall call, @NotNull String data) {
         val client = call.proxy().client();
-        val clientAddress = client.getAddress() != null ? client.getAddress().toHexString() : null;
-        val contractAddress = call.proxy().address().toHexString();
+        val clientAddress = client.getAddress() != null ? client.getAddress().toHex() : null;
+        val contractAddress = call.proxy().address().toHex();
         val callData = call.function().signature() + data;
         return client.getRpc().ethCall(clientAddress, contractAddress, null, null, null, callData, null);
     }

@@ -49,7 +49,7 @@ public record ContractProxy(@NotNull Web3Client client,
             case "getContractClass":
                 return type;
             case "toString":
-                return type.getSimpleName() + "(" + address.toHexString() + ")";
+                return type.getSimpleName() + "(" + address.toHex() + ")";
             case "hashCode":
                 return hashCode();
             case "equals":

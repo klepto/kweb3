@@ -125,7 +125,7 @@ public class EthBytes extends Number implements EthNumeric<EthBytes>, EthNumeric
     @NotNull
     public String toString() {
         val sizeString = byteSize > DYNAMIC_BYTE_SIZE ? byteSize : "";
-        return "bytes" + sizeString + "(" + toHexString() + ")";
+        return "bytes" + sizeString + "(" + this.toHex() + ")";
     }
 
     @Override
@@ -151,7 +151,7 @@ public class EthBytes extends Number implements EthNumeric<EthBytes>, EthNumeric
         if (!(object instanceof EthBytes other)) {
             return false;
         }
-        return toHexString().equals(other.toHexString());
+        return this.toHex().equals(other.toHex());
     }
 
     @Override

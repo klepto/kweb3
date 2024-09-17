@@ -94,7 +94,7 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
     }
 
     @Override
-    public String toHexString() {
+    public String toHex() {
         if (value.remaining() == 0) {
             return "0x0";
         }

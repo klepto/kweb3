@@ -1,8 +1,10 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
 import com.esaulpaugh.headlong.abi.Address;
+import com.google.common.base.Strings;
 import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
 import dev.klepto.kweb3.core.ethereum.type.reference.ValueRef;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,14 +67,22 @@ public class EthAddress extends EthUint {
     }
 
     @Override
-    public String toHexString() {
-        return Address.toChecksumAddress(super.toHexString());
+    public String toHex() {
+        val hex = super.toHex();
+        if (hex.length() == 42) {
+            return hex;
+        }
+        return "0x" + Strings.padStart(hex.substring(2), 40, '0');
+    }
+
+    public String toChecksumHex() {
+        return Address.toChecksumAddress(this.toHex());
     }
 
     @Override
     @NotNull
     public String toString() {
-        return "address(" + toHexString() + ")";
+        return "address(" + this.toHex() + ")";
     }
 
     @Override
@@ -98,7 +108,7 @@ public class EthAddress extends EthUint {
         if (!(object instanceof EthAddress other)) {
             return false;
         }
-        return toHexString().equals(other.toHexString());
+        return this.toHex().equals(other.toHex());
     }
 
 }

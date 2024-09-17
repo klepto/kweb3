@@ -96,7 +96,7 @@ public class NumberRef implements ValueRef<Number> {
     }
 
     @Override
-    public String toHexString() {
+    public String toHex() {
         var hex = toBigInteger().toString(16);
         return "0x" + hex;
     }

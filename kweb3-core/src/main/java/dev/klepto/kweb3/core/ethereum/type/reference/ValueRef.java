@@ -149,7 +149,7 @@ public interface ValueRef<T> {
      *
      * @return value as a hexadecimal {@link String}
      */
-    String toHexString();
+    String toHex();
 
     /**
      * Converts the value to a {@link ByteBuffer}.
