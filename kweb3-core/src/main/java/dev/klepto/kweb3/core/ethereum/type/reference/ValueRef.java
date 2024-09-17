@@ -19,12 +19,13 @@ public interface ValueRef<T> {
      * @param value the value to reference
      * @return a new reference to the given value
      */
+    @SuppressWarnings("unchecked")
     static <T> ValueRef<T> of(T value) {
         if (value instanceof Number number) {
             return (ValueRef<T>) of(number);
         } else if (value instanceof String string) {
             return (ValueRef<T>) of(string);
-        } else if (value instanceof EthNumeric ethNumeric) {
+        } else if (value instanceof EthNumeric<?> ethNumeric) {
             return (ValueRef<T>) of(ethNumeric);
         } else if (value instanceof ByteBuffer byteBuffer) {
             return (ValueRef<T>) of(byteBuffer);
@@ -59,7 +60,7 @@ public interface ValueRef<T> {
      * @param value the value to reference
      * @return a new reference to the given value
      */
-    static EthNumericRef of(EthNumeric value) {
+    static EthNumericRef of(EthNumeric<?> value) {
         return new EthNumericRef(value);
     }
 
