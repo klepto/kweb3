@@ -28,7 +28,7 @@ public interface ValueRef<T> {
         } else if (value instanceof EthNumeric<?> ethNumeric) {
             return (ValueRef<T>) of(ethNumeric);
         } else if (value instanceof ByteBuffer byteBuffer) {
-            return (ValueRef<T>) of(byteBuffer);
+            return (ValueRef<T>) of(false, byteBuffer);
         } else {
             throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
         }
@@ -67,11 +67,12 @@ public interface ValueRef<T> {
     /**
      * Creates a new reference to a given value.
      *
-     * @param value the value to reference
+     * @param signed whether the value is signed
+     * @param value  the value to reference
      * @return a new reference to the given value
      */
-    static ByteBufferRef of(ByteBuffer value) {
-        return new ByteBufferRef(value);
+    static ByteBufferRef of(boolean signed, ByteBuffer value) {
+        return new ByteBufferRef(signed, value);
     }
 
     /**

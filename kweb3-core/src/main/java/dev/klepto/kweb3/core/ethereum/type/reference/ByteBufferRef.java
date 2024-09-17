@@ -13,9 +13,11 @@ import java.nio.ByteBuffer;
  */
 public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
+    private final boolean signed;
     private final ByteBuffer value;
 
-    public ByteBufferRef(ByteBuffer value) {
+    public ByteBufferRef(boolean signed, ByteBuffer value) {
+        this.signed = signed;
         this.value = value;
     }
 
@@ -66,7 +68,7 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
         if (value.remaining() == 0) {
             return 0;
         }
-        return (float) toLong();
+        return (float) toInt();
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
         if (value.remaining() == 0) {
             return BigInteger.ZERO;
         }
-        return new BigInteger(toByteArray());
+        return new BigInteger(signed ? -1 : 1, toByteArray());
     }
 
     @Override

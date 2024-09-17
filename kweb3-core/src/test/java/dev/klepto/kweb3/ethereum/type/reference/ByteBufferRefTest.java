@@ -23,7 +23,7 @@ public class ByteBufferRefTest {
             bigInteger = (BigInteger) value;
         }
         val buffer = ByteBuffer.wrap(bigInteger.toByteArray());
-        return new ByteBufferRef(buffer);
+        return new ByteBufferRef(false, buffer);
     }
 
     @Test
@@ -73,13 +73,13 @@ public class ByteBufferRefTest {
     @Test
     public void testFloat() {
         val ref = createRef(Float.MAX_VALUE);
-        assertEquals(9223372036854775807L, ref.toFloat());
+        assertEquals(Integer.MAX_VALUE, ref.toFloat());
     }
 
     @Test
     public void testDouble() {
-        val ref = createRef(Float.MAX_VALUE);
-        assertEquals(9223372036854775807L, ref.toDouble());
+        val ref = createRef(Double.MAX_VALUE);
+        assertEquals(Long.MAX_VALUE, ref.toDouble());
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ByteBufferRefTest {
 
     @Test
     public void testEmpty() {
-        val ref = new ByteBufferRef(ByteBuffer.allocate(0));
+        val ref = new ByteBufferRef(false, ByteBuffer.allocate(0));
         assertEquals(0, ref.toByte());
         assertEquals(0, ref.toShort());
         assertEquals(0, ref.toInt());

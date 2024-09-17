@@ -14,94 +14,121 @@ import java.nio.ByteBuffer;
  */
 public class HexRef implements ValueRef<String> {
 
+    private static final String PREFIX = "0x";
+
     private final String value;
-    private final boolean prefix;
 
     public HexRef(String value) {
-        this.value = value;
-        this.prefix = value.startsWith("0x");
+        if (value.startsWith(PREFIX)) {
+            this.value = value;
+        } else {
+            this.value = PREFIX + value;
+        }
     }
 
     @Override
     public String value() {
-        if (prefix) {
-            return value;
-        }
-        return "0x" + value;
-    }
-
-    public String valueNoPrefix() {
-        if (prefix) {
-            return value.substring(2);
-        }
         return value;
     }
 
     @Override
     public boolean toBoolean() {
-        return Integer.parseInt(valueNoPrefix(), 16) == 1;
+        return toByte() == 1;
     }
 
     @Override
     public byte toByte() {
-        return Byte.parseByte(valueNoPrefix(), 16);
+        if (value.equals(PREFIX)) {
+            return 0;
+        }
+        return toBigInteger().byteValue();
     }
 
     @Override
     public short toShort() {
-        return Short.parseShort(valueNoPrefix(), 16);
+        if (value.equals(PREFIX)) {
+            return 0;
+        }
+        return toBigInteger().shortValue();
     }
 
     @Override
     public int toInt() {
-        return Integer.parseInt(valueNoPrefix(), 16);
+        if (value.equals(PREFIX)) {
+            return 0;
+        }
+        return toBigInteger().intValue();
     }
 
     @Override
     public long toLong() {
-        return Long.parseLong(valueNoPrefix(), 16);
+        if (value.equals(PREFIX)) {
+            return 0;
+        }
+        return toBigInteger().longValue();
     }
 
     @Override
     public float toFloat() {
-        return (float) toLong();
+        if (value.equals(PREFIX)) {
+            return 0;
+        }
+        return toBigInteger().floatValue();
     }
 
     @Override
     public double toDouble() {
-        return (double) toLong();
+        if (value.equals(PREFIX)) {
+            return 0;
+        }
+        return toBigInteger().doubleValue();
     }
 
     @Override
     public BigInteger toBigInteger() {
-        if (valueNoPrefix().isEmpty()) {
+        if (value.equals(PREFIX)) {
             return BigInteger.ZERO;
         }
-        return Hex.toBigInteger(valueNoPrefix());
+        return new BigInteger(1, toByteArray());
     }
 
     @Override
     public BigDecimal toBigDecimal() {
+        if (value.equals(PREFIX)) {
+            return BigDecimal.ZERO;
+        }
         return new BigDecimal(toBigInteger());
     }
 
     @Override
     public String toHex() {
+        if (value.equals(PREFIX)) {
+            return "0x0";
+        }
         return value();
     }
 
     @Override
     public ByteBuffer toByteBuffer() {
+        if (value.equals(PREFIX)) {
+            return ByteBuffer.allocate(0);
+        }
         return ByteBuffer.wrap(toByteArray());
     }
 
     @Override
     public byte[] toByteArray() {
+        if (value.equals(PREFIX)) {
+            return new byte[0];
+        }
         return Hex.toByteArray(value);
     }
 
     @Override
     public String toPlainString() {
+        if (value.equals(PREFIX)) {
+            return "0";
+        }
         return toBigInteger().toString();
     }
 }
