@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.core.ethereum.type.reference;
 
 import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
+import dev.klepto.kweb3.core.util.Hex;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,42 +42,42 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public short toShort() {
-        if (value.remaining() == 0) {
-            return 0;
+        if (value.remaining() < 2) {
+            return toByte();
         }
         return value.getShort(0);
     }
 
     @Override
     public int toInt() {
-        if (value.remaining() == 0) {
-            return 0;
+        if (value.remaining() < 4) {
+            return toShort();
         }
         return value.getInt(0);
     }
 
     @Override
     public long toLong() {
-        if (value.remaining() == 0) {
-            return 0;
+        if (value.remaining() < 8) {
+            return toInt();
         }
         return value.getLong(0);
     }
 
     @Override
     public float toFloat() {
-        if (value.remaining() == 0) {
-            return 0;
+        if (value.remaining() < 4) {
+            return toShort();
         }
-        return (float) toInt();
+        return toInt();
     }
 
     @Override
     public double toDouble() {
-        if (value.remaining() == 0) {
-            return 0;
+        if (value.remaining() < 8) {
+            return toFloat();
         }
-        return (double) toLong();
+        return toLong();
     }
 
     @Override
@@ -84,7 +85,11 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
         if (value.remaining() == 0) {
             return BigInteger.ZERO;
         }
-        return new BigInteger(signed ? -1 : 1, toByteArray());
+        if (signed) {
+            return new BigInteger(toByteArray());
+        } else {
+            return new BigInteger(1, toByteArray());
+        }
     }
 
     @Override
@@ -100,8 +105,7 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
         if (value.remaining() == 0) {
             return "0x0";
         }
-        var hex = toBigInteger().toString(16);
-        return "0x" + hex;
+        return Hex.toHex(toByteArray());
     }
 
     @Override
@@ -116,7 +120,7 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
         }
 
         byte[] array = new byte[value.remaining()];
-        value.get(array);
+        value.get(0, array);
         return array;
     }
 

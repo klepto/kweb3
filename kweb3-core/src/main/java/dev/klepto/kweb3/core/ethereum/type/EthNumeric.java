@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.nio.ByteBuffer;
 
 /**
  * Represents an ethereum data type that's backed by numeric value.
@@ -58,47 +57,6 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
     T value(@NotNull ValueRef<?> valueRef);
 
     /**
-     * Creates a new instance of numeric type with given {@link Number} value.
-     *
-     * @param value the value
-     * @return a new instance of numeric type with given {@link Number} value
-     */
-    default T value(Number value) {
-        return value(ValueRef.of(value));
-    }
-
-    /**
-     * Creates a new instance of numeric type with given hexadecimal {@link String} value.
-     *
-     * @param value the value
-     * @return a new instance of numeric type with given hexadecimal {@link String} value
-     */
-    default T value(String value) {
-        return value(ValueRef.of(value));
-    }
-
-    /**
-     * Creates a new instance of numeric type with another {@link EthNumeric} value.
-     *
-     * @param value the value
-     * @return a new instance of numeric type with another {@link EthNumeric} value
-     */
-    default T value(EthNumeric<?> value) {
-        return value(ValueRef.of(value));
-    }
-
-
-    /**
-     * Creates a new instance of numeric type with given {@link ByteBuffer} value.
-     *
-     * @param value the value
-     * @return a new instance of numeric type with given {@link ByteBuffer} value
-     */
-    default T value(ByteBuffer value) {
-        return value(ValueRef.of(value));
-    }
-
-    /**
      * Implementation of uniform mathematical operations for {@link EthNumeric} values.
      *
      * @param <T> the ethereum type of the numeric value
@@ -135,7 +93,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T plus(@NotNull Number other) {
             val result = toBigDecimal().add(parseBigDecimal(other));
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**
@@ -147,7 +105,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T minus(@NotNull Number other) {
             val result = toBigDecimal().subtract(parseBigDecimal(other));
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**
@@ -159,7 +117,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T times(@NotNull Number other) {
             val result = parseBigDecimal(this).multiply(parseBigDecimal(other));
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**
@@ -171,7 +129,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T div(@NotNull Number other) {
             val result = parseBigDecimal(this).divide(parseBigDecimal(other), RoundingMode.FLOOR);
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**
@@ -183,7 +141,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T rem(@NotNull Number other) {
             val result = parseBigDecimal(this).remainder(parseBigDecimal(other));
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**
@@ -195,7 +153,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T pow(int exponent) {
             val result = parseBigDecimal(this).pow(exponent);
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**
@@ -205,7 +163,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
          */
         @NotNull
         default T unaryPlus() {
-            return value(toBigDecimal());
+            return value(ValueRef.of(toBigDecimal()));
         }
 
         /**
@@ -216,7 +174,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
         @NotNull
         default T unaryMinus() {
             val result = toBigDecimal().negate();
-            return value(result);
+            return value(ValueRef.of(result));
         }
 
         /**

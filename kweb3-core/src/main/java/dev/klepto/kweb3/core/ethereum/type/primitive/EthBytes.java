@@ -37,43 +37,43 @@ public class EthBytes extends Number implements EthNumeric<EthBytes>, EthNumeric
     }
 
     /**
-     * Creates a new instance of uint256 with given hexadecimal {@link String} value.
+     * Creates a new instance of bytes with given {@link ValueRef} value.
+     *
+     * @param ref the value
+     * @return a new instance of bytes with given {@link ValueRef} value
+     */
+    public static @NotNull EthBytes bytes(@NotNull ValueRef<?> ref) {
+        return new EthBytes(ref, DYNAMIC_BYTE_SIZE);
+    }
+
+    /**
+     * Creates a new instance of bytes with given hexadecimal {@link String} value.
      *
      * @param hex the value
-     * @return a new instance of uint256 with given hexadecimal {@link String} value
+     * @return a new instance of bytes with given hexadecimal {@link String} value
      */
     public static @NotNull EthBytes bytes(@NotNull String hex) {
-        return new EthBytes(ValueRef.of(hex), DYNAMIC_BYTE_SIZE);
+        return new EthBytes(ValueRef.of(false, hex), DYNAMIC_BYTE_SIZE);
     }
 
     /**
-     * Creates a new instance of uint256 with given {@link EthNumeric} value.
+     * Creates a new instance of bytes with given {@code byte array}  value.
      *
-     * @param numeric the value
-     * @return a new instance of uint256 with given {@link EthNumeric} value
+     * @param bytes the value
+     * @return a new instance of bytes with given {@code byte array} value
      */
-    public static @NotNull EthBytes bytes(@NotNull EthNumeric<?> numeric) {
-        return new EthBytes(numeric, DYNAMIC_BYTE_SIZE);
+    public static @NotNull EthBytes bytes(byte @NotNull [] bytes) {
+        return new EthBytes(ValueRef.of(false, bytes), DYNAMIC_BYTE_SIZE);
     }
 
     /**
-     * Creates a new instance of uint256 with given {@link ByteBuffer} value.
+     * Creates a new instance of bytes with given {@link ByteBuffer} value.
      *
      * @param buffer the value
-     * @return a new instance of uint256 with given {@link ByteBuffer} value
+     * @return a new instance of bytes with given {@link ByteBuffer} value
      */
     public static @NotNull EthBytes bytes(@NotNull ByteBuffer buffer) {
-        return new EthBytes(ValueRef.of(buffer), DYNAMIC_BYTE_SIZE);
-    }
-
-    /**
-     * Creates a new instance of uint256 with given {@code byte array}  value.
-     *
-     * @param buffer the value
-     * @return a new instance of uint256 with given {@code byte array} value
-     */
-    public static @NotNull EthBytes bytes(byte @NotNull [] buffer) {
-        return new EthBytes(ValueRef.of(ByteBuffer.wrap(buffer)), DYNAMIC_BYTE_SIZE);
+        return new EthBytes(ValueRef.of(false, buffer), DYNAMIC_BYTE_SIZE);
     }
 
     @Delegate

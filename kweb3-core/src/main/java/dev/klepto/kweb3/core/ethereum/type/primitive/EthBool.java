@@ -1,6 +1,5 @@
 package dev.klepto.kweb3.core.ethereum.type.primitive;
 
-import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
 import dev.klepto.kweb3.core.ethereum.type.reference.ValueRef;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -48,23 +47,33 @@ public class EthBool extends EthUint {
     }
 
     /**
+     * Creates a new instance of bool with given {@link ValueRef} value.
+     *
+     * @param ref the value
+     * @return a new instance of bool with given {@link ValueRef} value
+     */
+    public static EthBool bool(ValueRef<?> ref) {
+        return new EthBool(ref);
+    }
+
+    /**
      * Creates a new instance of bool with given hexadecimal {@link String} value.
      *
      * @param hex the value
      * @return a new instance of bool with given hexadecimal {@link String} value
      */
     public static EthBool bool(String hex) {
-        return new EthBool(ValueRef.of(hex));
+        return new EthBool(ValueRef.of(false, hex));
     }
 
     /**
-     * Creates a new instance of bool with given {@link EthNumeric} value.
+     * Creates a new instance of bool with given {@code byte array} value.
      *
-     * @param numeric the value
-     * @return a new instance of bool with given {@link EthNumeric} value
+     * @param bytes the value
+     * @return a new instance of bool with given {@code byte array} value
      */
-    public static EthBool bool(EthNumeric<?> numeric) {
-        return new EthBool(numeric);
+    public static @NotNull EthBool bool(byte @NotNull [] bytes) {
+        return new EthBool(ValueRef.of(false, bytes));
     }
 
     /**
@@ -74,7 +83,7 @@ public class EthBool extends EthUint {
      * @return a new instance of bool with given {@link ByteBuffer} value
      */
     public static EthBool bool(ByteBuffer buffer) {
-        return new EthBool(ValueRef.of(buffer));
+        return new EthBool(ValueRef.of(false, buffer));
     }
 
     private EthBool(ValueRef<?> valueRef) {

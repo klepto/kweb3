@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.core.ethereum.type.reference;
 
 import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
+import dev.klepto.kweb3.core.util.Hex;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,39 +20,8 @@ public interface ValueRef<T> {
      * @param value the value to reference
      * @return a new reference to the given value
      */
-    @SuppressWarnings("unchecked")
-    static <T> ValueRef<T> of(T value) {
-        if (value instanceof Number number) {
-            return (ValueRef<T>) of(number);
-        } else if (value instanceof String string) {
-            return (ValueRef<T>) of(string);
-        } else if (value instanceof EthNumeric<?> ethNumeric) {
-            return (ValueRef<T>) of(ethNumeric);
-        } else if (value instanceof ByteBuffer byteBuffer) {
-            return (ValueRef<T>) of(false, byteBuffer);
-        } else {
-            throw new IllegalArgumentException("Unsupported value type: " + value.getClass());
-        }
-    }
-
-    /**
-     * Creates a new reference to a given value.
-     *
-     * @param value the value to reference
-     * @return a new reference to the given value
-     */
     static NumberRef of(Number value) {
         return new NumberRef(value);
-    }
-
-    /**
-     * Creates a new reference to a given value.
-     *
-     * @param value the value to reference
-     * @return a new reference to the given value
-     */
-    static HexRef of(String value) {
-        return new HexRef(value);
     }
 
     /**
@@ -67,8 +37,27 @@ public interface ValueRef<T> {
     /**
      * Creates a new reference to a given value.
      *
-     * @param signed whether the value is signed
-     * @param value  the value to reference
+     * @param value the value to reference
+     * @return a new reference to the given value
+     */
+    static ByteBufferRef of(boolean signed, String value) {
+        return of(signed, Hex.toByteArray(value));
+    }
+
+    /**
+     * Creates a new reference to a given value.
+     *
+     * @param value the value to reference
+     * @return a new reference to the given value
+     */
+    static ByteBufferRef of(boolean signed, byte[] value) {
+        return new ByteBufferRef(signed, ByteBuffer.wrap(value));
+    }
+
+    /**
+     * Creates a new reference to a given value.
+     *
+     * @param value the value to reference
      * @return a new reference to the given value
      */
     static ByteBufferRef of(boolean signed, ByteBuffer value) {

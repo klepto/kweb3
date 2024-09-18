@@ -1,6 +1,6 @@
 package dev.klepto.kweb3.core.util;
 
-import io.ethers.core.FastHex;
+import com.esaulpaugh.headlong.util.FastHex;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,10 @@ public final class Hex {
      * @return a byte array containing decoded hexadecimal string
      */
     public static byte @NotNull [] toByteArray(@NotNull String hex) {
-        if (hex.isEmpty() || hex.equalsIgnoreCase(PREFIX)) {
+        if (hex.startsWith(PREFIX)) {
+            hex = hex.substring(2);
+        }
+        if (hex.isEmpty()) {
             return EMPTY_BYTES;
         }
         return FastHex.decode(hex);
@@ -45,13 +48,14 @@ public final class Hex {
     /**
      * Converts <code>byte</code> array to a hexadecimal string.
      *
-     * @param value       the byte array value
-     * @param prefix      if true, appends <code>0x</code> prefix to the resulting string
+     * @param value  the byte array value
+     * @param prefix if true, appends <code>0x</code> prefix to the resulting string
      * @return a hexadecimal representation of integer
      */
     @NotNull
     public static String toHex(byte @NotNull [] value, boolean prefix) {
-        return prefix ? FastHex.encodeWithPrefix(value) : FastHex.encodeWithoutPrefix(value);
+        val result = FastHex.encodeToString(value);
+        return prefix ? PREFIX + result : result;
     }
 
     /**
@@ -68,6 +72,7 @@ public final class Hex {
 
     /**
      * Converts given hexadecimal string to a {@link BigInteger}.
+     *
      * @param hex the hexadecimal string
      * @return a big integer value of hexadecimal string
      */

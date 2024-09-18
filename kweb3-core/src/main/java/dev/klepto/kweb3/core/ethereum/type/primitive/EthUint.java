@@ -54,23 +54,33 @@ public class EthUint extends Number implements EthNumeric<EthUint>, EthNumeric.M
     }
 
     /**
+     * Creates a new instance of uint256 with given {@link ValueRef} value.
+     *
+     * @param ref the value
+     * @return a new instance of uint256 with given {@link ValueRef} value
+     */
+    public static @NotNull EthUint uint256(@NotNull ValueRef<?> ref) {
+        return new EthUint(ref, MAX_BIT_SIZE);
+    }
+
+    /**
      * Creates a new instance of uint256 with given hexadecimal {@link String} value.
      *
      * @param hex the value
      * @return a new instance of uint256 with given hexadecimal {@link String} value
      */
     public static @NotNull EthUint uint256(@NotNull String hex) {
-        return new EthUint(ValueRef.of(hex), MAX_BIT_SIZE);
+        return new EthUint(ValueRef.of(false, hex), MAX_BIT_SIZE);
     }
 
     /**
-     * Creates a new instance of uint256 with given {@link EthNumeric} value.
+     * Creates a new instance of uint256 with given {@code byte array} value.
      *
-     * @param numeric the value
-     * @return a new instance of uint256 with given {@link EthNumeric} value
+     * @param bytes the value
+     * @return a new instance of uint256 with given {@code byte array} value
      */
-    public static @NotNull EthUint uint256(@NotNull EthNumeric<?> numeric) {
-        return new EthUint(numeric, MAX_BIT_SIZE);
+    public static @NotNull EthUint uint256(byte @NotNull [] bytes) {
+        return new EthUint(ValueRef.of(false, bytes), MAX_BIT_SIZE);
     }
 
     /**
@@ -80,7 +90,7 @@ public class EthUint extends Number implements EthNumeric<EthUint>, EthNumeric.M
      * @return a new instance of uint256 with given {@link ByteBuffer} value
      */
     public static @NotNull EthUint uint256(@NotNull ByteBuffer buffer) {
-        return new EthUint(ValueRef.of(buffer), MAX_BIT_SIZE);
+        return new EthUint(ValueRef.of(false, buffer), MAX_BIT_SIZE);
     }
 
     @Delegate

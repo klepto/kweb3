@@ -120,15 +120,15 @@ public class HeadlongCodecTest {
         );
 
         assertEquals(
-                uint256(123456789),
+                uint256("0xF8A432EB"),
                 codec.decode(
-                        "00000000000000000000000000000000000000000000000000000000075bcd15",
+                        "00000000000000000000000000000000000000000000000000000000f8a432eb",
                         new EthSizedTypeDescriptor(EthUint.class, 256)
                 ).get(0)
         );
 
         assertEquals(
-                int256("F8A432EB"),
+                int256("0xF8A432EB"),
                 codec.decode(
                         "fffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a432eb",
                         new EthSizedTypeDescriptor(EthInt.class, 256)

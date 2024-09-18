@@ -2,7 +2,6 @@ package dev.klepto.kweb3.core.ethereum.type.primitive;
 
 import com.esaulpaugh.headlong.abi.Address;
 import com.google.common.base.Strings;
-import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
 import dev.klepto.kweb3.core.ethereum.type.reference.ValueRef;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,17 @@ public class EthAddress extends EthUint {
      * @return a new instance of address with given {@link Number} value
      */
     public static EthAddress address(Number number) {
-        return new EthAddress(ValueRef.of(number));
+        return new EthAddress(uint256(number));
+    }
+
+    /**
+     * Creates a new instance of address with given {@link ValueRef} value.
+     *
+     * @param ref the value
+     * @return a new instance of address with given {@link ValueRef} value
+     */
+    public static EthAddress address(ValueRef<?> ref) {
+        return new EthAddress(ref);
     }
 
     /**
@@ -39,17 +48,17 @@ public class EthAddress extends EthUint {
      * @return a new instance of address with given hexadecimal {@link String} value
      */
     public static EthAddress address(String hex) {
-        return new EthAddress(ValueRef.of(hex));
+        return new EthAddress(ValueRef.of(false, hex));
     }
 
     /**
-     * Creates a new instance of address with given {@link EthNumeric} value.
+     * Creates a new instance of address with given {@code byte array} value.
      *
-     * @param numeric the value
-     * @return a new instance of address with given {@link EthNumeric} value
+     * @param bytes the value
+     * @return a new instance of address with given {@code byte array} value
      */
-    public static EthAddress address(EthNumeric<?> numeric) {
-        return new EthAddress(numeric);
+    public static @NotNull EthAddress address(byte @NotNull [] bytes) {
+        return new EthAddress(ValueRef.of(false, bytes));
     }
 
     /**
@@ -59,7 +68,7 @@ public class EthAddress extends EthUint {
      * @return a new instance of address with given {@link ByteBuffer} value
      */
     public static EthAddress address(ByteBuffer buffer) {
-        return new EthAddress(ValueRef.of(buffer));
+        return new EthAddress(ValueRef.of(false, buffer));
     }
 
     private EthAddress(ValueRef<?> valueRef) {

@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.core.ethereum.type.reference;
 
 import dev.klepto.kweb3.core.ethereum.type.EthNumeric;
+import dev.klepto.kweb3.core.util.Hex;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -31,49 +32,31 @@ public class NumberRef implements ValueRef<Number> {
 
     @Override
     public byte toByte() {
-        if (value instanceof Byte) {
-            return (Byte) value;
-        }
         return value().byteValue();
     }
 
     @Override
     public short toShort() {
-        if (value instanceof Short) {
-            return (Short) value;
-        }
         return value().shortValue();
     }
 
     @Override
     public int toInt() {
-        if (value instanceof Integer) {
-            return (Integer) value;
-        }
         return value().intValue();
     }
 
     @Override
     public long toLong() {
-        if (value instanceof Long) {
-            return (Long) value;
-        }
         return value().longValue();
     }
 
     @Override
     public float toFloat() {
-        if (value instanceof Float) {
-            return (Float) value;
-        }
         return value().floatValue();
     }
 
     @Override
     public double toDouble() {
-        if (value instanceof Double) {
-            return (Double) value;
-        }
         return value().doubleValue();
     }
 
@@ -97,8 +80,7 @@ public class NumberRef implements ValueRef<Number> {
 
     @Override
     public String toHex() {
-        var hex = toBigInteger().toString(16);
-        return "0x" + hex;
+        return Hex.toHex(toByteArray());
     }
 
     @Override
@@ -115,4 +97,5 @@ public class NumberRef implements ValueRef<Number> {
     public String toPlainString() {
         return toBigDecimal().toPlainString();
     }
+
 }
