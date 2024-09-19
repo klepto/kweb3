@@ -27,6 +27,21 @@ public class ByteBufferRefTest {
     }
 
     @Test
+    public void testRefMaintainsBufferState() {
+        val buffer = ByteBuffer.allocate(Long.BYTES * 2);
+        val first = 0x1234567890abcdefL;
+        val second = 0xfedcba0987654321L;
+        buffer.putLong(first);
+        buffer.putLong(second);
+        buffer.flip();
+        // Skip first long, meaning our ref should point to the second long
+        buffer.position(buffer.position() + Long.BYTES);
+
+        val ref = new ByteBufferRef(false, buffer);
+        assertEquals(second, ref.toLong());
+    }
+
+    @Test
     public void testBoolean() {
         val refTrue = createRef(1);
         val refFalse = createRef(0);

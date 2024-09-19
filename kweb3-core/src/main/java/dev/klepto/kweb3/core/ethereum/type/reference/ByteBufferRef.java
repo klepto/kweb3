@@ -19,12 +19,12 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     public ByteBufferRef(boolean signed, ByteBuffer value) {
         this.signed = signed;
-        this.value = value;
+        this.value = value.asReadOnlyBuffer();
     }
 
     @Override
     public ByteBuffer value() {
-        return value;
+        return value.duplicate();
     }
 
     @Override
@@ -34,55 +34,37 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public byte toByte() {
-        if (value.remaining() == 0) {
-            return 0;
-        }
-        return value.get(0);
+        return isReadable() ? value.get(value.position()) : 0;
     }
 
     @Override
     public short toShort() {
-        if (value.remaining() < 2) {
-            return toByte();
-        }
-        return value.getShort(0);
+        return isReadable(Short.BYTES) ? value.getShort(value.position()) : toByte();
     }
 
     @Override
     public int toInt() {
-        if (value.remaining() < 4) {
-            return toShort();
-        }
-        return value.getInt(0);
+        return isReadable(Integer.BYTES) ? value.getInt(value.position()) : toShort();
     }
 
     @Override
     public long toLong() {
-        if (value.remaining() < 8) {
-            return toInt();
-        }
-        return value.getLong(0);
+        return isReadable(Long.BYTES) ? value.getLong(value.position()) : toInt();
     }
 
     @Override
     public float toFloat() {
-        if (value.remaining() < 4) {
-            return toShort();
-        }
-        return toInt();
+        return isReadable(Float.BYTES) ? (float) toInt() : (float) toShort();
     }
 
     @Override
     public double toDouble() {
-        if (value.remaining() < 8) {
-            return toFloat();
-        }
-        return toLong();
+        return isReadable(Double.BYTES) ? (double) toLong() : (double) toFloat();
     }
 
     @Override
     public BigInteger toBigInteger() {
-        if (value.remaining() == 0) {
+        if (!isReadable()) {
             return BigInteger.ZERO;
         }
         if (signed) {
@@ -94,41 +76,42 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
 
     @Override
     public BigDecimal toBigDecimal() {
-        if (value.remaining() == 0) {
-            return BigDecimal.ZERO;
-        }
         return new BigDecimal(toBigInteger());
     }
 
     @Override
     public String toHex() {
-        if (value.remaining() == 0) {
-            return "0x0";
-        }
-        return Hex.toHex(toByteArray());
+        return isReadable() ? Hex.toHex(toByteArray()) : EMPTY_HEX;
     }
 
     @Override
     public ByteBuffer toByteBuffer() {
-        return value;
+        return value();
     }
 
     @Override
     public byte[] toByteArray() {
-        if (value.remaining() == 0) {
-            return new byte[0];
+        if (!isReadable()) {
+            return EMPTY;
         }
-
-        byte[] array = new byte[value.remaining()];
-        value.get(0, array);
-        return array;
+        byte[] bytes = new byte[value.remaining()];
+        value.get(value.position(), bytes);
+        return bytes;
     }
 
     @Override
     public String toPlainString() {
-        if (value.remaining() == 0) {
-            return "0";
-        }
         return toBigInteger().toString();
     }
+
+    private boolean isReadable() {
+        return isReadable(1);
+    }
+
+    private boolean isReadable(int bytes) {
+        return value.remaining() >= bytes;
+    }
+
+    private static final byte[] EMPTY = new byte[0];
+    private static final String EMPTY_HEX = "0x0";
 }
