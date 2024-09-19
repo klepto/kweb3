@@ -1,6 +1,7 @@
 package dev.klepto.kweb3.ethereum.type.reference;
 
 import dev.klepto.kweb3.core.ethereum.type.reference.ByteBufferRef;
+import dev.klepto.kweb3.core.util.Hex;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
+import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -17,17 +19,40 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class ByteBufferRefTest {
 
-    private static ByteBufferRef createRef(Number value) {
-        var bigInteger = BigInteger.valueOf(value.longValue());
-        if (value instanceof BigInteger) {
-            bigInteger = (BigInteger) value;
+    private static ByteBufferRef createRef(Object object) {
+        BigInteger bigint;
+        if (object instanceof BigInteger value) {
+          bigint = value;
+        } else if (object instanceof Number value) {
+          bigint = BigInteger.valueOf(value.longValue());
+        } else if (object instanceof String value) {
+          bigint = Hex.toBigInteger(value);
+        } else {
+          throw new IllegalArgumentException("Unsupported object type: " + object.getClass());
         }
-        val buffer = ByteBuffer.wrap(bigInteger.toByteArray());
-        return new ByteBufferRef(false, buffer);
+        return new ByteBufferRef(false, ByteBuffer.wrap(bigint.toByteArray()));
     }
 
     @Test
-    public void testRefMaintainsBufferState() {
+    public void testHexZero() {
+      val decimalZero = createRef(0);
+      assertEquals(0, decimalZero.toLong());
+
+      val hexZeroZero = createRef("0x00");
+      assertEquals(0, hexZeroZero.toLong());
+
+      val slimHexZero = createRef("0x");
+      assertEquals(0, slimHexZero.toLong());
+
+      val fullZero = createRef("0x0000000000000000000000000000000000000000");
+      assertEquals(0, fullZero.toLong());
+
+      val stringDecimalZero = createRef("0");
+      assertEquals(0, stringDecimalZero.toLong());
+    }
+
+    @Test
+    public void testPersistentBufferPosition() {
         val buffer = ByteBuffer.allocate(Long.BYTES * 2);
         val first = 0x1234567890abcdefL;
         val second = 0xfedcba0987654321L;

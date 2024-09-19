@@ -25,13 +25,19 @@ public final class Hex {
      * @return a byte array containing decoded hexadecimal string
      */
     public static byte @NotNull [] toByteArray(@NotNull String hex) {
-        if (hex.startsWith(PREFIX)) {
-            hex = hex.substring(2);
+        int offset = 0, length = hex.length();
+        if (length >= 2 && hex.charAt(0) == '0' && (hex.charAt(1) == 'x' || hex.charAt(1) == 'X')) {
+            offset = 2;
+            length -= 2;
         }
-        if (hex.isEmpty()) {
+        if (length == 0) {
             return EMPTY_BYTES;
         }
-        return FastHex.decode(hex);
+        // Support "0x0" as a valid hex string
+        if (length == 1 && hex.charAt(offset) == '0') {
+            return EMPTY_BYTES;
+        }
+        return FastHex.decode(hex, offset, length);
     }
 
     /**
