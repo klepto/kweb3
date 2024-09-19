@@ -160,6 +160,7 @@ public interface ValueRef<T> {
      *
      * @return value as a plain {@link String}
      */
-    String toPlainString();
-
+    default String toPlainString() {
+      return toBigDecimal().stripTrailingZeros().toPlainString();
+    }
 }

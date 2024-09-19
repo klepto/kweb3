@@ -93,9 +93,4 @@ public class NumberRef implements ValueRef<Number> {
         return toBigInteger().toByteArray();
     }
 
-    @Override
-    public String toPlainString() {
-        return toBigDecimal().toPlainString();
-    }
-
 }
