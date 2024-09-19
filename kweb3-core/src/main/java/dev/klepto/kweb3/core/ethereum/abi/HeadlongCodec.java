@@ -269,7 +269,7 @@ public class HeadlongCodec implements AbiCodec {
      * @return the headlong-compatible byte array value
      */
     private byte[] encodeBytes(EthBytes value) {
-        return value.toByteBuffer().array();
+        return value.toByteArray();
     }
 
     /**
