@@ -209,7 +209,7 @@ public class HeadlongCodec implements AbiCodec {
     private String encode(EthTuple value, TypeDescriptor descriptor) {
         val tupleType = TupleType.parse(descriptor.toAbiDescriptor());
         val result = tupleType.encode((Tuple) encodeValue(value)).array();
-        return Hex.toHex(result);
+        return Hex.toHex(result, false); /* no prefix */
     }
 
     /**
