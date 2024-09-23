@@ -81,7 +81,7 @@ public interface EthNumeric<T extends EthNumeric<T>> extends EthValue, ValueRef<
          */
         @Override
         default int compareTo(@NotNull Number other) {
-            return toBigDecimal().compareTo(parseBigDecimal(other));
+            return toBigInteger().compareTo(parseBigDecimal(other).toBigInteger());
         }
 
         /**

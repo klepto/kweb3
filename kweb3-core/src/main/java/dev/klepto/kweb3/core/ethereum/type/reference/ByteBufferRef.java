@@ -99,6 +99,11 @@ public class ByteBufferRef implements ValueRef<ByteBuffer> {
         return bytes;
     }
 
+    @Override
+    public String toPlainString() {
+        return toBigInteger().toString();
+    }
+
     private boolean isReadable() {
         return isReadable(1);
     }
