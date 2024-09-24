@@ -64,6 +64,8 @@ public class NumberRef implements ValueRef<Number> {
     public BigInteger toBigInteger() {
         if (value instanceof BigInteger) {
             return (BigInteger) value;
+        } else if (value instanceof BigDecimal) {
+            return ((BigDecimal) value).toBigInteger();
         }
         return BigInteger.valueOf(toLong());
     }
