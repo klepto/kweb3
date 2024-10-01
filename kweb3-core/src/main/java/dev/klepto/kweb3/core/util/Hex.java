@@ -1,6 +1,5 @@
 package dev.klepto.kweb3.core.util;
 
-import com.esaulpaugh.headlong.util.FastHex;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +11,6 @@ import java.math.BigInteger;
  * @author <a href="http://github.com/klepto">Augustinas R.</a>
  */
 public final class Hex {
-    private static final byte[] EMPTY_BYTES = new byte[0];
     private static final String PREFIX = "0x";
 
     private Hex() {
@@ -25,19 +23,7 @@ public final class Hex {
      * @return a byte array containing decoded hexadecimal string
      */
     public static byte @NotNull [] toByteArray(@NotNull String hex) {
-        int offset = 0, length = hex.length();
-        if (length >= 2 && hex.charAt(0) == '0' && (hex.charAt(1) == 'x' || hex.charAt(1) == 'X')) {
-            offset = 2;
-            length -= 2;
-        }
-        if (length == 0) {
-            return EMPTY_BYTES;
-        }
-        // Support "0x0" as a valid hex string
-        if (length == 1 && hex.charAt(offset) == '0') {
-            return EMPTY_BYTES;
-        }
-        return FastHex.decode(hex, offset, length);
+        return FastHex.decode(hex);
     }
 
     /**

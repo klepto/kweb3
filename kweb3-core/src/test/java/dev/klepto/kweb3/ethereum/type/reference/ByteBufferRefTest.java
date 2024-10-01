@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
-import static dev.klepto.kweb3.core.ethereum.type.primitive.EthAddress.address;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -46,9 +45,6 @@ public class ByteBufferRefTest {
 
       val fullZero = createRef("0x0000000000000000000000000000000000000000");
       assertEquals(0, fullZero.toLong());
-
-      val stringDecimalZero = createRef("0");
-      assertEquals(0, stringDecimalZero.toLong());
     }
 
     @Test
