@@ -15,8 +15,6 @@
 */
 package dev.klepto.kweb3.core.util;
 
-import com.esaulpaugh.headlong.util.Integers;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.function.IntUnaryOperator;
@@ -84,29 +82,64 @@ public final class FastHex {
   }
 
   public static byte[] decode(CharSequence hex, int offset, int len) {
-    return decode(offset, len, hex::charAt);
+    var currOffset = offset;
+
+    if (hex.length() >= 2 && hex.charAt(0) == '0' && (hex.charAt(1) == 'x' || hex.charAt(1) == 'X')) {
+      currOffset += 2;
+    }
+
+    if (hex.length() == currOffset) {
+      return EMPTY_BYTES;
+    }
+
+    return decode(currOffset, len, hex::charAt);
   }
 
   public static byte[] decode(byte[] hexBytes, int offset, int len) {
-    return decode(offset, len, o -> hexBytes[o]);
+    var currOffset = offset;
+    var currLength = len;
+
+    if (currLength >= 2 && hexBytes[currOffset] == BYTE_0 && hexBytes[currOffset + 1] == BYTE_X) {
+      currOffset += 2;
+      currLength -= 2;
+    }
+
+    if (currLength == 0) {
+      return EMPTY_BYTES;
+    }
+
+    return decode(currOffset, currLength, o -> hexBytes[o]);
   }
 
   private static byte[] decode(int offset, int len, IntUnaryOperator extractor) {
-    final byte[] dest = new byte[decodedLength(len)];
-    for (int i = 0; i < dest.length; i++, offset += CHARS_PER_BYTE) {
-      dest[i] = (byte) decodeByte(extractor, offset);
+    byte[] dest;
+    int destPos = 0;
+
+    if ((len & 1) != 0) {
+      // If the hex string has an odd length, decode the first single hex character (nibble) separately,
+      // as it represents half a byte. This adjusts the offset so the remaining string can be processed normally.
+      int b = DECODE_TABLE[extractor.applyAsInt(offset)];
+      if (b < 0) {
+        throw new IllegalArgumentException("Illegal hex value at offset " + offset);
+      }
+
+      dest = new byte[(len + 1 - offset) / CHARS_PER_BYTE];
+      dest[destPos++] = (byte) b;
+    } else {
+      dest = new byte[(len - offset) / CHARS_PER_BYTE];
+    }
+
+    while (destPos < dest.length) {
+      dest[destPos++] = (byte) decodeByte(extractor, offset);
+      offset += CHARS_PER_BYTE;
     }
     return dest;
   }
 
-  public static int decodedLength(int encodedLen) {
-    if (!Integers.isMultiple(encodedLen, CHARS_PER_BYTE)) {
-      throw new IllegalArgumentException("len must be a multiple of two");
-    }
-    return encodedLen / CHARS_PER_BYTE;
-  }
-
   private static final int[] DECODE_TABLE = new int[256];
+  private static final byte BYTE_0 = (byte) '0';
+  private static final byte BYTE_X = (byte) 'x';
+  private static final byte[] EMPTY_BYTES = new byte[0];
 
   static {
     Arrays.fill(DECODE_TABLE, -(0xF << BITS_PER_CHAR) - 1);
@@ -128,4 +161,5 @@ public final class FastHex {
       throw new IllegalArgumentException("illegal hex val @ " + offset, aioobe);
     }
   }
+
 }
