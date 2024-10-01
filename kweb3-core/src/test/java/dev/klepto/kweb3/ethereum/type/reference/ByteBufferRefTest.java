@@ -37,14 +37,20 @@ public class ByteBufferRefTest {
       val decimalZero = createRef(0);
       assertEquals(0, decimalZero.toLong());
 
-      val hexZeroZero = createRef("0x00");
-      assertEquals(0, hexZeroZero.toLong());
+      val prefixedOneByteZero = createRef("0x00");
+      assertEquals(0, prefixedOneByteZero.toLong());
 
-      val slimHexZero = createRef("0x");
-      assertEquals(0, slimHexZero.toLong());
+      val oneByteZero = createRef("00");
+      assertEquals(0, oneByteZero.toLong());
 
-      val fullZero = createRef("0x0000000000000000000000000000000000000000");
-      assertEquals(0, fullZero.toLong());
+      val prefix = createRef("0x");
+      assertEquals(0, prefix.toLong());
+
+      val twentyByteZero = createRef("0000000000000000000000000000000000000000");
+      assertEquals(BigInteger.ZERO, twentyByteZero.toBigInteger());
+
+      val prefixedTwentyByteZero = createRef("0x0000000000000000000000000000000000000000");
+      assertEquals(BigInteger.ZERO, prefixedTwentyByteZero.toBigInteger());
     }
 
     @Test
