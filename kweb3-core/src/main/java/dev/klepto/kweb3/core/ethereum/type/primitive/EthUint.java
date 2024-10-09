@@ -199,4 +199,38 @@ public class EthUint extends Number implements EthNumeric<EthUint>, EthNumeric.M
         return minus(1);
     }
 
+    public static final EthUint MIN_UINT = uint256(BigInteger.ZERO);
+
+    public static final EthUint MAX_UINT8 = uint256(BigInteger.valueOf(2).pow(8).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT16 = uint256(BigInteger.valueOf(2).pow(16).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT24 = uint256(BigInteger.valueOf(2).pow(24).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT32 = uint256(BigInteger.valueOf(2).pow(32).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT40 = uint256(BigInteger.valueOf(2).pow(40).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT48 = uint256(BigInteger.valueOf(2).pow(48).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT56 = uint256(BigInteger.valueOf(2).pow(56).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT64 = uint256(BigInteger.valueOf(2).pow(64).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT72 = uint256(BigInteger.valueOf(2).pow(72).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT80 = uint256(BigInteger.valueOf(2).pow(80).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT88 = uint256(BigInteger.valueOf(2).pow(88).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT96 = uint256(BigInteger.valueOf(2).pow(96).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT104 = uint256(BigInteger.valueOf(2).pow(104).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT112 = uint256(BigInteger.valueOf(2).pow(112).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT120 = uint256(BigInteger.valueOf(2).pow(120).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT128 = uint256(BigInteger.valueOf(2).pow(128).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT136 = uint256(BigInteger.valueOf(2).pow(136).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT144 = uint256(BigInteger.valueOf(2).pow(144).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT152 = uint256(BigInteger.valueOf(2).pow(152).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT160 = uint256(BigInteger.valueOf(2).pow(160).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT168 = uint256(BigInteger.valueOf(2).pow(168).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT176 = uint256(BigInteger.valueOf(2).pow(176).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT184 = uint256(BigInteger.valueOf(2).pow(184).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT192 = uint256(BigInteger.valueOf(2).pow(192).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT200 = uint256(BigInteger.valueOf(2).pow(200).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT208 = uint256(BigInteger.valueOf(2).pow(208).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT216 = uint256(BigInteger.valueOf(2).pow(216).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT224 = uint256(BigInteger.valueOf(2).pow(224).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT232 = uint256(BigInteger.valueOf(2).pow(232).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT240 = uint256(BigInteger.valueOf(2).pow(240).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT248 = uint256(BigInteger.valueOf(2).pow(248).subtract(BigInteger.ONE));
+    public static final EthUint MAX_UINT256 = uint256(BigInteger.valueOf(2).pow(256).subtract(BigInteger.ONE));
 }

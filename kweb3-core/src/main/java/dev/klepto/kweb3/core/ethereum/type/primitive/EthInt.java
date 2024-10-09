@@ -7,6 +7,7 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
@@ -200,4 +201,69 @@ public class EthInt extends Number implements EthNumeric<EthInt>, EthNumeric.Mat
         return minus(1);
     }
 
+    public static final EthInt MIN_INT8 = int256(BigInteger.valueOf(-2).pow(7));
+    public static final EthInt MIN_INT16 = int256(BigInteger.valueOf(-2).pow(15));
+    public static final EthInt MIN_INT24 = int256(BigInteger.valueOf(-2).pow(23));
+    public static final EthInt MIN_INT32 = int256(BigInteger.valueOf(-2).pow(31));
+    public static final EthInt MIN_INT40 = int256(BigInteger.valueOf(-2).pow(39));
+    public static final EthInt MIN_INT48 = int256(BigInteger.valueOf(-2).pow(47));
+    public static final EthInt MIN_INT56 = int256(BigInteger.valueOf(-2).pow(55));
+    public static final EthInt MIN_INT64 = int256(BigInteger.valueOf(-2).pow(63));
+    public static final EthInt MIN_INT72 = int256(BigInteger.valueOf(-2).pow(71));
+    public static final EthInt MIN_INT80 = int256(BigInteger.valueOf(-2).pow(79));
+    public static final EthInt MIN_INT88 = int256(BigInteger.valueOf(-2).pow(87));
+    public static final EthInt MIN_INT96 = int256(BigInteger.valueOf(-2).pow(95));
+    public static final EthInt MIN_INT104 = int256(BigInteger.valueOf(-2).pow(103));
+    public static final EthInt MIN_INT112 = int256(BigInteger.valueOf(-2).pow(111));
+    public static final EthInt MIN_INT120 = int256(BigInteger.valueOf(-2).pow(119));
+    public static final EthInt MIN_INT128 = int256(BigInteger.valueOf(-2).pow(127));
+    public static final EthInt MIN_INT136 = int256(BigInteger.valueOf(-2).pow(135));
+    public static final EthInt MIN_INT144 = int256(BigInteger.valueOf(-2).pow(143));
+    public static final EthInt MIN_INT152 = int256(BigInteger.valueOf(-2).pow(151));
+    public static final EthInt MIN_INT160 = int256(BigInteger.valueOf(-2).pow(159));
+    public static final EthInt MIN_INT168 = int256(BigInteger.valueOf(-2).pow(167));
+    public static final EthInt MIN_INT176 = int256(BigInteger.valueOf(-2).pow(175));
+    public static final EthInt MIN_INT184 = int256(BigInteger.valueOf(-2).pow(183));
+    public static final EthInt MIN_INT192 = int256(BigInteger.valueOf(-2).pow(191));
+    public static final EthInt MIN_INT200 = int256(BigInteger.valueOf(-2).pow(199));
+    public static final EthInt MIN_INT208 = int256(BigInteger.valueOf(-2).pow(207));
+    public static final EthInt MIN_INT216 = int256(BigInteger.valueOf(-2).pow(215));
+    public static final EthInt MIN_INT224 = int256(BigInteger.valueOf(-2).pow(223));
+    public static final EthInt MIN_INT232 = int256(BigInteger.valueOf(-2).pow(231));
+    public static final EthInt MIN_INT240 = int256(BigInteger.valueOf(-2).pow(239));
+    public static final EthInt MIN_INT248 = int256(BigInteger.valueOf(-2).pow(247));
+    public static final EthInt MIN_INT256 = int256(BigInteger.valueOf(-2).pow(255));
+
+    public static final EthInt MAX_INT8 = int256(BigInteger.valueOf(2).pow(7).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT16 = int256(BigInteger.valueOf(2).pow(15).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT24 = int256(BigInteger.valueOf(2).pow(23).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT32 = int256(BigInteger.valueOf(2).pow(31).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT40 = int256(BigInteger.valueOf(2).pow(39).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT48 = int256(BigInteger.valueOf(2).pow(47).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT56 = int256(BigInteger.valueOf(2).pow(55).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT64 = int256(BigInteger.valueOf(2).pow(63).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT72 = int256(BigInteger.valueOf(2).pow(71).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT80 = int256(BigInteger.valueOf(2).pow(79).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT88 = int256(BigInteger.valueOf(2).pow(87).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT96 = int256(BigInteger.valueOf(2).pow(95).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT104 = int256(BigInteger.valueOf(2).pow(103).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT112 = int256(BigInteger.valueOf(2).pow(111).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT120 = int256(BigInteger.valueOf(2).pow(119).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT128 = int256(BigInteger.valueOf(2).pow(127).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT136 = int256(BigInteger.valueOf(2).pow(135).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT144 = int256(BigInteger.valueOf(2).pow(143).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT152 = int256(BigInteger.valueOf(2).pow(151).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT160 = int256(BigInteger.valueOf(2).pow(159).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT168 = int256(BigInteger.valueOf(2).pow(167).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT176 = int256(BigInteger.valueOf(2).pow(175).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT184 = int256(BigInteger.valueOf(2).pow(183).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT192 = int256(BigInteger.valueOf(2).pow(191).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT200 = int256(BigInteger.valueOf(2).pow(199).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT208 = int256(BigInteger.valueOf(2).pow(207).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT216 = int256(BigInteger.valueOf(2).pow(215).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT224 = int256(BigInteger.valueOf(2).pow(223).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT232 = int256(BigInteger.valueOf(2).pow(231).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT240 = int256(BigInteger.valueOf(2).pow(239).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT248 = int256(BigInteger.valueOf(2).pow(247).subtract(BigInteger.ONE));
+    public static final EthInt MAX_INT256 = int256(BigInteger.valueOf(2).pow(255).subtract(BigInteger.ONE));
 }
